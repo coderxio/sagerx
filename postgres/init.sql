@@ -1,0 +1,7 @@
+CREATE USER airflow WITH ENCRYPTED PASSWORD 'airflow';
+CREATE DATABASE airflow;
+GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;
+
+CREATE SCHEMA staging;
+CREATE SCHEMA datasource;
+CREATE SCHEMA flatfile;

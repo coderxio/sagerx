@@ -13,7 +13,7 @@ x-airflow-common:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
-    # - ./data:/opt/airflow/data
+    - ./data:/opt/airflow/data
 
 services:
   db:
@@ -23,6 +23,7 @@ services:
       POSTGRES_DB: sagerx
     volumes:
       - ./postgres:/docker-entrypoint-initdb.d
+      - ./data:/opt/airflow/data
 
   pgadmin:
     environment:

@@ -1,0 +1,26 @@
+version: '3.8'
+x-airflow-image:
+  &airflow-image
+  image: apache/airflow:2.1.4
+
+services:
+
+  db:
+    image: postgres:14-alpine
+    container_name: postgres
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+
+  airflow-init:
+    <<: *airflow-image
+    container_name: airflow-init
+
+  airflow-webserver:
+    <<: *airflow-image
+    container_name: airflow-webserver
+
+  airflow-scheduler:
+    <<: *airflow-image
+    container_name: airflow-scheduler

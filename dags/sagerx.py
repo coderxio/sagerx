@@ -11,6 +11,17 @@ def create_path(*args):
     return p
 
 
+# SQL functions
+def read_sql_file(sql_path: str):
+    """reads a sql file and returns the string when given a path
+    sql_path = path as string to sql file"""
+
+    fd = open(sql_path, "r")
+    sql_string = fd.read()
+    fd.close()
+    return sql_string
+
+
 # Web functions
 def download_dataset(url: str, dest: os.PathLike = Path.cwd(), file_name: str = None):
     """Downloads a data set file from provided Url via a requests steam

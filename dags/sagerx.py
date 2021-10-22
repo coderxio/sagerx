@@ -63,3 +63,20 @@ def get_dataset(ds_url, data_folder, ti):
 
     file_path_str = file_path.resolve().as_posix()
     ti.xcom_push(key="file_path", value=file_path_str)
+
+
+def get_sql_list(pre_str: str = "", ds_path: os.PathLike = Path.cwd()):
+    """When given a folder path returns all .sql files in it as a list
+
+    pre_str = determines what sql files to grab by matching str at start of name
+    ds_path = folder path to grab sqls from"""
+    import glob
+    import os
+
+    glob_folder = ds_path.resolve().as_posix()
+    glob_path = glob_folder + "/" + pre_str + "*.sql"
+    sql_file_list = []
+    for path in glob.glob(glob_path):
+        file = os.path.basename(path)
+        sql_file_list.append(file)
+    return sql_file_list

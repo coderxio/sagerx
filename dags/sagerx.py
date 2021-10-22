@@ -1,7 +1,9 @@
+from pathlib import Path
+import os
+
 # Filesystem functions
 def create_path(*args):
     """creates and returns folder path object if it does not exist"""
-    from pathlib import Path
 
     p = Path.cwd().joinpath(*args)
     if not p.exists():
@@ -39,7 +41,6 @@ def get_dataset(ds_url, data_folder, ti):
     data_folder = path to save dataset to
     ti = airflow parameter to store task instance for xcoms"""
     import zipfile
-    import os
 
     file_path = download_dataset(url=ds_url, dest=data_folder)
 

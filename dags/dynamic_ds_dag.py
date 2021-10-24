@@ -11,7 +11,13 @@ data_set_list = [
         "schedule": "0 6 * * 5",  # run a 6am every thur (url marco minuses day to get wed)
         "url": "https://download.medicaid.gov/data/nadac-national-average-drug-acquisition-cost-{{ macros.ds_format( macros.ds_add(ds ,-1), '%Y-%m-%d', '%m-%d-%Y' ) }}.csv",
         #   "url": "https://download.medicaid.gov/data/nadac-national-average-drug-acquisition-cost-10-20-2021.csv"
-    }
+    },
+    {
+        "dag_id": "cms_noc_pricing",
+        "schedule": "0 0 20 */3 *",  # runs every quarter on the 20th day of the month
+        "url": "https://www.cms.gov/files/zip/{{ macros.ds_format(ds, '%Y-%m-%d', '%B-%Y' ) }}-noc-pricing-file.zip",
+        #   "url": "https://www.cms.gov/files/zip/october-2021-noc-pricing-file.zip"
+    },
 ]
 
 ########################### DYNAMIC DAG DO NOT TOUCH BELOW HERE #################################

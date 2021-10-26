@@ -17,6 +17,11 @@ data_set_list = [
         "schedule": "0 4 * * *",  # run a 4am every day
         "url": "https://www.accessdata.fda.gov/cder/ndctext.zip",
     },
+    {
+        "dag_id": "fda_unfinished",
+        "schedule": "15 4 * * *",  # run a 4:15am every day
+        "url": "https://www.accessdata.fda.gov/cder/ndc_unfinished.zip",
+    },
 ]
 
 ########################### DYNAMIC DAG DO NOT TOUCH BELOW HERE #################################

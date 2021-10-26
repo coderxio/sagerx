@@ -13,6 +13,11 @@ data_set_list = [
         #   "url": "https://download.medicaid.gov/data/nadac-national-average-drug-acquisition-cost-10-20-2021.csv"
     },
     {
+        "dag_id": "fda_ndc",
+        "schedule": "0 4 * * *",  # run a 4am every day
+        "url": "https://www.accessdata.fda.gov/cder/ndctext.zip",
+    },
+    {
         "dag_id": "fda_unfinished",
         "schedule": "15 4 * * *",  # run a 4:15am every day
         "url": "https://www.accessdata.fda.gov/cder/ndc_unfinished.zip",

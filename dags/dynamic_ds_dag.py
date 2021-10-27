@@ -13,6 +13,11 @@ data_set_list = [
         #   "url": "https://download.medicaid.gov/data/nadac-national-average-drug-acquisition-cost-10-20-2021.csv"
     },
     {
+        "dag_id": "fda_excluded",
+        "schedule": "30 4 * * *",  # run a 4:30am every day
+        "url": "https://www.accessdata.fda.gov/cder/ndc_excluded.zip",
+    },
+    {
         "dag_id": "fda_ndc",
         "schedule": "0 4 * * *",  # run a 4am every day
         "url": "https://www.accessdata.fda.gov/cder/ndctext.zip",
@@ -23,6 +28,7 @@ data_set_list = [
         "url": "https://www.accessdata.fda.gov/cder/ndc_unfinished.zip",
     },
 ]
+
 
 ########################### DYNAMIC DAG DO NOT TOUCH BELOW HERE #################################
 

@@ -30,13 +30,20 @@ def download_dataset(url: str, dest: os.PathLike = Path.cwd(), file_name: str = 
     dest = path to save downloaded file to
     filename = name to call file, if None last segement of url is used"""
     import requests
+    import re
 
-    if file_name == None:
-        dest_path = create_path(dest) / url.split("/")[-1]
-    else:
-        dest_path = create_path(dest) / file_name
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
+        if file_name == None:
+            if "Content-Disposition" in r.headers.keys():
+                file_name = re.findall(
+                    "filename=(.+)", r.headers["Content-Disposition"]
+                )[0]
+            else:
+                file_name = url.split("/")[-1]
+            dest_path = create_path(dest) / file_name
+        else:
+            dest_path = create_path(dest) / file_name
         with open(dest_path, "wb") as f:
             for chunk in r.iter_content(chunk_size=8192):
                 f.write(chunk)

@@ -13,6 +13,11 @@ data_set_list = [
         #   "url": "https://download.medicaid.gov/data/nadac-national-average-drug-acquisition-cost-10-20-2021.csv"
     },
     {
+        "dag_id": "cms_asp_pricing",
+        "schedule": "0 0 20 */3 *",  # runs once every quarter on the 20th of each month
+        "url": "https://www.cms.gov/files/zip/{{ macros.ds_format(ds, '%Y-%m-%d', '%B-%Y' ) }}-asp-pricing-file.zip"
+        #   "url": "https://www.cms.gov/files/zip/october-2021-asp-pricing-file.zip"
+
         "dag_id": "fda_excluded",
         "schedule": "30 4 * * *",  # run a 4:30am every day
         "url": "https://www.accessdata.fda.gov/cder/ndc_excluded.zip",

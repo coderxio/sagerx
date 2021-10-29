@@ -17,8 +17,23 @@ data_set_list = [
         "schedule": "0 0 20 */3 *",  # runs once every quarter on the 20th of each month
         "url": "https://www.cms.gov/files/zip/{{ macros.ds_format(ds, '%Y-%m-%d', '%B-%Y' ) }}-asp-pricing-file.zip"
         #   "url": "https://www.cms.gov/files/zip/october-2021-asp-pricing-file.zip"
+
+        "dag_id": "fda_excluded",
+        "schedule": "30 4 * * *",  # run a 4:30am every day
+        "url": "https://www.accessdata.fda.gov/cder/ndc_excluded.zip",
+    },
+    {
+        "dag_id": "fda_ndc",
+        "schedule": "0 4 * * *",  # run a 4am every day
+        "url": "https://www.accessdata.fda.gov/cder/ndctext.zip",
+    },
+    {
+        "dag_id": "fda_unfinished",
+        "schedule": "15 4 * * *",  # run a 4:15am every day
+        "url": "https://www.accessdata.fda.gov/cder/ndc_unfinished.zip",
     },
 ]
+
 
 ########################### DYNAMIC DAG DO NOT TOUCH BELOW HERE #################################
 

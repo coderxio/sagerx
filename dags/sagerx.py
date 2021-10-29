@@ -52,6 +52,7 @@ def get_dataset(ds_url, data_folder, ti):
     data_folder = path to save dataset to
     ti = airflow parameter to store task instance for xcoms"""
     import zipfile
+    import logging
 
     file_path = download_dataset(url=ds_url, dest=data_folder)
 
@@ -63,6 +64,8 @@ def get_dataset(ds_url, data_folder, ti):
 
     file_path_str = file_path.resolve().as_posix()
     ti.xcom_push(key="file_path", value=file_path_str)
+    logging.info(f"requested url: {ds_url}")
+    logging.info(f"created dataset at path: {file_path}")
 
 
 def get_sql_list(pre_str: str = "", ds_path: os.PathLike = Path.cwd()):

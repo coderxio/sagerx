@@ -124,11 +124,6 @@ def create_dag(dag_id, schedule, url, default_args):
 
 # builds a dag for each data set in data_set_list
 for ds in data_set_list:
-
-    dag_id = ds["dag_id"]
-    schedule = ds["schedule"]
-    url = ds["url"]
-
     default_args = {
         "owner": "airflow",
         "start_date": days_ago(0),
@@ -139,5 +134,7 @@ for ds in data_set_list:
         "retries": 1,
         "retry_delay": timedelta(minutes=5),
     }
+
+    default_args = {**default_args, **ds}
 
     globals()[dag_id] = create_dag(dag_id, schedule, url, default_args)

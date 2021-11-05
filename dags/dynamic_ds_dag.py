@@ -63,6 +63,7 @@ def create_dag(dag_args):
 
     dag_id = dag_args["dag_id"]
     url = dag_args["url"]
+    retrieve_dataset_function = dag_args["retrieve_dataset_function"]
 
     dag = DAG(dag_id, default_args=dag_args, description=f"Processes {dag_id} source")
 
@@ -74,7 +75,7 @@ def create_dag(dag_args):
         # Task to download data from web location
         get_data = PythonOperator(
             task_id=f"get_{dag_id}",
-            python_callable=get_dataset,
+            python_callable=retrieve_dataset_function,
             op_kwargs={"ds_url": url, "data_folder": data_folder},
         )
 
@@ -132,6 +133,8 @@ for ds in data_set_list:
         "email_on_retry": False,
         "retries": 1,
         "retry_delay": timedelta(minutes=5),
+        # none airflow common dag elements
+        "retrieve_dataset_function": get_dataset,
     }
 
     dag_args = {**default_args, **ds}

@@ -1,17 +1,21 @@
 from datetime import date, timedelta
 from textwrap import dedent
 from pathlib import Path
+import calendar
 
 from sagerx import get_dataset, read_sql_file, get_sql_list
 
 import user_macros
 
-
 data_set_list = [
     {
         "dag_id": "nadac",
         "schedule_interval": "0 6 * * 5",  # run a 6am every thur (url marco minuses day to get wed)
-        "url": "https://download.medicaid.gov/data/nadac-national-average-drug-acquisition-cost-{{ macros.ds_format( macros.ds_add(ds ,-1), '%Y-%m-%d', '%m-%d-%Y' ) }}.csv",
+        "url": "https://download.medicaid.gov/data/nadac-national-average-drug-acquisition-cost-{{ get_date_of_prior_weekday('wednesday', ds_datetime( ds ), '%m-%d-%Y' ) }}.csv",
+        "user_defined_macros": {
+            "get_date_of_prior_weekday": user_macros.get_date_of_prior_weekday,
+            "ds_datetime": user_macros.ds_datetime,
+        }
         #   "url": "https://download.medicaid.gov/data/nadac-national-average-drug-acquisition-cost-10-20-2021.csv"
     },
     {
@@ -67,7 +71,19 @@ def create_dag(dag_args):
     url = dag_args["url"]
     retrieve_dataset_function = dag_args["retrieve_dataset_function"]
 
-    dag = DAG(dag_id, default_args=dag_args, description=f"Processes {dag_id} source")
+    if "user_defined_macros" in dag_args.keys():
+        dag = DAG(
+            dag_id,
+            default_args=dag_args,
+            description=f"Processes {dag_id} source",
+            user_defined_macros=dag_args["user_defined_macros"],
+        )
+    else:
+        dag = DAG(
+            dag_id,
+            default_args=dag_args,
+            description=f"Processes {dag_id} source",
+        )
 
     ds_folder = Path("/opt/airflow/dags") / dag_id
     data_folder = Path("/opt/airflow/data") / dag_id

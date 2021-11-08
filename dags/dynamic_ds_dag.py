@@ -4,6 +4,8 @@ from pathlib import Path
 
 from sagerx import get_dataset, read_sql_file, get_sql_list
 
+import user_macros
+
 
 data_set_list = [
     {

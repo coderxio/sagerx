@@ -29,5 +29,6 @@ def get_quarter(reference_date: date) -> int:
     return (reference_date.month - 1) // 3 + 1
 
 
-def get_first_day_of_the_quarter(reference_date: date):
-    return datetime(reference_date.year, 3 * get_quarter(reference_date) + 1, 1)
+def get_first_day_of_quarter(reference_date: date):
+    quarter = get_quarter(reference_date)
+    return datetime(reference_date.year, 3 * quarter + 1, 1)

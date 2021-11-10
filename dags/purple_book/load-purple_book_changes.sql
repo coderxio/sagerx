@@ -26,7 +26,8 @@ date_of_first_licensure						TEXT,
 exclusivity_expiration_date					TEXT,
 first_interchangeable_exclusivity_exp_date	TEXT,
 ref_product_exclusivity_exp_date			TEXT,
-orphan_exclusivity_exp_date					TEXT
+orphan_exclusivity_exp_date					TEXT,
+blank										TEXT
 );
 
 COPY datasource.purple_book_changes
@@ -35,4 +36,3 @@ FROM PROGRAM 'ds_path={{ ti.xcom_pull(key='file_path', task_ids='get_purple_book
 			lineNum=$((lineNum - 5))
 			tail -n +4 "$ds_path" | head -n $lineNum'
 CSV HEADER QUOTE '"';
-

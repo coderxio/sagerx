@@ -26,7 +26,8 @@ date_of_first_licensure						TEXT,
 exclusivity_expiration_date					TEXT,
 first_interchangeable_exclusivity_exp_date	TEXT,
 ref_product_exclusivity_exp_date			TEXT,
-orphan_exclusivity_exp_date					TEXT
+orphan_exclusivity_exp_date					TEXT,
+blank										TEXT
 );
 
 COPY datasource.purple_book_extract

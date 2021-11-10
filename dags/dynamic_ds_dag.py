@@ -45,6 +45,12 @@ data_set_list = [
         "schedule_interval": "15 4 * * *",  # run a 4:15am every day
         "url": "https://www.accessdata.fda.gov/cder/ndc_unfinished.zip",
     },
+    {
+        "dag_id": "purple_book",
+        "schedule_interval": "15 0 24 1 *",  # runs once monthly on the 23rd
+        "url": "https://purplebooksearch.fda.gov/files/{{ (execution_date - macros.dateutil.relativedelta.relativedelta(months=1)).strftime('%Y') }}/purplebook-search-{{ (execution_date - macros.dateutil.relativedelta.relativedelta(months=1)).strftime('%B').lower() }}-data-download.csv",
+        # "url": "https://purplebooksearch.fda.gov/files/2021/purplebook-search-january-data-download.csv",
+    },
 ]
 
 

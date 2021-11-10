@@ -2,6 +2,10 @@ from datetime import datetime, date, timedelta
 import calendar
 
 
+def ds_datetime(ds):
+    return datetime.strptime(ds, "%Y-%m-%d")
+
+
 def get_date_of_prior_weekday(
     weekday, reference_date=date.today(), date_format="%m-%d-%Y"
 ):
@@ -21,5 +25,9 @@ def get_date_of_prior_weekday(
     return prior_weekday
 
 
-def ds_datetime(ds):
-    return datetime.strptime(ds, "%Y-%m-%d")
+def get_quarter(reference_date: date) -> int:
+    return (reference_date.month - 1) // 3 + 1
+
+
+def get_first_day_of_the_quarter(reference_date: date):
+    return datetime(reference_date.year, 3 * get_quarter(reference_date) + 1, 1)

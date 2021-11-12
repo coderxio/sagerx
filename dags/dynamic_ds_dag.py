@@ -83,19 +83,12 @@ def create_dag(dag_args):
     url = dag_args["url"]
     retrieve_dataset_function = dag_args["retrieve_dataset_function"]
 
-    if "user_defined_macros" in dag_args.keys():
-        dag = DAG(
-            dag_id,
-            default_args=dag_args,
-            description=f"Processes {dag_id} source",
-            user_defined_macros=dag_args["user_defined_macros"],
-        )
-    else:
-        dag = DAG(
-            dag_id,
-            default_args=dag_args,
-            description=f"Processes {dag_id} source",
-        )
+    dag = DAG(
+        dag_id,
+        default_args=dag_args,
+        description=f"Processes {dag_id} source",
+        user_defined_macros=dag_args.get("user_defined_macros")
+    )
 
     ds_folder = Path("/opt/airflow/dags") / dag_id
     data_folder = Path("/opt/airflow/data") / dag_id

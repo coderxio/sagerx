@@ -1,4 +1,4 @@
-Fixes coderxio/medication-diversification#ISSUE NUMBER
+Fixes coderxio/sagerx#ISSUE NUMBER
 
 ## Explanation
 [What did you change?]

@@ -1,4 +1,4 @@
-Fixes coderxio/sagerx#ISSUE NUMBER
+Resolves #ISSUE NUMBER
 
 ## Explanation
 [What did you change?]

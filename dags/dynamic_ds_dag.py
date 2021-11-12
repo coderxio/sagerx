@@ -21,20 +21,32 @@ data_set_list = [
     {
         "dag_id": "cms_noc_pricing",
         "schedule_interval": "0 0 20 */3 *",  # runs every quarter on the 20th day of the month
-        "url": "https://www.cms.gov/files/zip/{{ macros.ds_format(ds, '%Y-%m-%d', '%B-%Y' ) }}-noc-pricing-file.zip",
+        "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-noc-pricing-file.zip",
         #   "url": "https://www.cms.gov/files/zip/october-2021-noc-pricing-file.zip"
+        "user_defined_macros": {
+            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
+            "ds_datetime": user_macros.ds_datetime,
+        },
     },
     {
         "dag_id": "cms_ndc_hcpcs",
         "schedule_interval": "0 0 20 */3 *",  # runs every quarter on the 20th of the month
-        "url": "https://www.cms.gov/files/zip/{{ macros.ds_format(ds, '%Y-%m-%d', '%B-%Y')}}-asp-ndc-hcpcs-crosswalk.zip"
+        "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-asp-ndc-hcpcs-crosswalk.zip",
         # https://www.cms.gov/files/zip/october-2021-asp-ndc-hcpcs-crosswalk.zip
+        "user_defined_macros": {
+            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
+            "ds_datetime": user_macros.ds_datetime,
+        },
     },
     {
         "dag_id": "cms_asp_pricing",
         "schedule_interval": "0 0 20 */3 *",  # runs once every quarter on the 20th of each month
-        "url": "https://www.cms.gov/files/zip/{{ macros.ds_format(ds, '%Y-%m-%d', '%B-%Y' ) }}-asp-pricing-file.zip"
+        "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-asp-pricing-file.zip",
         #   "url": "https://www.cms.gov/files/zip/october-2021-asp-pricing-file.zip"
+        "user_defined_macros": {
+            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
+            "ds_datetime": user_macros.ds_datetime,
+        },
     },
     {
         "dag_id": "fda_excluded",

@@ -4,6 +4,7 @@ import calendar
 
 def ds_datetime(ds):
     return datetime.strptime(ds, "%Y-%m-%d")
+<<<<<<< HEAD
 
 
 def get_date_of_prior_weekday(
@@ -33,3 +34,5 @@ def get_first_day_of_quarter(reference_date: date, date_format="%m-%d-%Y"):
     quarter = get_quarter(reference_date)
     required_date = datetime(reference_date.year, (3 * quarter) - 2, 1)
     return required_date.strftime(date_format)
+=======
+>>>>>>> Remove last Wednesday function

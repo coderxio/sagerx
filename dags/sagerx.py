@@ -30,13 +30,41 @@ def download_dataset(url: str, dest: os.PathLike = Path.cwd(), file_name: str = 
     dest = path to save downloaded file to
     filename = name to call file, if None last segement of url is used"""
     import requests
+    import re
 
-    if file_name == None:
-        dest_path = create_path(dest) / url.split("/")[-1]
-    else:
-        dest_path = create_path(dest) / file_name
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
+
+        if file_name == None:
+            try:
+                content_disposition_list = r.headers["Content-Disposition"].split(";")
+
+                r = re.compile(r"""
+                    # the filename directive keyword
+                    filename=
+                    # 0 or 1 quote
+                    (?:"|')?
+                    # capture the filename itself
+                    (?P<filename>.+)
+                    # a quote or end of string
+                    # if not proceded by a quote
+                    (?:"|'|(?<!(?:"|'))$)
+                    """, re.VERBOSE)
+
+                # get the only element of the content_disposition_list
+                # after filtering based on regex pattern
+                # NOTE: if 0 or >1 elements after filtering, will return ValueError
+                [filename_directive] = list(filter(r.search, content_disposition_list))
+
+                match = r.search(filename_directive)
+
+                file_name = match.group('filename')
+
+            except:
+                file_name = url.split("/")[-1]
+
+        dest_path = create_path(dest) / file_name
+
         with open(dest_path, "wb") as f:
             for chunk in r.iter_content(chunk_size=8192):
                 f.write(chunk)

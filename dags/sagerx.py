@@ -37,9 +37,28 @@ def download_dataset(url: str, dest: os.PathLike = Path.cwd(), file_name: str = 
 
         if file_name == None:
             try:
-                file_name = re.findall(
-                    "filename=(.+)", r.headers["Content-Disposition"].replace('"', "")
-                )[0]
+                content_disposition_list = r.headers["Content-Disposition"].split(";")
+
+                r = re.compile(r"""
+                    # the filename directive keyword
+                    filename=
+                    # 0 or 1 quote
+                    (?:"|')?
+                    # capture the filename itself
+                    (?P<filename>.+)
+                    # a quote or end of string
+                    # if not proceded by a quote
+                    (?:"|'|(?<!(?:"|'))$)
+                    """, re.VERBOSE)
+
+                # get the only element of the content_disposition_list
+                # after filtering based on regex pattern
+                # NOTE: if 0 or >1 elements after filtering, will return ValueError
+                [filename_directive] = list(filter(r.search, content_disposition_list))
+
+                match = r.search(filename_directive)
+
+                file_name = match.group('filename')
 
             except:
                 file_name = url.split("/")[-1]

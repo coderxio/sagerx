@@ -49,6 +49,16 @@ data_set_list = [
         },
     },
     {
+        "dag_id": "cms_addendum_a",
+        "schedule": "0 0 20 */3 *",  # runs every quarter on the 20th
+        "url": "https://www.cms.gov/files/zip/addendum-{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}.zip?agree=yes&next=Accept",
+        # "url":https://www.cms.gov/files/zip/addendum-october-2021.zip?agree=yes&next=Accept
+        "user_defined_macros": {
+            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
+            "ds_datetime": user_macros.ds_datetime,
+        },
+    },
+    {
         "dag_id": "fda_excluded",
         "schedule_interval": "30 4 * * *",  # run a 4:30am every day
         "url": "https://www.accessdata.fda.gov/cder/ndc_excluded.zip",
@@ -87,7 +97,7 @@ def create_dag(dag_args):
         dag_id,
         default_args=dag_args,
         description=f"Processes {dag_id} source",
-        user_defined_macros=dag_args.get("user_defined_macros")
+        user_defined_macros=dag_args.get("user_defined_macros"),
     )
 
     ds_folder = Path("/opt/airflow/dags") / dag_id

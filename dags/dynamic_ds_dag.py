@@ -59,6 +59,16 @@ data_set_list = [
         },
     },
     {
+        "dag_id": "cms_addendum_a",
+        "schedule": "0 0 20 */3 *",  # runs every quarter on the 20th
+        "url": "https://www.cms.gov/files/zip/addendum-{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}.zip?agree=yes&next=Accept",
+        # "url":https://www.cms.gov/files/zip/addendum-october-2021.zip?agree=yes&next=Accept
+        "user_defined_macros": {
+            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
+            "ds_datetime": user_macros.ds_datetime,
+        },
+    },
+    {
         "dag_id": "fda_excluded",
         "schedule_interval": "30 4 * * *",  # run a 4:30am every day
         "url": "https://www.accessdata.fda.gov/cder/ndc_excluded.zip",

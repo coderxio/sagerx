@@ -91,9 +91,14 @@ data_set_list = [
     },
     {
         "dag_id": "orange_book",
-        "schedule": "15 0 24 1 *",  # runs once monthly on the 24th day at 00:15
+        "schedule_interval": "15 0 24 1 *",  # runs once monthly on the 24th day at 00:15
         "url": "https://www.fda.gov/media/76860/download",
         #   "url": "https://www.fda.gov/media/76860/download"
+    },
+    {
+        "dag_id": "rxnorm",
+        "schedule_interval": "10 0 1 1 *",  # runs once monthly on the 1st day at 00:10
+        "url": "https://download.nlm.nih.gov/rxnorm/RxNorm_full_prescribe_current.zip",
     },
 ]
 

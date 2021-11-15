@@ -117,6 +117,7 @@ def create_dag(dag_args):
 
     dag = DAG(
         dag_id,
+        schedule_interval=dag_args["schedule_interval"],
         default_args=dag_args,
         description=f"Processes {dag_id} source",
         user_defined_macros=dag_args.get("user_defined_macros"),

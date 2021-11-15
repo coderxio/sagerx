@@ -1,4 +1,4 @@
-Fixes coderxio/medication-diversification#ISSUE NUMBER
+Resolves #ISSUE NUMBER
 
 ## Explanation
 [What did you change?]

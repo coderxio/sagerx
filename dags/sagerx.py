@@ -34,16 +34,42 @@ def download_dataset(url: str, dest: os.PathLike = Path.cwd(), file_name: str = 
 
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
+
         if file_name == None:
-            if "Content-Disposition" in r.headers.keys():
-                file_name = re.findall(
-                    "filename=(.+)", r.headers["Content-Disposition"]
-                )[0]
-            else:
+            try:
+                content_disposition_list = r.headers["Content-Disposition"].split(";")
+
+                compiled_regex = re.compile(
+                    r"""
+                    # the filename directive keyword
+                    filename=
+                    # 0 or 1 quote
+                    (?:"|')?
+                    # capture the filename itself
+                    (?P<filename>.+)
+                    # a quote or end of string
+                    # if not proceded by a quote
+                    (?:"|'|(?<!(?:"|'))$)
+                    """,
+                    re.VERBOSE,
+                )
+
+                # get the only element of the content_disposition_list
+                # after filtering based on regex pattern
+                # NOTE: if 0 or >1 elements after filtering, will return ValueError
+                [filename_directive] = list(
+                    filter(compiled_regex.search, content_disposition_list)
+                )
+
+                match = compiled_regex.search(filename_directive)
+
+                file_name = match.group("filename")
+
+            except:
                 file_name = url.split("/")[-1]
-            dest_path = create_path(dest) / file_name
-        else:
-            dest_path = create_path(dest) / file_name
+
+        dest_path = create_path(dest) / file_name
+
         with open(dest_path, "wb") as f:
             for chunk in r.iter_content(chunk_size=8192):
                 f.write(chunk)
@@ -59,6 +85,7 @@ def get_dataset(ds_url, data_folder, ti):
     data_folder = path to save dataset to
     ti = airflow parameter to store task instance for xcoms"""
     import zipfile
+    import logging
 
     file_path = download_dataset(url=ds_url, dest=data_folder)
 
@@ -70,6 +97,8 @@ def get_dataset(ds_url, data_folder, ti):
 
     file_path_str = file_path.resolve().as_posix()
     ti.xcom_push(key="file_path", value=file_path_str)
+    logging.info(f"requested url: {ds_url}")
+    logging.info(f"created dataset at path: {file_path}")
 
 
 def get_sql_list(pre_str: str = "", ds_path: os.PathLike = Path.cwd()):

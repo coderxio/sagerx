@@ -1,30 +1,86 @@
 from datetime import date, timedelta
 from textwrap import dedent
 from pathlib import Path
+import calendar
 
 from sagerx import get_dataset, read_sql_file, get_sql_list
 
+import user_macros
 
 data_set_list = [
     {
         "dag_id": "nadac",
-        "schedule": "0 6 * * 5",  # run a 6am every thur (url marco minuses day to get wed)
-        "url": "https://download.medicaid.gov/data/nadac-national-average-drug-acquisition-cost-{{ macros.ds_format( macros.ds_add(ds ,-1), '%Y-%m-%d', '%m-%d-%Y' ) }}.csv",
+        "schedule_interval": "0 6 * * 5",  # run a 6am every thur (url marco minuses day to get wed)
+        "url": "https://download.medicaid.gov/data/nadac-national-average-drug-acquisition-cost-{{ get_date_of_prior_weekday('wednesday', ds_datetime( ds ), '%m-%d-%Y' ) }}.csv",
+        "user_defined_macros": {
+            "get_date_of_prior_weekday": user_macros.get_date_of_prior_weekday,
+            "ds_datetime": user_macros.ds_datetime,
+        }
         #   "url": "https://download.medicaid.gov/data/nadac-national-average-drug-acquisition-cost-10-20-2021.csv"
     },
     {
+        "dag_id": "cms_noc_pricing",
+        "schedule_interval": "0 0 20 */3 *",  # runs every quarter on the 20th day of the month
+        "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-noc-pricing-file.zip",
+        #   "url": "https://www.cms.gov/files/zip/october-2021-noc-pricing-file.zip"
+        "user_defined_macros": {
+            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
+            "ds_datetime": user_macros.ds_datetime,
+        },
+    },
+    {
+        "dag_id": "cms_ndc_hcpcs",
+        "schedule_interval": "0 0 20 */3 *",  # runs every quarter on the 20th of the month
+        "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-asp-ndc-hcpcs-crosswalk.zip",
+        # https://www.cms.gov/files/zip/october-2021-asp-ndc-hcpcs-crosswalk.zip
+        "user_defined_macros": {
+            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
+            "ds_datetime": user_macros.ds_datetime,
+        },
+    },
+    {
+        "dag_id": "cms_asp_pricing",
+        "schedule_interval": "0 0 20 */3 *",  # runs once every quarter on the 20th of each month
+        "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-asp-pricing-file.zip",
+        #   "url": "https://www.cms.gov/files/zip/october-2021-asp-pricing-file.zip"
+        "user_defined_macros": {
+            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
+            "ds_datetime": user_macros.ds_datetime,
+        },
+    },
+    {
+        "dag_id": "cms_addendum_a",
+        "schedule": "0 0 20 */3 *",  # runs every quarter on the 20th
+        "url": "https://www.cms.gov/files/zip/addendum-{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}.zip?agree=yes&next=Accept",
+        # "url":https://www.cms.gov/files/zip/addendum-october-2021.zip?agree=yes&next=Accept
+        "user_defined_macros": {
+            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
+            "ds_datetime": user_macros.ds_datetime,
+        },
+    },
+    {
+        "dag_id": "cms_addendum_a",
+        "schedule": "0 0 20 */3 *",  # runs every quarter on the 20th
+        "url": "https://www.cms.gov/files/zip/addendum-{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}.zip?agree=yes&next=Accept",
+        # "url":https://www.cms.gov/files/zip/addendum-october-2021.zip?agree=yes&next=Accept
+        "user_defined_macros": {
+            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
+            "ds_datetime": user_macros.ds_datetime,
+        },
+    },
+    {
         "dag_id": "fda_excluded",
-        "schedule": "30 4 * * *",  # run a 4:30am every day
+        "schedule_interval": "30 4 * * *",  # run a 4:30am every day
         "url": "https://www.accessdata.fda.gov/cder/ndc_excluded.zip",
     },
     {
         "dag_id": "fda_ndc",
-        "schedule": "0 4 * * *",  # run a 4am every day
+        "schedule_interval": "0 4 * * *",  # run a 4am every day
         "url": "https://www.accessdata.fda.gov/cder/ndctext.zip",
     },
     {
         "dag_id": "fda_unfinished",
-        "schedule": "15 4 * * *",  # run a 4:15am every day
+        "schedule_interval": "15 4 * * *",  # run a 4:15am every day
         "url": "https://www.accessdata.fda.gov/cder/ndc_unfinished.zip",
     },
     {
@@ -47,13 +103,17 @@ from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.utils.dates import days_ago
 
 
-def create_dag(dag_id, schedule, url, default_args):
+def create_dag(dag_args):
+
+    dag_id = dag_args["dag_id"]
+    url = dag_args["url"]
+    retrieve_dataset_function = dag_args["retrieve_dataset_function"]
 
     dag = DAG(
         dag_id,
-        default_args=default_args,
+        default_args=dag_args,
         description=f"Processes {dag_id} source",
-        schedule_interval=schedule,
+        user_defined_macros=dag_args.get("user_defined_macros"),
     )
 
     ds_folder = Path("/opt/airflow/dags") / dag_id
@@ -64,7 +124,7 @@ def create_dag(dag_id, schedule, url, default_args):
         # Task to download data from web location
         get_data = PythonOperator(
             task_id=f"get_{dag_id}",
-            python_callable=get_dataset,
+            python_callable=retrieve_dataset_function,
             op_kwargs={"ds_url": url, "data_folder": data_folder},
         )
 
@@ -113,10 +173,6 @@ def create_dag(dag_id, schedule, url, default_args):
 # builds a dag for each data set in data_set_list
 for ds in data_set_list:
 
-    dag_id = ds["dag_id"]
-    schedule = ds["schedule"]
-    url = ds["url"]
-
     default_args = {
         "owner": "airflow",
         "start_date": days_ago(0),
@@ -126,6 +182,10 @@ for ds in data_set_list:
         "email_on_retry": False,
         "retries": 1,
         "retry_delay": timedelta(minutes=5),
+        # none airflow common dag elements
+        "retrieve_dataset_function": get_dataset,
     }
 
-    globals()[dag_id] = create_dag(dag_id, schedule, url, default_args)
+    dag_args = {**default_args, **ds}
+
+    globals()[dag_args["dag_id"]] = create_dag(dag_args)

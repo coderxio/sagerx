@@ -50,7 +50,7 @@ data_set_list = [
     },
     {
         "dag_id": "cms_addendum_a",
-        "schedule": "0 0 20 */3 *",  # runs every quarter on the 20th
+        "schedule_interval": "0 0 20 */3 *",  # runs every quarter on the 20th
         "url": "https://www.cms.gov/files/zip/addendum-{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}.zip?agree=yes&next=Accept",
         # "url":https://www.cms.gov/files/zip/addendum-october-2021.zip?agree=yes&next=Accept
         "user_defined_macros": {
@@ -60,7 +60,7 @@ data_set_list = [
     },
     {
         "dag_id": "cms_addendum_b",
-        "schedule": "0 0 20 */3 *",  # runs every quarter on the 20th
+        "schedule_interval": "0 0 20 */3 *",  # runs every quarter on the 20th
         "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-addendum-b.zip?agree=yes&next=Accept",
         # "url": "https://www.cms.gov/files/zip/october-2021-addendum-b.zip?agree=yes&next=Accept"
         "user_defined_macros": {
@@ -91,7 +91,7 @@ data_set_list = [
     },
     {
         "dag_id": "orange_book",
-        "schedule": "15 0 24 1 *",  # runs once monthly on the 24th day at 00:15
+        "schedule_interval": "15 0 24 1 *",  # runs once monthly on the 24th day at 00:15
         "url": "https://www.fda.gov/media/76860/download",
         #   "url": "https://www.fda.gov/media/76860/download"
     },

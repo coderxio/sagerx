@@ -83,6 +83,12 @@ data_set_list = [
         "schedule_interval": "15 4 * * *",  # run a 4:15am every day
         "url": "https://www.accessdata.fda.gov/cder/ndc_unfinished.zip",
     },
+    {
+        "dag_id": "orange_book",
+        "schedule": "15 0 24 1 *",  # runs once monthly on the 24th day at 00:15
+        "url": "https://www.fda.gov/media/76860/download",
+        #   "url": "https://www.fda.gov/media/76860/download"
+    },
 ]
 
 

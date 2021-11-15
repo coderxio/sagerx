@@ -1,34 +1,72 @@
 from datetime import date, timedelta
 from textwrap import dedent
 from pathlib import Path
+import calendar
 
 from sagerx import get_dataset, read_sql_file, get_sql_list
 
+import user_macros
 
 data_set_list = [
     {
         "dag_id": "nadac",
         "schedule_interval": "0 6 * * 5",  # run a 6am every thur (url marco minuses day to get wed)
-        "url": "https://download.medicaid.gov/data/nadac-national-average-drug-acquisition-cost-{{ macros.ds_format( macros.ds_add(ds ,-1), '%Y-%m-%d', '%m-%d-%Y' ) }}.csv",
+        "url": "https://download.medicaid.gov/data/nadac-national-average-drug-acquisition-cost-{{ get_date_of_prior_weekday('wednesday', ds_datetime( ds ), '%m-%d-%Y' ) }}.csv",
+        "user_defined_macros": {
+            "get_date_of_prior_weekday": user_macros.get_date_of_prior_weekday,
+            "ds_datetime": user_macros.ds_datetime,
+        }
         #   "url": "https://download.medicaid.gov/data/nadac-national-average-drug-acquisition-cost-10-20-2021.csv"
     },
     {
         "dag_id": "cms_noc_pricing",
         "schedule_interval": "0 0 20 */3 *",  # runs every quarter on the 20th day of the month
-        "url": "https://www.cms.gov/files/zip/{{ macros.ds_format(ds, '%Y-%m-%d', '%B-%Y' ) }}-noc-pricing-file.zip",
+        "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-noc-pricing-file.zip",
         #   "url": "https://www.cms.gov/files/zip/october-2021-noc-pricing-file.zip"
+        "user_defined_macros": {
+            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
+            "ds_datetime": user_macros.ds_datetime,
+        },
     },
     {
         "dag_id": "cms_ndc_hcpcs",
         "schedule_interval": "0 0 20 */3 *",  # runs every quarter on the 20th of the month
-        "url": "https://www.cms.gov/files/zip/{{ macros.ds_format(ds, '%Y-%m-%d', '%B-%Y')}}-asp-ndc-hcpcs-crosswalk.zip"
+        "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-asp-ndc-hcpcs-crosswalk.zip",
         # https://www.cms.gov/files/zip/october-2021-asp-ndc-hcpcs-crosswalk.zip
+        "user_defined_macros": {
+            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
+            "ds_datetime": user_macros.ds_datetime,
+        },
     },
     {
         "dag_id": "cms_asp_pricing",
         "schedule_interval": "0 0 20 */3 *",  # runs once every quarter on the 20th of each month
-        "url": "https://www.cms.gov/files/zip/{{ macros.ds_format(ds, '%Y-%m-%d', '%B-%Y' ) }}-asp-pricing-file.zip"
+        "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-asp-pricing-file.zip",
         #   "url": "https://www.cms.gov/files/zip/october-2021-asp-pricing-file.zip"
+        "user_defined_macros": {
+            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
+            "ds_datetime": user_macros.ds_datetime,
+        },
+    },
+    {
+        "dag_id": "cms_addendum_a",
+        "schedule": "0 0 20 */3 *",  # runs every quarter on the 20th
+        "url": "https://www.cms.gov/files/zip/addendum-{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}.zip?agree=yes&next=Accept",
+        # "url":https://www.cms.gov/files/zip/addendum-october-2021.zip?agree=yes&next=Accept
+        "user_defined_macros": {
+            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
+            "ds_datetime": user_macros.ds_datetime,
+        },
+    },
+    {
+        "dag_id": "cms_addendum_b",
+        "schedule": "0 0 20 */3 *",  # runs every quarter on the 20th
+        "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-addendum-b.zip?agree=yes&next=Accept",
+        # "url": "https://www.cms.gov/files/zip/october-2021-addendum-b.zip?agree=yes&next=Accept"
+        "user_defined_macros": {
+            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
+            "ds_datetime": user_macros.ds_datetime,
+        },
     },
     {
         "dag_id": "fda_excluded",
@@ -51,6 +89,12 @@ data_set_list = [
         "url": "https://purplebooksearch.fda.gov/files/{{ (execution_date - macros.dateutil.relativedelta.relativedelta(months=1)).strftime('%Y') }}/purplebook-search-{{ (execution_date - macros.dateutil.relativedelta.relativedelta(months=1)).strftime('%B').lower() }}-data-download.csv",
         # "url": "https://purplebooksearch.fda.gov/files/2021/purplebook-search-january-data-download.csv",
     },
+    {
+        "dag_id": "orange_book",
+        "schedule": "15 0 24 1 *",  # runs once monthly on the 24th day at 00:15
+        "url": "https://www.fda.gov/media/76860/download",
+        #   "url": "https://www.fda.gov/media/76860/download"
+    },
 ]
 
 
@@ -71,7 +115,12 @@ def create_dag(dag_args):
     url = dag_args["url"]
     retrieve_dataset_function = dag_args["retrieve_dataset_function"]
 
-    dag = DAG(dag_id, default_args=dag_args, description=f"Processes {dag_id} source")
+    dag = DAG(
+        dag_id,
+        default_args=dag_args,
+        description=f"Processes {dag_id} source",
+        user_defined_macros=dag_args.get("user_defined_macros"),
+    )
 
     ds_folder = Path("/opt/airflow/dags") / dag_id
     data_folder = Path("/opt/airflow/data") / dag_id

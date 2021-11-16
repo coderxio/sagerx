@@ -95,6 +95,13 @@ data_set_list = [
         "url": "https://www.fda.gov/media/76860/download",
         #   "url": "https://www.fda.gov/media/76860/download"
     },
+    {
+        "dag_id": "medicaid_utilization",
+        "schedule_interval": "0 0 1 1 *",  # run a year on jJan 1st
+        "url": "https://download.medicaid.gov/data/state-drug-utilization-data-{{ macros.ds_format(ds, '%Y-%m-%d', '%Y' ) }}.csv",
+        # datetime(1992, 1, 1, 1, 1),  # for backfill if wanted.
+        #'url': 'https://download.medicaid.gov/data/state-drug-utilization-data-2020.csv'
+    },
 ]
 
 

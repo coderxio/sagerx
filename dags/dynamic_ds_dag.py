@@ -50,7 +50,7 @@ data_set_list = [
     },
     {
         "dag_id": "cms_addendum_a",
-        "schedule": "0 0 20 */3 *",  # runs every quarter on the 20th
+        "schedule_interval": "0 0 20 */3 *",  # runs every quarter on the 20th
         "url": "https://www.cms.gov/files/zip/addendum-{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}.zip?agree=yes&next=Accept",
         # "url":https://www.cms.gov/files/zip/addendum-october-2021.zip?agree=yes&next=Accept
         "user_defined_macros": {
@@ -60,7 +60,7 @@ data_set_list = [
     },
     {
         "dag_id": "cms_addendum_b",
-        "schedule": "0 0 20 */3 *",  # runs every quarter on the 20th
+        "schedule_interval": "0 0 20 */3 *",  # runs every quarter on the 20th
         "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-addendum-b.zip?agree=yes&next=Accept",
         # "url": "https://www.cms.gov/files/zip/october-2021-addendum-b.zip?agree=yes&next=Accept"
         "user_defined_macros": {
@@ -100,6 +100,13 @@ data_set_list = [
         "schedule_interval": "10 0 1 1 *",  # runs once monthly on the 1st day at 00:10
         "url": "https://download.nlm.nih.gov/rxnorm/RxNorm_full_prescribe_current.zip",
     },
+    {
+        "dag_id": "medicaid_utilization",
+        "schedule_interval": "0 0 1 1 *",  # run a year on jJan 1st
+        "url": "https://download.medicaid.gov/data/state-drug-utilization-data-{{ macros.ds_format(ds, '%Y-%m-%d', '%Y' ) }}.csv",
+        # datetime(1992, 1, 1, 1, 1),  # for backfill if wanted.
+        #'url': 'https://download.medicaid.gov/data/state-drug-utilization-data-2020.csv'
+    },
 ]
 
 
@@ -122,6 +129,7 @@ def create_dag(dag_args):
 
     dag = DAG(
         dag_id,
+        schedule_interval=dag_args["schedule_interval"],
         default_args=dag_args,
         description=f"Processes {dag_id} source",
         user_defined_macros=dag_args.get("user_defined_macros"),

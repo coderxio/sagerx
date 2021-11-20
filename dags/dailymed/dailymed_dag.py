@@ -60,6 +60,7 @@ def load_xml(data_folder):
     import pandas as pd
     import sqlalchemy
     import os
+    import logging
 
     db_conn_string = os.environ["AIRFLOW_CONN_POSTGRES_DEFAULT"]
     db_conn = sqlalchemy.create_engine(db_conn_string)
@@ -69,11 +70,14 @@ def load_xml(data_folder):
         for subfile in unzipped_folder.infolist():
             if re.match(".*.xml", subfile.filename):
                 file_name = subfile.filename
-                xml_content = unzipped_folder.read(subfile.filename)
+                xml_content = unzipped_folder.read(file_name).decode("utf-8")
                 df = pd.DataFrame(
                     columns=["file", "xml_content"], data=[[file_name, xml_content]]
                 )
-                df.to_sql("datasource.dailymed_rx", con=db_conn, if_exists="append")
+                logging.info(xml_content)
+                df.to_sql(
+                    "dailymed_rx", schema="datasource", con=db_conn, if_exists="append"
+                )
 
 
 ########################### DYNAMIC DAG DO NOT TOUCH BELOW HERE #################################

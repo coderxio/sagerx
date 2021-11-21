@@ -13,7 +13,7 @@ ds = {
     "dag_id": "dailymed_rx_full",
     "schedule_interval": "0 0 1 * *",  # run once monthly)
     "url": "https://dailymed-data.nlm.nih.gov/public-release-files/",
-    "user_defined_macros": {"list_to_array": list_to_bash_array},
+    "user_defined_macros": {"list_to_bash_array": list_to_bash_array},
 }
 
 
@@ -145,7 +145,8 @@ with dag:
             task_id=f"get_{dag_id}",
             bash_command="""files=({{list_to_bash_array( ti.xcom_pull(key='file_path',task_ids='obtain_list_' + dag.dag_id) )}})
             for f in ${files[@]}; do
-                curl -s -o /opt/airflow/data/{{ dag.dag_id }}/$f ftp://public.nlm.nih.gov/nlmdata/.dailymed/$f && echo "$f download complete"
+                path=/opt/airflow/data/{{ dag.dag_id }}/$f
+                curl -s -o $path ftp://public.nlm.nih.gov/nlmdata/.dailymed/$f && echo "$f download complete"
             done""",
         )
     )

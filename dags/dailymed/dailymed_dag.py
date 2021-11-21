@@ -2,7 +2,8 @@ from datetime import date, timedelta
 from textwrap import dedent
 from pathlib import Path
 
-from sagerx import create_path, read_sql_file, get_sql_list
+from sagerx import create_path
+from user_macros import list_to_bash_array
 
 daily_med_ftp = "public.nlm.nih.gov"
 ftp_dir = "/nlmdata/.dailymed/"
@@ -12,6 +13,7 @@ ds = {
     "dag_id": "dailymed_rx_full",
     "schedule_interval": "0 0 1 * *",  # run once monthly)
     "url": "https://dailymed-data.nlm.nih.gov/public-release-files/",
+    "user_defined_macros": {"list_to_array": list_to_bash_array},
 }
 
 
@@ -26,14 +28,16 @@ def connect_to_ftp_dir(ftp_str: str, dir: str):
     return ftp
 
 
-def obtain_ftp_file_list(ftp, file_set: str):
+def obtain_ftp_file_list(ftp, file_set: str, ti):
     import fnmatch
+    import logging
 
     file_list = []
     for file in ftp.nlst():
         if fnmatch.fnmatch(file, f"*{file_set}*"):
             file_list.append(file)
-    return file_list
+    logging.info(file_list)
+    ti.xcom_push(key="file_path", value=file_list)
 
 
 def get_dailymed_files(
@@ -88,6 +92,7 @@ from airflow import DAG
 # Operators; we need this to operate!
 from airflow.operators.python_operator import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
+from airflow.operators.bash_operator import BashOperator
 from airflow.utils.dates import days_ago
 
 
@@ -127,18 +132,23 @@ with dag:
     # Task to download data from web location
 
     tl = []
-    for file_name in obtain_ftp_file_list(ftp, file_set):
-        tl.append(
-            PythonOperator(
-                task_id=f"get_{dag_id}_{file_name}",
-                python_callable=get_dailymed_files,
-                op_kwargs={
-                    "ftp": ftp,
-                    "data_folder": data_folder,
-                    "file_name": file_name,
-                },
-            )
+    tl.append(
+        PythonOperator(
+            task_id=f"obtain_list_{dag_id}",
+            python_callable=obtain_ftp_file_list,
+            op_kwargs={"ftp": ftp, "file_set": file_set},
         )
+    )
+
+    tl.append(
+        BashOperator(
+            task_id=f"get_{dag_id}",
+            bash_command="""files=({{list_to_bash_array( ti.xcom_pull(key='file_path',task_ids='obtain_list_' + dag.dag_id) )}})
+            for f in ${files[@]}; do
+                curl -s -o /opt/airflow/data/{{ dag.dag_id }}/$f ftp://public.nlm.nih.gov/nlmdata/.dailymed/$f && echo "$f download complete"
+            done""",
+        )
+    )
 
     # Task to load data into source db schema
     tl.append(

@@ -24,6 +24,7 @@ services:
     volumes:
       - ./postgres:/docker-entrypoint-initdb.d
       - ./data:/opt/airflow/data
+      - ./extracts:/opt/airflow/extracts
 
   pgadmin:
     environment:
@@ -42,8 +43,9 @@ services:
     command:
       - -c
       - |
-        mkdir -p /sources/logs /sources/dags /sources/plugins /sources/data
-        chown -R "${AIRFLOW_UID}:${AIRFLOW_GID-0}" /sources/{logs,dags,plugins,data}
+        mkdir -p /sources/logs /sources/dags /sources/plugins /sources/data /sources/extracts
+        chown -R "${AIRFLOW_UID}:${AIRFLOW_GID-0}" /sources/{logs,dags,plugins,data,extracts}
+        chmod o+rw /sources/extracts
         exec /entrypoint airflow version
     environment:
       <<: *airflow-common-env

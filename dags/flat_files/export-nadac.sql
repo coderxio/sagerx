@@ -19,6 +19,8 @@ AS
    FROM staging.nadac nadac
    WHERE nadac.price_line = 1;
 
+   COPY (SELECT * FROM flatfile.nadac) TO '/opt/airflow/extracts/nadac.txt' CSV HEADER DELIMITER '|'
+
 
 
 

@@ -1,12 +1,12 @@
 from datetime import date, timedelta
 from textwrap import dedent
 from pathlib import Path
-import calendar
+import os
 
 from sagerx import get_dataset, read_sql_file, get_sql_list
 
 download_url = "https://download.nlm.nih.gov/umls/kss/rxnorm/RxNorm_full_current.zip"
-apikey = "ed76cb1b-37ec-4ab5-8f09-71139e8cf214"
+apikey = os.environ["AIRFLOW_VAR_UMLS_API"]
 
 ds = {
     "dag_id": "rxnorm_full",
@@ -17,6 +17,7 @@ ds = {
 
 def obtain_umls_tgt(apikey: str, ti):
     import requests
+    import logging
 
     url = "https://utslogin.nlm.nih.gov/cas/v1/api-key"
     param = {"apikey": apikey}
@@ -28,6 +29,7 @@ def obtain_umls_tgt(apikey: str, ti):
     tgt_ticket, fourth = second.split('" method')
 
     # print(TGTTicket)
+    logging.info(apikey)
     ti.xcom_push(key="tgt_ticket", value=tgt_ticket)
 
 

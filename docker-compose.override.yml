@@ -8,6 +8,7 @@ x-airflow-common:
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW_CONN_POSTGRES_DEFAULT: postgresql://sagerx:sagerx@postgres/sagerx
+    AIRFLOW_VAR_UMLS_API: ${UMLS_API}
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
   volumes:
     - ./dags:/opt/airflow/dags

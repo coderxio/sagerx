@@ -107,6 +107,12 @@ data_set_list = [
         # datetime(1992, 1, 1, 1, 1),  # for backfill if wanted.
         #'url': 'https://download.medicaid.gov/data/state-drug-utilization-data-2020.csv'
     },
+    {
+        "dag_id": "nppes_npi",
+        "schedule_interval": "45 0 15 1 *",  # runs once monthly on the 15th day at 00:45
+        "url": "https://download.cms.gov/nppes/NPPES_Data_Dissemination_{{ macros.ds_format(ds, '%Y-%m-%d', '%B_%Y' ) }}.zip",
+        # "url": "https://download.cms.gov/nppes/NPPES_Data_Dissemination_November_2021.zip",
+    },
 ]
 
 

@@ -19,3 +19,5 @@ FROM (SELECT ti.task_id
 		AND POSITION('-' IN ti.task_id) > 0) z
 	
 WHERE ROW_NUM = 1;
+
+ COPY (SELECT * FROM flatfile.last_sql_task) TO '/opt/airflow/extracts/last_sql_task.txt' CSV HEADER DELIMITER '|'

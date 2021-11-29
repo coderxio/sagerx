@@ -106,13 +106,6 @@ def get_sql_list(pre_str: str = "", ds_path: os.PathLike = Path.cwd()):
 
     pre_str = determines what sql files to grab by matching str at start of name
     ds_path = folder path to grab sqls from"""
-    import glob
-    import os
 
-    glob_folder = ds_path.resolve().as_posix()
-    glob_path = glob_folder + "/" + pre_str + "*.sql"
-    sql_file_list = []
-    for path in glob.glob(glob_path):
-        file = os.path.basename(path)
-        sql_file_list.append(file)
+    sql_file_list = [path.name for path in ds_path.glob(pre_str + "*.sql")]
     return sql_file_list

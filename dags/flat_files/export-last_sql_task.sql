@@ -1,5 +1,5 @@
-DROP FOREIGN TABLE IF EXISTS staging.dag_run;
-DROP FOREIGN TABLE IF EXISTS staging.task_instance;
+DROP FOREIGN TABLE IF EXISTS staging.dag_run CASCADE;
+DROP FOREIGN TABLE IF EXISTS staging.task_instance CASCADE;
 
 IMPORT FOREIGN SCHEMA public LIMIT TO (dag_run,task_instance) FROM SERVER airflow_fdw INTO staging;
 

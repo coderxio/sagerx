@@ -88,7 +88,7 @@ def get_dataset(ds_url, data_folder, ti):
     import logging
 
     file_path = download_dataset(url=ds_url, dest=data_folder)
-
+    logging.info(f"requested url: {ds_url}")
     if file_path.suffix == ".zip":
         with zipfile.ZipFile(file_path, "r") as zip_ref:
             zip_ref.extractall(file_path.with_suffix(""))
@@ -97,7 +97,6 @@ def get_dataset(ds_url, data_folder, ti):
 
     file_path_str = file_path.resolve().as_posix()
     ti.xcom_push(key="file_path", value=file_path_str)
-    logging.info(f"requested url: {ds_url}")
     logging.info(f"created dataset at path: {file_path}")
 
 

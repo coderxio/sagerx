@@ -6,4 +6,5 @@ __pycache__
 # Airflow Volumes
 data
 logs
+extracts
 plugins

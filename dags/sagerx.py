@@ -32,7 +32,7 @@ def download_dataset(url: str, dest: os.PathLike = Path.cwd(), file_name: str = 
     import requests
     import re
 
-    with requests.get(url, stream=True) as r:
+    with requests.get(url, stream=True, allow_redirects=True) as r:
         r.raise_for_status()
 
         if file_name == None:

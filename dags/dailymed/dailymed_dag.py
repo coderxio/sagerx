@@ -76,7 +76,7 @@ def load_xml(data_folder):
                 )
                 logging.info(xml_content)
                 df.to_sql(
-                    "dailymed_rx", schema="datasource", con=db_conn, if_exists="append"
+                    "dailymed_rx", schema="datasource", con=db_conn, if_exists="append",index=False
                 )
 
 

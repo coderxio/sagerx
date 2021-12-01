@@ -1,6 +1,7 @@
 from datetime import datetime, date, timedelta
 import calendar
 
+
 def ds_datetime(ds):
     return datetime.strptime(ds, "%Y-%m-%d")
 
@@ -32,3 +33,10 @@ def get_first_day_of_quarter(reference_date: date, date_format="%m-%d-%Y"):
     quarter = get_quarter(reference_date)
     required_date = datetime(reference_date.year, (3 * quarter) - 2, 1)
     return required_date.strftime(date_format)
+
+
+def list_to_bash_array(list: list):
+    array_str = ""
+    for x in list:
+        array_str = f"{array_str} {x}"
+    return array_str.strip()

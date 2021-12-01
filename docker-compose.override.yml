@@ -35,8 +35,8 @@ services:
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
     ports:
       - 8002:80
-    # volumes:
-    #   - ./pgadmin/servers.json:/pgadmin4/servers.json
+    volumes:
+      - ./pgadmin/servers.json:/pgadmin4/servers.json
 
   airflow-init:
     <<: *airflow-common

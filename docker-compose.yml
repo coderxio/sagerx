@@ -10,7 +10,7 @@ services:
     container_name: postgres
 
   pgadmin:
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:6.2
     container_name: pgadmin
 
   airflow-init:

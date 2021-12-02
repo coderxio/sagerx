@@ -8,12 +8,24 @@ CREATE TABLE staging.rxnorm_ingredient_component_link (
 );
 
 INSERT INTO staging.rxnorm_ingredient_component_link
+WITH cte AS (
+	SELECT
+		rxnrel.rxcui2 AS ingredient_rxcui
+		, ingredient_component.rxcui AS ingredient_component_rxcui
+		, ingredient_component.str AS ingredient_component_name
+		, ingredient_component.tty AS ingredient_component_tty
+	FROM
+		datasource.rxnorm_rxnrel rxnrel
+	INNER JOIN datasource.rxnorm_rxnconso ingredient_component
+		ON rxnrel.rxcui1 = ingredient_component.rxcui
+	WHERE rxnrel.rela = 'has_part'
+		AND ingredient_component.tty = 'IN'
+		AND ingredient_component.sab = 'RXNORM'
+)
 SELECT DISTINCT
 	ingredient.rxcui AS ingredient_rxcui
-	, case when ingredient_component.rxcui is null then ingredient.rxcui else ingredient_component.rxcui end ingredient_component_rxcui
-from datasource.rxnorm_rxnconso ingredient
-left join datasource.rxnorm_rxnrel rxnrel on rxnrel.rxcui2 = ingredient.rxcui and rxnrel.rela = 'has_part'
-left join datasource.rxnorm_rxnconso ingredient_component on rxnrel.rxcui1 = ingredient_component.rxcui and ingredient_component.tty = 'IN'
-where ingredient.tty in('IN', 'MIN')
-	and ingredient.sab = 'RXNORM'
-	and ingredient_component.sab = 'RXNORM';
+	, CASE WHEN cte.ingredient_component_rxcui IS NULL THEN ingredient.rxcui ELSE cte.ingredient_component_rxcui END ingredient_component_rxcui
+FROM datasource.rxnorm_rxnconso ingredient
+LEFT JOIN cte ON ingredient.rxcui = cte.ingredient_rxcui
+WHERE ingredient.tty IN('IN', 'MIN')
+	AND ingredient.sab = 'RXNORM';

@@ -27,8 +27,10 @@ SELECT rxnsat.atv as ndc
 FROM datasource.rxnorm_rxnsat rxnsat
 	INNER JOIN datasource.rxnorm_rxnconso rxnconso ON rxnsat.rxaui = rxnconso.rxaui
 	LEFT JOIN datasource.rxnorm_rxnrel sbdrel ON rxnsat.RXCUI = sbdrel.RXCUI2 AND RELA = 'tradename_of' and rxnconso.tty IN ('BPCK','SBD')
-	LEFT JOIN datasource.rxnorm_rxnconso relc ON sbdrel.RXCUI1 = relc.RXCUI AND relc.tty IN ('SCD','GPCK')
+	LEFT JOIN datasource.rxnorm_rxnconso relc
+		ON sbdrel.RXCUI1 = relc.RXCUI
+		AND relc.tty IN ('SCD','GPCK')
+		AND relc.sab = 'RXNORM'
 WHERE rxnsat.atn = 'NDC'
 	AND rxnconso.tty in ('SCD','SBD','GPCK','BPCK')
-	AND rxnconso.sab = 'RXNORM'
-	and relc.sab = 'RXNORM';
+	AND rxnconso.sab = 'RXNORM';

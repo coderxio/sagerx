@@ -24,5 +24,4 @@ blank       TEXT
 );
 
 COPY datasource.rxnorm_rxnconso
-FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_rxnorm_full') }}/rrf/RXNCONSO.RRF' DELIMITER '|' CSV;
-
+FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_rxnorm_full') }}/rrf/RXNCONSO.RRF' with (delimiter '|', null '');

@@ -14,8 +14,10 @@ SELECT DISTINCT
 	, brand.str AS brand_name
 	, brand.tty AS brand_tty
 from datasource.rxnorm_rxnconso product
-left join datasource.rxnorm_rxnrel rxnrel on rxnrel.rxcui2 = product.rxcui and rxnrel.rela = 'has_ingredient'
-left join datasource.rxnorm_rxnconso brand on rxnrel.rxcui1 = brand.rxcui and brand.tty = 'BN'
+INNER join datasource.rxnorm_rxnrel rxnrel on rxnrel.rxcui2 = product.rxcui and rxnrel.rela = 'has_ingredient'
+INNER join datasource.rxnorm_rxnconso brand
+	on rxnrel.rxcui1 = brand.rxcui
+	and brand.tty = 'BN'
+	and brand.sab = 'RXNORM'
 where product.tty = 'SBD'
-	and product.sab = 'RXNORM'
-	and brand.sab = 'RXNORM';
+	and product.sab = 'RXNORM';

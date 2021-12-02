@@ -11,4 +11,5 @@ CREATE TABLE datasource.rxnorm_rxndoc (
 );
 
 COPY datasource.rxnorm_rxndoc
-FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_rxnorm_full') }}/rrf/RXNDOC.RRF' with (delimiter '|', null '');
+FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_rxnorm_full') }}/rrf/RXNDOC.RRF' CSV DELIMITER '|' ENCODING 'UTF8' ESCAPE E'\b' QUOTE E'\b';
+--ESCAPE and QOUTE characters are dummy to remove default

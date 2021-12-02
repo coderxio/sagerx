@@ -1,5 +1,4 @@
 from pathlib import Path
-import os
 
 # Filesystem functions
 def create_path(*args):
@@ -23,7 +22,7 @@ def read_sql_file(sql_path: str):
 
 
 # Web functions
-def download_dataset(url: str, dest: os.PathLike = Path.cwd(), file_name: str = None):
+def download_dataset(url: str, dest: Path = Path.cwd(), file_name: str = None):
     """Downloads a data set file from provided Url via a requests steam
 
     url = url to send request to
@@ -92,7 +91,7 @@ def get_dataset(ds_url, data_folder, ti):
     if file_path.suffix == ".zip":
         with zipfile.ZipFile(file_path, "r") as zip_ref:
             zip_ref.extractall(file_path.with_suffix(""))
-        os.remove(file_path)
+        Path.rmdir(file_path)
         file_path = file_path.with_suffix("")
 
     file_path_str = file_path.resolve().as_posix()
@@ -100,7 +99,7 @@ def get_dataset(ds_url, data_folder, ti):
     logging.info(f"created dataset at path: {file_path}")
 
 
-def get_sql_list(pre_str: str = "", ds_path: os.PathLike = Path.cwd()):
+def get_sql_list(pre_str: str = "", ds_path: Path = Path.cwd()):
     """When given a folder path returns all .sql files in it as a list
 
     pre_str = determines what sql files to grab by matching str at start of name

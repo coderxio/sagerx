@@ -13,24 +13,24 @@ CREATE TABLE staging.rxnorm_ndc (
 
 INSERT INTO staging.rxnorm_ndc
 SELECT rxnsat.atv as ndc
-	,CASE WHEN rxnconso.tty IN ('BPCK','SBD') THEN relc.RXCUI 
-		ELSE rxnsat.rxcui END AS clinical_rxcui
-	,CASE WHEN rxnconso.tty IN ('BPCK','SBD') THEN relc.tty
-		ELSE rxnconso.tty END AS clinical_tty
-	,CASE WHEN rxnconso.tty IN ('BPCK','SBD') THEN relc.str
-		ELSE rxnconso.str END AS clinical_str
+	,CASE WHEN product.tty IN ('BPCK','SBD') THEN clinical_product.rxcui 
+		ELSE rxnsat.rxcui END AS clinical_product_rxcui
+	,CASE WHEN product.tty IN ('BPCK','SBD') THEN clinical_product.tty
+		ELSE product.tty END AS clinical_product_tty
+	,CASE WHEN product.tty IN ('BPCK','SBD') THEN clinical_product.str
+		ELSE product.str END AS clinical_product_name
 		
-	,CASE WHEN rxnconso.tty IN ('BPCK','SBD') THEN rxnsat.rxcui ELSE NULL END AS brand_rxcui
-	,CASE WHEN rxnconso.tty IN ('BPCK','SBD') THEN rxnconso.tty ELSE NULL END AS brand_tty
-	,CASE WHEN rxnconso.tty IN ('BPCK','SBD') THEN rxnconso.str ELSE NULL END AS brand_str
+	,CASE WHEN product.tty IN ('BPCK','SBD') THEN rxnsat.rxcui ELSE NULL END AS brand_product_rxcui
+	,CASE WHEN product.tty IN ('BPCK','SBD') THEN product.tty ELSE NULL END AS brand_product_tty
+	,CASE WHEN product.tty IN ('BPCK','SBD') THEN product.str ELSE NULL END AS brand_product_name
 
 FROM datasource.rxnorm_rxnsat rxnsat
-	INNER JOIN datasource.rxnorm_rxnconso rxnconso ON rxnsat.rxaui = rxnconso.rxaui
-	LEFT JOIN datasource.rxnorm_rxnrel sbdrel ON rxnsat.RXCUI = sbdrel.RXCUI2 AND RELA = 'tradename_of' and rxnconso.tty IN ('BPCK','SBD')
-	LEFT JOIN datasource.rxnorm_rxnconso relc
-		ON sbdrel.RXCUI1 = relc.RXCUI
-		AND relc.tty IN ('SCD','GPCK')
-		AND relc.sab = 'RXNORM'
+	INNER JOIN datasource.rxnorm_rxnconso product ON rxnsat.rxaui = product.rxaui
+	LEFT JOIN datasource.rxnorm_rxnrel rxnrel ON rxnsat.rxcui = rxnrel.rxcui2 AND rela = 'tradename_of' and product.tty IN ('BPCK','SBD')
+	LEFT JOIN datasource.rxnorm_rxnconso clinical_product
+		ON rxnrel.rxcui1 = clinical_product.rxcui
+		AND clinical_product.tty IN ('SCD','GPCK')
+		AND clinical_product.sab = 'RXNORM'
 WHERE rxnsat.atn = 'NDC'
-	AND rxnconso.tty in ('SCD','SBD','GPCK','BPCK')
-	AND rxnconso.sab = 'RXNORM';
+	AND product.tty in ('SCD','SBD','GPCK','BPCK')
+	AND product.sab = 'RXNORM';

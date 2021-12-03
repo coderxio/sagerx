@@ -91,7 +91,7 @@ def get_dataset(ds_url, data_folder, ti):
     if file_path.suffix == ".zip":
         with zipfile.ZipFile(file_path, "r") as zip_ref:
             zip_ref.extractall(file_path.with_suffix(""))
-        Path.rmdir(file_path)
+        Path.unlink(file_path)
         file_path = file_path.with_suffix("")
 
     file_path_str = file_path.resolve().as_posix()

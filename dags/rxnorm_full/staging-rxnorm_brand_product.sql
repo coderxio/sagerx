@@ -6,6 +6,7 @@ CREATE TABLE staging.rxnorm_brand_product (
     brand_product_name			TEXT,
 	brand_product_tty			VARCHAR(20),
     clinical_product_rxcui      VARCHAR(8) NOT NULL,
+    brand_rxcui			      	VARCHAR(8),
 	PRIMARY KEY(brand_product_rxcui)
 );
 

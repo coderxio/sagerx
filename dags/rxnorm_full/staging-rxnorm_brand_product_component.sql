@@ -15,21 +15,21 @@ SELECT DISTINCT
 	CASE WHEN product.tty = 'SBD' THEN product.rxcui ELSE product_component.rxcui END brand_product_component_rxcui
 	, CASE WHEN product.tty = 'SBD' THEN product.str ELSE product_component.str END brand_product_component_name
 	, CASE WHEN product.tty = 'SBD' THEN product.tty ELSE product_component.tty END brand_product_component_tty
-	, CASE WHEN product_component.tty = 'SCD' THEN product_component.rxcui ELSE clinical_product.rxcui END clinical_product_rxcui
+	, CASE WHEN product_component.tty = 'SCD' THEN product_component.rxcui ELSE clinical_product_component.rxcui END clinical_product_component_rxcui
 	, brand.rxcui AS brand_rxcui
 FROM datasource.rxnorm_rxnconso product
 LEFT JOIN datasource.rxnorm_rxnrel rxnrel ON rxnrel.rxcui2 = product.rxcui AND rxnrel.rela = 'contains'
 LEFT JOIN datasource.rxnorm_rxnconso product_component
 	ON rxnrel.rxcui1 = product_component.rxcui
-	AND product_component.tty IN ('SBD', 'SCD') -- NOTE: BPCKs can contaIN SBDs AND SCDs
+	AND product_component.tty IN ('SBD', 'SCD') -- NOTE: BPCKs can contain SBDs AND SCDs
 	AND product_component.sab = 'RXNORM'
 LEFT JOIN datasource.rxnorm_rxnrel rxnrel2 
 	ON rxnrel2.rxcui2 = CASE WHEN product_component.rxcui IS NULL THEN product.rxcui ELSE product_component.rxcui END 
 	AND rxnrel2.rela = 'tradename_of'
-LEFT JOIN datasource.rxnorm_rxnconso clinical_product
-    ON rxnrel2.rxcui1 = clinical_product.rxcui
-    AND clinical_product.tty IN('SCD', 'GPCK')
-    AND clinical_product.sab = 'RXNORM'
+LEFT JOIN datasource.rxnorm_rxnconso clinical_product_component
+    ON rxnrel2.rxcui1 = clinical_product_component.rxcui
+    AND clinical_product_component.tty = 'SCD'
+    AND clinical_product_component.sab = 'RXNORM'
 LEFT JOIN datasource.rxnorm_rxnrel rxnrel3 
 	ON rxnrel3.rxcui2 = CASE WHEN product_component.rxcui IS NULL THEN product.rxcui ELSE product_component.rxcui END 
 	AND rxnrel3.rela = 'has_ingredient'

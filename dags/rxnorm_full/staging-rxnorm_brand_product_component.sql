@@ -5,7 +5,7 @@ CREATE TABLE staging.rxnorm_brand_product_component (
     brand_product_component_rxcui       VARCHAR(8) NOT NULL,
     brand_product_component_name		TEXT,
 	brand_product_component_tty			VARCHAR(20),
-    clinical_product_rxcui     			VARCHAR(8) NOT NULL,
+    clinical_product_component_rxcui	VARCHAR(8) NOT NULL,
     brand_rxcui    						VARCHAR(8), -- NOTE: brand_product_component SCDs will have NULL for brand_rxcui
 	PRIMARY KEY(brand_product_component_rxcui)
 );

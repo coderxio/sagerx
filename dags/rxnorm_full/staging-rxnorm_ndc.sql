@@ -2,9 +2,9 @@
 DROP TABLE IF EXISTS staging.rxnorm_ndc CASCADE;
 
 CREATE TABLE staging.rxnorm_ndc (
-    ndc        			 varchar(12) PRIMARY KEY,
-    clinical_rxcui       varchar(8),
-    brand_rxcui          varchar(8)
+    ndc        			 		 varchar(12) PRIMARY KEY,
+    clinical_product_rxcui       varchar(8),
+    brand_product_rxcui          varchar(8)
 );
 
 INSERT INTO staging.rxnorm_ndc

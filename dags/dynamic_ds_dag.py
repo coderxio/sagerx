@@ -96,11 +96,6 @@ data_set_list = [
         #   "url": "https://www.fda.gov/media/76860/download"
     },
     {
-        "dag_id": "rxnorm",
-        "schedule_interval": "10 0 1 1 *",  # runs once monthly on the 1st day at 00:10
-        "url": "https://download.nlm.nih.gov/rxnorm/RxNorm_full_prescribe_current.zip",
-    },
-    {
         "dag_id": "medicaid_utilization",
         "schedule_interval": "0 0 1 1 *",  # run a year on jJan 1st
         "url": "https://download.medicaid.gov/data/state-drug-utilization-data-{{ macros.ds_format(ds, '%Y-%m-%d', '%Y' ) }}.csv",

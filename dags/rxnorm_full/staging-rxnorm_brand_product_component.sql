@@ -2,20 +2,32 @@
 DROP TABLE IF EXISTS staging.rxnorm_brand_product_component;
 
 CREATE TABLE staging.rxnorm_brand_product_component (
-    brand_product_component_rxcui       varchar(8) NOT NULL,
+    brand_product_component_rxcui       VARCHAR(8) NOT NULL,
     brand_product_component_name		TEXT,
-	brand_product_component_tty			varchar(20),
+	brand_product_component_tty			VARCHAR(20),
+    clinical_product_component_rxcui	VARCHAR(8) NOT NULL,
+    brand_rxcui    						VARCHAR(8), -- NOTE: brand_product_component SCDs will have NULL for brand_rxcui
 	PRIMARY KEY(brand_product_component_rxcui)
 );
 
 INSERT INTO staging.rxnorm_brand_product_component
 SELECT DISTINCT
-	case when product_component.rxcui is null then product.rxcui else product_component.rxcui end brand_product_component_rxcui
-	, case when product_component.str is null then product.str else product_component.str end brand_product_component_name
-	, case when product_component.tty is null then product.tty else product_component.tty end brand_product_component_tty
-from datasource.rxnorm_rxnconso product
-left join datasource.rxnorm_rxnrel rxnrel on rxnrel.rxcui2 = product.rxcui and rxnrel.rela = 'contains'
-left join datasource.rxnorm_rxnconso product_component on rxnrel.rxcui1 = product_component.rxcui and product_component.tty = 'SBD'
-where product.tty in('SBD', 'BPCK')
-	and product.sab = 'RXNORM'
-	and product_component.sab = 'RXNORM';
+	CASE WHEN product.tty = 'SBD' THEN product.rxcui ELSE product_component.rxcui END brand_product_component_rxcui
+	, CASE WHEN product.tty = 'SBD' THEN product.str ELSE product_component.str END brand_product_component_name
+	, CASE WHEN product.tty = 'SBD' THEN product.tty ELSE product_component.tty END brand_product_component_tty
+	, CASE WHEN product_component.tty = 'SCD' THEN product_component.rxcui ELSE rxnrel_scd.rxcui1 END clinical_product_component_rxcui
+	, rxnrel_bn.rxcui1 AS brand_rxcui
+FROM datasource.rxnorm_rxnconso product
+LEFT JOIN datasource.rxnorm_rxnrel rxnrel ON rxnrel.rxcui2 = product.rxcui AND rxnrel.rela = 'contains'
+LEFT JOIN datasource.rxnorm_rxnconso product_component
+	ON rxnrel.rxcui1 = product_component.rxcui
+	AND product_component.tty IN ('SBD', 'SCD') -- NOTE: BPCKs can contain SBDs AND SCDs
+	AND product_component.sab = 'RXNORM'
+LEFT JOIN datasource.rxnorm_rxnrel rxnrel_scd 
+	ON rxnrel_scd.rxcui2 = CASE WHEN product_component.rxcui IS NULL THEN product.rxcui ELSE product_component.rxcui END 
+	AND rxnrel_scd.rela = 'tradename_of' -- rxnrel_scd.rxcui1 = clinical_product_component_rxcui
+LEFT JOIN datasource.rxnorm_rxnrel rxnrel_bn 
+	ON rxnrel_bn.rxcui2 = CASE WHEN product_component.rxcui IS NULL THEN product.rxcui ELSE product_component.rxcui END 
+	AND rxnrel_bn.rela = 'has_ingredient' -- rxnrel_bn.rxcui1 = brand_rxcui
+WHERE product.tty IN('SBD', 'BPCK')
+	AND product.sab = 'RXNORM';

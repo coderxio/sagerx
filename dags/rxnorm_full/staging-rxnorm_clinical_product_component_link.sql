@@ -15,7 +15,9 @@ SELECT DISTINCT
     end AS rxnorm_clinical_product_component_rxcui
 from datasource.rxnorm_rxnconso product
 left join datasource.rxnorm_rxnrel rxnrel on rxnrel.rxcui2 = product.rxcui and rxnrel.rela = 'contains'
-left join datasource.rxnorm_rxnconso product_component on rxnrel.rxcui1 = product_component.rxcui and product_component.tty = 'SCD'
+left join datasource.rxnorm_rxnconso product_component
+    on rxnrel.rxcui1 = product_component.rxcui
+    and product_component.tty = 'SCD'
+    and product_component.sab = 'RXNORM'
 where product.tty in('SCD', 'GPCK')
-	and product.sab = 'RXNORM'
-    and product_component.sab = 'RXNORM';
+	and product.sab = 'RXNORM';

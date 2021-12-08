@@ -23,6 +23,5 @@ cvf			varchar(50),
 blank       TEXT
 );
 
-COPY datasource.rxnorm_rxnconso
-FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_rxnorm_full') }}/rrf/RXNCONSO.RRF' DELIMITER '|' CSV;
-
+COPY datasource.rxnorm_rxnconso FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_rxnorm_full') }}/rrf/RXNCONSO.RRF' CSV DELIMITER '|' ENCODING 'UTF8' ESCAPE E'\b' QUOTE E'\b';
+--ESCAPE and QOUTE characters are dummy to remove default

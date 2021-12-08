@@ -9,7 +9,7 @@ CREATE TABLE staging.rxnorm_ingredient_strength (
 	strength_denominator_value			TEXT,
 	strength_denominator_unit			TEXT,
 	strength_text						TEXT,
-	strength_active_ingreident			TEXT,
+	strength_active_ingredient			TEXT,
 	strength_active_moeity				TEXT,
 	strength_from						TEXT,
 	PRIMARY KEY (ingredient_strength_rxcui)
@@ -37,8 +37,8 @@ left join datasource.rxnorm_rxnsat strength_numerator_unit on strength_numerator
 left join datasource.rxnorm_rxnsat strength_denominator_value on strength_denominator_value.rxcui = ingredient_strength.rxcui and strength_denominator_value.atn = 'RXN_BOSS_STRENGTH_DENOM_VALUE'
 left join datasource.rxnorm_rxnsat strength_denominator_unit on strength_denominator_unit.rxcui = ingredient_strength.rxcui and strength_denominator_unit.atn = 'RXN_BOSS_STRENGTH_DENOM_UNIT'
 left join datasource.rxnorm_rxnsat strength_text on strength_text.rxcui = ingredient_strength.rxcui and strength_text.atn = 'RXN_STRENGTH'
-left join datasource.rxnorm_rxnsat strength_active_ingredient on strength_active_ingredient.rxcui = ingredient_strength.rxcui and strength_active_ingredient.atn = 'RXN_BOSS_AI'
-left join datasource.rxnorm_rxnsat strength_active_moeity on strength_active_moeity.rxcui = ingredient_strength.rxcui and strength_active_moeity.atn = 'RXN_BOSS_AM'
+left join datasource.rxnorm_rxnsat strength_active_ingredient on strength_active_ingredient.rxcui = ingredient_strength.rxcui and strength_active_ingredient.atn = 'RXN_AI'
+left join datasource.rxnorm_rxnsat strength_active_moeity on strength_active_moeity.rxcui = ingredient_strength.rxcui and strength_active_moeity.atn = 'RXN_AM'
 left join datasource.rxnorm_rxnsat strength_from on strength_from.rxcui = ingredient_strength.rxcui and strength_from.atn = 'RXN_BOSS_FROM'
 where ingredient_strength.tty = 'SCDC'
 	and ingredient_strength.sab = 'RXNORM';

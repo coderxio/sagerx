@@ -22,6 +22,8 @@ services:
       POSTGRES_USER: sagerx
       POSTGRES_PASSWORD: sagerx
       POSTGRES_DB: sagerx
+    ports:
+      - 5432:5432
     volumes:
       - ./postgres:/docker-entrypoint-initdb.d
       - ./data:/opt/airflow/data

@@ -15,7 +15,8 @@ substancename                       TEXT,
 active_numerator_strength           TEXT,
 active_ingred_unit                  TEXT,
 deaschedule                         TEXT,
-listing_record_certified_through    TEXT
+listing_record_certified_through    TEXT,
+PRIMARY KEY (productid)
 );
 
 COPY datasource.fda_unfinished_product

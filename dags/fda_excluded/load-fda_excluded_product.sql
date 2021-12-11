@@ -5,7 +5,7 @@ CREATE TABLE datasource.fda_excluded_product (
 productid                           TEXT,
 productndc                          TEXT,
 producttypename                     TEXT,
-propietaryname                      TEXT,
+proprietaryname                     TEXT,
 proprietarynamesuffix               TEXT,
 nonproprietaryname                  TEXT,
 dosageformname                      TEXT,
@@ -20,8 +20,9 @@ active_numerator_strength           TEXT,
 active_ingred_unit                  TEXT,
 pharm_classes                       TEXT,
 deaschedule                         TEXT,
-ndc_excluded_flag                   TEXT,
-listing_record_certified_through    TEXT
+ndc_exclude_flag                    TEXT,
+listing_record_certified_through    TEXT,
+PRIMARY KEY (productid)
 );
 
 COPY datasource.fda_excluded_product

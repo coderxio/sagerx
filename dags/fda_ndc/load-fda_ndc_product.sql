@@ -21,7 +21,8 @@ active_ingred_unit                  TEXT,
 pharm_classes                       TEXT, 
 deaschedule                         TEXT, 
 ndc_exclude_flag                    TEXT,
-listing_record_certified_through    TEXT
+listing_record_certified_through    TEXT,
+PRIMARY KEY (productid)
 );
 
 COPY datasource.fda_ndc_product

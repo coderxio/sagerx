@@ -150,6 +150,16 @@ with dag:
             )
         )
 
+    for sql in get_sql_list("alter-", ds_folder):
+        sql_path = ds_folder / sql
+        tl.append(
+            PostgresOperator(
+                task_id=sql,
+                postgres_conn_id="postgres_default",
+                sql=read_sql_file(sql_path),
+            )
+        )
+
     for i in range(len(tl)):
         if i not in [0]:
             tl[i - 1] >> tl[i]

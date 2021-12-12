@@ -1,18 +1,3 @@
-CREATE USER airflow WITH ENCRYPTED PASSWORD 'airflow';
-CREATE DATABASE airflow;
-GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;
-
---Make schemas for sagerx
-CREATE SCHEMA staging;
-CREATE SCHEMA datasource;
-CREATE SCHEMA flatfile;
-
---Make foreign data wrapper to allow sagerx read access to airflow tables
-CREATE EXTENSION IF NOT EXISTS postgres_fdw;
-CREATE SERVER airflow_fdw FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'postgres', port '5432', dbname 'airflow');
-CREATE USER MAPPING FOR sagerx SERVER airflow_fdw OPTIONS (user 'airflow', password 'airflow');
-GRANT USAGE ON FOREIGN SERVER airflow_fdw TO sagerx;
-
 --add ndc Converting functions to db public sagerx
 CREATE OR REPLACE FUNCTION ndc_format(ndc CHAR(13)) 
 RETURNS CHAR(8) 

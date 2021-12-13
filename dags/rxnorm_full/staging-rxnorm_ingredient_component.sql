@@ -2,9 +2,9 @@
 DROP TABLE IF EXISTS staging.rxnorm_ingredient_component;
 
 CREATE TABLE staging.rxnorm_ingredient_component (
-    ingredient_component_rxcui		varchar(8) NOT NULL,
+    ingredient_component_rxcui		VARCHAR(8) NOT NULL,
     ingredient_component_name 		TEXT,
-	ingredient_component_tty		varchar(20),
+	ingredient_component_tty		VARCHAR(20),
 	PRIMARY KEY(ingredient_component_rxcui)
 );
 

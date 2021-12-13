@@ -33,3 +33,10 @@ ALTER TABLE staging.rxnorm_brand_product_component_link
     ADD CONSTRAINT fk_brand_product_component
         FOREIGN KEY (brand_product_component_rxcui)
             REFERENCES staging.rxnorm_brand_product_component(brand_product_component_rxcui);
+
+/* staging.rxnorm_brand_product_component */
+ALTER TABLE staging.rxnorm_brand_product_component
+    DROP CONSTRAINT IF EXISTS fk_brand,
+    ADD CONSTRAINT fk_brand
+        FOREIGN KEY (brand_rxcui)
+            REFERENCES staging.rxnorm_brand(brand_rxcui);

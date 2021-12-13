@@ -29,5 +29,5 @@ LEFT JOIN datasource.rxnorm_rxnrel rxnrel_scd
 LEFT JOIN datasource.rxnorm_rxnrel rxnrel_bn 
 	ON rxnrel_bn.rxcui2 = CASE WHEN product_component.rxcui IS NULL THEN product.rxcui ELSE product_component.rxcui END 
 	AND rxnrel_bn.rela = 'has_ingredient' -- rxnrel_bn.rxcui1 = brand_rxcui
-WHERE product.tty IN('SBD', 'BPCK')
+WHERE product.tty IN ('SBD', 'BPCK')
 	AND product.sab = 'RXNORM';

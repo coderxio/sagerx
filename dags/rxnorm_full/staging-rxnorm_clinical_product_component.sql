@@ -2,10 +2,11 @@
 DROP TABLE IF EXISTS staging.rxnorm_clinical_product_component;
 
 CREATE TABLE staging.rxnorm_clinical_product_component (
-    clinical_product_component_rxcui VARCHAR(8) PRIMARY KEY,
+    clinical_product_component_rxcui VARCHAR(8) NOT NULL,
     clinical_product_compnent_name   TEXT,
     clinical_product_component_tty   VARCHAR(20),
-	ingredient_rxcui				 VARCHAR(8)
+	ingredient_rxcui				 VARCHAR(8),
+	PRIMARY KEY(clinical_product_component_rxcui)
 );
 
 INSERT INTO staging.rxnorm_clinical_product_component

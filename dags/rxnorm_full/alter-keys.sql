@@ -22,6 +22,13 @@ ALTER TABLE staging.rxnorm_clinical_product_component_link
         FOREIGN KEY (clinical_product_component_rxcui)
             REFERENCES staging.rxnorm_clinical_product_component(clinical_product_component_rxcui);
 
+/* staging.rxnorm_clinical_product_component */
+ALTER TABLE staging.rxnorm_clinical_product_component
+    DROP CONSTRAINT IF EXISTS fk_ingredient,
+    ADD CONSTRAINT fk_ingredient
+        FOREIGN KEY (ingredient_rxcui)
+            REFERENCES staging.rxnorm_ingredient(ingredient_rxcui);
+
 /* staging.rxnorm_brand_product_component_link */
 ALTER TABLE staging.rxnorm_brand_product_component_link
     DROP CONSTRAINT IF EXISTS fk_brand_product,
@@ -40,3 +47,10 @@ ALTER TABLE staging.rxnorm_brand_product_component
     ADD CONSTRAINT fk_brand
         FOREIGN KEY (brand_rxcui)
             REFERENCES staging.rxnorm_brand(brand_rxcui);
+
+/* staging.rxnorm_brand */
+ALTER TABLE staging.rxnorm_brand
+    DROP CONSTRAINT IF EXISTS fk_ingredient,
+    ADD CONSTRAINT fk_ingredient
+        FOREIGN KEY (ingredient_rxcui)
+            REFERENCES staging.rxnorm_ingredient(ingredient_rxcui);

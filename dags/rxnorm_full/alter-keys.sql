@@ -78,3 +78,20 @@ ALTER TABLE staging.rxnorm_ingredient_component_link
     ADD CONSTRAINT fk_ingredient_component
         FOREIGN KEY (ingredient_component_rxcui)
             REFERENCES staging.rxnorm_ingredient_component(ingredient_component_rxcui);
+
+/* staging.rxnorm_ingredient_strength_link */
+ALTER TABLE staging.rxnorm_ingredient_strength_link
+    DROP CONSTRAINT IF EXISTS fk_clinical_product_component,
+    ADD CONSTRAINT fk_clinical_product_component
+        FOREIGN KEY (clinical_product_component_rxcui)
+            REFERENCES staging.rxnorm_clinical_product_component(clinical_product_component_rxcui);
+ALTER TABLE staging.rxnorm_ingredient_strength_link
+    DROP CONSTRAINT IF EXISTS fk_ingredient_component,
+    ADD CONSTRAINT fk_ingredient_component
+        FOREIGN KEY (ingredient_component_rxcui)
+            REFERENCES staging.rxnorm_ingredient_component(ingredient_component_rxcui);
+ALTER TABLE staging.rxnorm_ingredient_strength_link
+    DROP CONSTRAINT IF EXISTS fk_ingredient_strength,
+    ADD CONSTRAINT fk_ingredient_strength
+        FOREIGN KEY (ingredient_strength_rxcui)
+            REFERENCES staging.rxnorm_ingredient_strength(ingredient_strength_rxcui);

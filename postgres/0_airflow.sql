@@ -1,11 +1,7 @@
+--Build airflow database and user
 CREATE USER airflow WITH ENCRYPTED PASSWORD 'airflow';
 CREATE DATABASE airflow;
 GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;
-
---Make schemas for sagerx
-CREATE SCHEMA staging;
-CREATE SCHEMA datasource;
-CREATE SCHEMA flatfile;
 
 --Make foreign data wrapper to allow sagerx read access to airflow tables
 CREATE EXTENSION IF NOT EXISTS postgres_fdw;

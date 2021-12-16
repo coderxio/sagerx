@@ -1,6 +1,6 @@
 /* datasource.rxnorm_rxncuichanges */
 
-DROP TABLE IF EXISTS  datasource.rxnorm_rxncuichanges;
+DROP TABLE IF EXISTS  datasource.rxnorm_rxncuichanges CASCADE;
 
 CREATE TABLE datasource.rxnorm_rxncuichanges (
       rxaui         varchar(8),

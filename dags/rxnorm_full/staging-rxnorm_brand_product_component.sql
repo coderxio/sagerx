@@ -1,5 +1,5 @@
 /* staging.rxnorm_brand_product_component (SBD) */
-DROP TABLE IF EXISTS staging.rxnorm_brand_product_component;
+DROP TABLE IF EXISTS staging.rxnorm_brand_product_component CASCADE;
 
 CREATE TABLE staging.rxnorm_brand_product_component (
     brand_product_component_rxcui       VARCHAR(8) NOT NULL,

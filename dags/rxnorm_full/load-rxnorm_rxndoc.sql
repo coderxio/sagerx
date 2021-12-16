@@ -1,6 +1,6 @@
 /* datasource.rxnorm_rxndoc */
 
-DROP TABLE IF EXISTS datasource.rxnorm_rxndoc;
+DROP TABLE IF EXISTS datasource.rxnorm_rxndoc CASCADE;
 
 CREATE TABLE datasource.rxnorm_rxndoc (
     dockey      varchar(50) NOT NULL,

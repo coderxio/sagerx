@@ -1,5 +1,5 @@
 /* staging.rxnorm_ingredient_component_link */
-DROP TABLE IF EXISTS staging.rxnorm_ingredient_component_link;
+DROP TABLE IF EXISTS staging.rxnorm_ingredient_component_link CASCADE;
 
 CREATE TABLE staging.rxnorm_ingredient_component_link (
     ingredient_rxcui				varchar(8) NOT NULL,

@@ -1,5 +1,5 @@
 /* datasource.rxnorm_rxnatomarchive */
-DROP TABLE IF EXISTS datasource.rxnorm_rxnatomarchive;
+DROP TABLE IF EXISTS datasource.rxnorm_rxnatomarchive CASCADE;
 
 CREATE TABLE datasource.rxnorm_rxnatomarchive (
    rxaui             varchar(8) not null,

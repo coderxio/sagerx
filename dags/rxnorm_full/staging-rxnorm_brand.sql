@@ -1,5 +1,5 @@
 /* stagnig.rxnorm_brand (BN) */
-DROP TABLE IF EXISTS staging.rxnorm_brand;
+DROP TABLE IF EXISTS staging.rxnorm_brand CASCADE;
 
 CREATE TABLE staging.rxnorm_brand (
     brand_rxcui         VARCHAR(8) NOT NULL,

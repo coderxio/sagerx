@@ -1,5 +1,5 @@
 /* datasource.fda_excluded_package */
-DROP TABLE IF EXISTS datasource.fda_excluded_package;
+DROP TABLE IF EXISTS datasource.fda_excluded_package CASCADE;
 
 CREATE TABLE datasource.fda_excluded_package (
 productid           TEXT NOT NULL,

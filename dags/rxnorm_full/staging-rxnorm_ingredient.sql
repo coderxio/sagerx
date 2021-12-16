@@ -1,5 +1,5 @@
 /*  staging.rxnorm_ingredient(in/min) */
-DROP TABLE IF EXISTS staging.rxnorm_ingredient;
+DROP TABLE IF EXISTS staging.rxnorm_ingredient CASCADE;
 
 CREATE TABLE staging.rxnorm_ingredient (
     ingredient_rxcui		varchar(8) NOT NULL,

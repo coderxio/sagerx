@@ -1,5 +1,5 @@
 /* datasource.fda_unfinished_product*/
-DROP TABLE IF EXISTS datasource.fda_unfinished_product;
+DROP TABLE IF EXISTS datasource.fda_unfinished_product CASCADE;
 
 CREATE TABLE datasource.fda_unfinished_product (
 productid                           TEXT,

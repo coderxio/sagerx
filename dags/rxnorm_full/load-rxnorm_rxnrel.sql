@@ -1,5 +1,5 @@
 /* datasource.rxnorm_rxnrel */
-DROP TABLE IF EXISTS datasource.rxnorm_rxnrel;
+DROP TABLE IF EXISTS datasource.rxnorm_rxnrel CASCADE;
 
 CREATE TABLE datasource.rxnorm_rxnrel (
     rxcui1    varchar(8) ,

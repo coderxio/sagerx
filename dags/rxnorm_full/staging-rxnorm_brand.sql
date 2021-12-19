@@ -1,5 +1,5 @@
 /* stagnig.rxnorm_brand (BN) */
-DROP TABLE IF EXISTS staging.rxnorm_brand;
+DROP TABLE IF EXISTS staging.rxnorm_brand CASCADE;
 
 CREATE TABLE staging.rxnorm_brand (
     brand_rxcui         VARCHAR(8) NOT NULL,
@@ -42,17 +42,9 @@ WITH cte AS (
 			, ingredient.str AS ingredient_name
 			, ingredient.tty AS ingredient_tty
 		FROM datasource.rxnorm_rxnconso brand
-		INNER JOIN datasource.rxnorm_rxnrel sbd_rxnrel ON sbd_rxnrel.rxcui2 = brand.rxcui and sbd_rxnrel.rela = 'ingredient_of'
-		INNER JOIN datasource.rxnorm_rxnconso sbd
-			ON sbd_rxnrel.rxcui1 = sbd.rxcui
-			AND sbd.tty = 'SBD'
-			AND sbd.sab = 'RXNORM'		
-		INNER JOIN datasource.rxnorm_rxnrel scd_rxnrel ON scd_rxnrel.rxcui2 = sbd.rxcui and scd_rxnrel.rela = 'tradename_of'
-		INNER JOIN datasource.rxnorm_rxnconso scd
-			ON scd_rxnrel.rxcui1 = scd.rxcui
-			AND scd.tty = 'SCD'
-			AND scd.sab = 'RXNORM'		
-		INNER JOIN datasource.rxnorm_rxnrel ingredient_rxnrel ON ingredient_rxnrel.rxcui2 = scd.rxcui and ingredient_rxnrel.rela = 'has_ingredients'
+		INNER JOIN datasource.rxnorm_rxnrel sbd_rxnrel ON sbd_rxnrel.rxcui2 = brand.rxcui AND sbd_rxnrel.rela = 'ingredient_of'
+		INNER JOIN datasource.rxnorm_rxnrel scd_rxnrel ON scd_rxnrel.rxcui2 = sbd_rxnrel.rxcui1 AND scd_rxnrel.rela = 'tradename_of'
+		INNER JOIN datasource.rxnorm_rxnrel ingredient_rxnrel ON ingredient_rxnrel.rxcui2 = scd_rxnrel.rxcui1 AND ingredient_rxnrel.rela = 'has_ingredients'
 		LEFT JOIN datasource.rxnorm_rxnconso ingredient
 			ON ingredient_rxnrel.rxcui1 = ingredient.rxcui
 			AND ingredient.tty = 'MIN'
@@ -66,12 +58,12 @@ SELECT DISTINCT
 	, brand.str AS brand_name
 	, brand.tty AS brand_tty
 	, cte.ingredient_rxcui AS ingredient_rxcui
-from datasource.rxnorm_rxnconso product
-INNER join datasource.rxnorm_rxnrel rxnrel on rxnrel.rxcui2 = product.rxcui and rxnrel.rela = 'has_ingredient'
+FROM datasource.rxnorm_rxnconso product
+INNER join datasource.rxnorm_rxnrel rxnrel ON rxnrel.rxcui2 = product.rxcui AND rxnrel.rela = 'has_ingredient'
 INNER join datasource.rxnorm_rxnconso brand
-	on rxnrel.rxcui1 = brand.rxcui
-	and brand.tty = 'BN'
-	and brand.sab = 'RXNORM'
+	ON rxnrel.rxcui1 = brand.rxcui
+	AND brand.tty = 'BN'
+	AND brand.sab = 'RXNORM'
 LEFT JOIN cte ON cte.brand_rxcui = brand.rxcui AND cte.rn < 2
-where product.tty = 'SBD'
-	and product.sab = 'RXNORM';
+WHERE product.tty = 'SBD'
+	AND product.sab = 'RXNORM';

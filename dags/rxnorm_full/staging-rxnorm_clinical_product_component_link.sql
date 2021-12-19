@@ -1,5 +1,5 @@
 /* staging.rxnorm_clinical_product_component_link */
-DROP TABLE IF EXISTS staging.rxnorm_clinical_product_component_link;
+DROP TABLE IF EXISTS staging.rxnorm_clinical_product_component_link CASCADE;
 
 CREATE TABLE staging.rxnorm_clinical_product_component_link (
     clinical_product_rxcui           varchar(8) NOT NULL,

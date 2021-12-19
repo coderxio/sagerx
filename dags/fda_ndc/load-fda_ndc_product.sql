@@ -1,5 +1,5 @@
 /* datasource.fda_ndc_product */
-DROP TABLE IF EXISTS datasource.fda_ndc_product;
+DROP TABLE IF EXISTS datasource.fda_ndc_product CASCADE;
 
 CREATE TABLE datasource.fda_ndc_product (
 productid                           TEXT, 
@@ -21,7 +21,8 @@ active_ingred_unit                  TEXT,
 pharm_classes                       TEXT, 
 deaschedule                         TEXT, 
 ndc_exclude_flag                    TEXT,
-listing_record_certified_through    TEXT
+listing_record_certified_through    TEXT,
+PRIMARY KEY (productid)
 );
 
 COPY datasource.fda_ndc_product

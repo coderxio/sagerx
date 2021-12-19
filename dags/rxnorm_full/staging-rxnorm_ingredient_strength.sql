@@ -1,5 +1,5 @@
 /* staging.rxnorm_ingredient_strength */
-DROP TABLE IF EXISTS staging.rxnorm_ingredient_strength;
+DROP TABLE IF EXISTS staging.rxnorm_ingredient_strength CASCADE;
 
 CREATE TABLE staging.rxnorm_ingredient_strength (
 	ingredient_strength_rxcui			varchar(8),

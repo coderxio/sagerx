@@ -5,6 +5,8 @@ CREATE TABLE staging.rxnorm_ingredient_component (
     ingredient_component_rxcui		VARCHAR(8) NOT NULL,
     ingredient_component_name 		TEXT,
 	ingredient_component_tty		VARCHAR(20),
+	active							BOOLEAN,
+	prescribable					BOOLEAN,
 	PRIMARY KEY(ingredient_component_rxcui)
 );
 
@@ -27,6 +29,8 @@ SELECT DISTINCT
 	CASE WHEN cte.ingredient_component_rxcui IS NULL THEN ingredient.rxcui ELSE cte.ingredient_component_rxcui END ingredient_component_rxcui
 	, CASE WHEN cte.ingredient_component_name IS NULL THEN ingredient.str ELSE cte.ingredient_component_name END ingredient_component_name
 	, CASE WHEN cte.ingredient_component_tty IS NULL THEN ingredient.tty ELSE cte.ingredient_component_tty END ingredient_component_tty
+	, CASE WHEN ingredient_component.suppress = 'N' THEN TRUE ELSE FALSE END AS active
+	, CASE WHEN ingredient_component.cvf = '4096' THEN TRUE ELSE FALSE END AS prescribable
 FROM datasource.rxnorm_rxnconso ingredient
 LEFT JOIN cte ON ingredient.rxcui = cte.ingredient_rxcui
 WHERE ingredient.tty IN('IN', 'MIN')

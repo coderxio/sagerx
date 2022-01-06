@@ -7,6 +7,8 @@ CREATE TABLE staging.rxnorm_clinical_product_component (
     clinical_product_component_tty   VARCHAR(20),
 	ingredient_rxcui				 VARCHAR(8),
 	dose_form_rxcui					 VARCHAR(8),
+	active							BOOLEAN,
+	prescribable					BOOLEAN,
 	PRIMARY KEY(clinical_product_component_rxcui)
 );
 
@@ -23,6 +25,8 @@ WITH cte AS (
 			, ingredient.rxcui AS ingredient_rxcui
 			, ingredient.str AS ingredient_name
 			, ingredient.tty AS ingredient_tty
+			, CASE WHEN product.suppress = 'N' THEN TRUE ELSE FALSE END AS active
+			, CASE WHEN product.cvf = '4096' THEN TRUE ELSE FALSE END AS prescribable
 		FROM datasource.rxnorm_rxnconso product_component
 		INNER JOIN datasource.rxnorm_rxnrel rxnrel ON rxnrel.rxcui2 = product_component.rxcui AND rxnrel.rela = 'has_ingredients'
 		INNER JOIN datasource.rxnorm_rxnconso ingredient

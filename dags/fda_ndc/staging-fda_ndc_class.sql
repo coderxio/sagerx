@@ -1,7 +1,7 @@
-/* staging.fda_class  */
-DROP TABLE IF EXISTS staging.fda_class;
+/* staging.fda_ndc_class  */
+DROP TABLE IF EXISTS staging.fda_ndc_class;
 
-CREATE TABLE staging.fda_class (
+CREATE TABLE staging.fda_ndc_class (
 	productid	TEXT NOT NULL,
 	productndc 	TEXT NOT NULL,
 	class_line 	TEXT NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE staging.fda_class (
 	PRIMARY KEY (productid,productndc,class_line)
 );
 
-INSERT INTO staging.fda_class
+INSERT INTO staging.fda_ndc_class
 SELECT
 	z.productid
 	,ROW_NUMBER() OVER (PARTITION BY z.productid ORDER BY z.token DESC) AS class_line

@@ -5,10 +5,10 @@ CREATE TABLE staging.rxnorm_clinical_product_component (
     clinical_product_component_rxcui VARCHAR(8) NOT NULL,
     clinical_product_compnent_name   TEXT,
     clinical_product_component_tty   VARCHAR(20),
-	ingredient_rxcui				 VARCHAR(8),
-	dose_form_rxcui					 VARCHAR(8),
 	active							BOOLEAN,
 	prescribable					BOOLEAN,
+	ingredient_rxcui				 VARCHAR(8),
+	dose_form_rxcui					 VARCHAR(8),
 	PRIMARY KEY(clinical_product_component_rxcui)
 );
 
@@ -25,8 +25,6 @@ WITH cte AS (
 			, ingredient.rxcui AS ingredient_rxcui
 			, ingredient.str AS ingredient_name
 			, ingredient.tty AS ingredient_tty
-			, CASE WHEN product.suppress = 'N' THEN TRUE ELSE FALSE END AS active
-			, CASE WHEN product.cvf = '4096' THEN TRUE ELSE FALSE END AS prescribable
 		FROM datasource.rxnorm_rxnconso product_component
 		INNER JOIN datasource.rxnorm_rxnrel rxnrel ON rxnrel.rxcui2 = product_component.rxcui AND rxnrel.rela = 'has_ingredients'
 		INNER JOIN datasource.rxnorm_rxnconso ingredient
@@ -61,6 +59,10 @@ SELECT DISTINCT
 	CASE WHEN product_component.rxcui IS NULL THEN product.rxcui ELSE product_component.rxcui END clinical_product_component_rxcui
 	, CASE WHEN product_component.str IS NULL THEN product.str ELSE product_component.str END clinical_product_compnent_name 
 	, CASE WHEN product_component.tty IS NULL THEN product.tty ELSE product_component.tty END clinical_product_component_tty
+	, CASE WHEN 
+		CASE WHEN product_component.rxcui IS NULL THEN product.suppress ELSE product_component.suppress END = 'N' THEN TRUE ELSE FALSE END AS active
+	, CASE WHEN 
+		CASE WHEN product_component.rxcui IS NULL THEN product.cvf ELSE product_component.cvf END = '4096' THEN TRUE ELSE FALSE END AS prescribable
 	, cte.ingredient_rxcui AS ingredient_rxcui
 	, dose_form_rxnrel.rxcui1 AS dose_form_rxcui
 FROM datasource.rxnorm_rxnconso product

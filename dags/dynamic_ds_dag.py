@@ -61,8 +61,8 @@ data_set_list = [
     {
         "dag_id": "cms_addendum_b",
         "schedule_interval": "0 0 20 */3 *",  # runs every quarter on the 20th
-        "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-addendum-b.zip?agree=yes&next=Accept",
-        # "url": "https://www.cms.gov/files/zip/october-2021-addendum-b.zip?agree=yes&next=Accept"
+        "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-opps-addendum-b.zip?agree=yes&next=Accept",
+        # "url": "https://www.cms.gov/license/ama?file=/files/zip/january-2022-opps-addendum-b.zip?agree=yes&next=Accept"
         "user_defined_macros": {
             "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
             "ds_datetime": user_macros.ds_datetime,

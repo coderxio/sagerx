@@ -1,6 +1,6 @@
 /* datasource.cms_addendum_b */
 
-DROP TABLE IF EXISTS datasource.cms_addendum_b;
+DROP TABLE IF EXISTS datasource.cms_addendum_b CASCADE;
 
 CREATE TABLE datasource.cms_addendum_b (
 hcpcs                           TEXT,

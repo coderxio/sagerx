@@ -12,6 +12,8 @@ CREATE TABLE staging.rxnorm_ingredient_strength (
 	strength_active_ingredient			TEXT,
 	strength_active_moeity				TEXT,
 	strength_from						TEXT,
+	active					BOOLEAN,
+	prescribable			BOOLEAN,
 	PRIMARY KEY (ingredient_strength_rxcui)
 );
 
@@ -31,6 +33,8 @@ SELECT
 		WHEN strength_from.atv = 'AM' THEN 'ACTIVE_MOEITY'
 		ELSE NULL
 	  END AS strength_from
+	, CASE WHEN ingredient_strength.suppress = 'N' THEN TRUE ELSE FALSE END AS active
+	, CASE WHEN ingredient_strength.cvf = '4096' THEN TRUE ELSE FALSE END AS prescribable
 from datasource.rxnorm_rxnconso ingredient_strength
 left join datasource.rxnorm_rxnsat strength_numerator_value on strength_numerator_value.rxcui = ingredient_strength.rxcui and strength_numerator_value.atn = 'RXN_BOSS_STRENGTH_NUM_VALUE'
 left join datasource.rxnorm_rxnsat strength_numerator_unit on strength_numerator_unit.rxcui = ingredient_strength.rxcui and strength_numerator_unit.atn = 'RXN_BOSS_STRENGTH_NUM_UNIT'

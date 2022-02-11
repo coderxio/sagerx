@@ -1,5 +1,5 @@
 /* datasource.cms_addendum_a */
-DROP TABLE IF EXISTS datasource.cms_addendum_a;
+DROP TABLE IF EXISTS datasource.cms_addendum_a CASCADE;
 CREATE TABLE datasource.cms_addendum_a (
 apc                            TEXT,
 group_title                    TEXT,

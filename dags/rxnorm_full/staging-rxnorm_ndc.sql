@@ -2,9 +2,11 @@
 DROP TABLE IF EXISTS staging.rxnorm_ndc CASCADE;
 
 CREATE TABLE staging.rxnorm_ndc (
-    ndc        			 		 varchar(12) PRIMARY KEY,
-    clinical_product_rxcui       varchar(8),
-    brand_product_rxcui          varchar(8)
+    ndc							VARCHAR(12) PRIMARY KEY,
+    clinical_product_rxcui		VARCHAR(8),
+    brand_product_rxcui			VARCHAR(8),
+	active						BOOLEAN,
+	prescribable				BOOLEAN
 );
 
 INSERT INTO staging.rxnorm_ndc
@@ -13,7 +15,8 @@ SELECT rxnsat.atv as ndc
 		ELSE rxnsat.rxcui END AS clinical_product_rxcui		
 	,CASE WHEN product.tty IN ('BPCK','SBD') THEN rxnsat.rxcui
 		ELSE NULL END AS brand_product_rxcui
-
+	, CASE WHEN rxnsat.suppress = 'N' THEN TRUE ELSE FALSE END AS active
+	, CASE WHEN rxnsat.cvf = '4096' THEN TRUE ELSE FALSE END AS prescribable
 FROM datasource.rxnorm_rxnsat rxnsat
 	INNER JOIN datasource.rxnorm_rxnconso product ON rxnsat.rxaui = product.rxaui
 	LEFT JOIN datasource.rxnorm_rxnrel rxnrel ON rxnsat.rxcui = rxnrel.rxcui2 AND rela = 'tradename_of' and product.tty IN ('BPCK','SBD')

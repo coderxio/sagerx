@@ -5,6 +5,8 @@ CREATE TABLE staging.rxnorm_brand (
     brand_rxcui         VARCHAR(8) NOT NULL,
     brand_name			TEXT,
 	brand_tty			VARCHAR(20),
+	active				BOOLEAN,
+	prescribable		BOOLEAN,
     ingredient_rxcui    VARCHAR(8) NOT NULL,
 	PRIMARY KEY(brand_rxcui)
 );
@@ -57,6 +59,8 @@ SELECT DISTINCT
 	brand.rxcui AS brand_rxcui
 	, brand.str AS brand_name
 	, brand.tty AS brand_tty
+	, CASE WHEN brand.suppress = 'N' THEN TRUE ELSE FALSE END AS active
+	, CASE WHEN brand.cvf = '4096' THEN TRUE ELSE FALSE END AS prescribable
 	, cte.ingredient_rxcui AS ingredient_rxcui
 FROM datasource.rxnorm_rxnconso product
 INNER join datasource.rxnorm_rxnrel rxnrel ON rxnrel.rxcui2 = product.rxcui AND rxnrel.rela = 'has_ingredient'

@@ -7,6 +7,8 @@ CREATE TABLE staging.rxnorm_brand_product_component (
 	brand_product_component_tty			VARCHAR(20),
     clinical_product_component_rxcui	VARCHAR(8) NOT NULL,
     brand_rxcui    						VARCHAR(8), -- NOTE: brand_product_component SCDs will have NULL for brand_rxcui
+	active								BOOLEAN,
+	prescribable						BOOLEAN,
 	PRIMARY KEY(brand_product_component_rxcui)
 );
 
@@ -17,6 +19,10 @@ SELECT DISTINCT
 	, CASE WHEN product.tty = 'SBD' THEN product.tty ELSE product_component.tty END brand_product_component_tty
 	, CASE WHEN product_component.tty = 'SCD' THEN product_component.rxcui ELSE rxnrel_scd.rxcui1 END clinical_product_component_rxcui
 	, rxnrel_bn.rxcui1 AS brand_rxcui
+	, CASE WHEN 
+		CASE WHEN product.tty = 'SBD' THEN product.suppress ELSE product_component.suppress END = 'N' THEN TRUE ELSE FALSE END AS active
+	, CASE WHEN 
+		CASE WHEN product.tty = 'SBD' THEN product.cvf ELSE product_component.cvf END = '4096' THEN TRUE ELSE FALSE END AS prescribable
 FROM datasource.rxnorm_rxnconso product
 LEFT JOIN datasource.rxnorm_rxnrel rxnrel ON rxnrel.rxcui2 = product.rxcui AND rxnrel.rela = 'contains'
 LEFT JOIN datasource.rxnorm_rxnconso product_component

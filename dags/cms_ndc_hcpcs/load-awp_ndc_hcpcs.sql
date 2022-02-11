@@ -1,5 +1,5 @@
 /* datasource.awp_ndc_hcpcs */
-DROP TABLE IF EXISTS datasource.awp_ndc_hcpcs;
+DROP TABLE IF EXISTS datasource.awp_ndc_hcpcs CASCADE;
 
 CREATE TABLE datasource.awp_ndc_hcpcs (
 

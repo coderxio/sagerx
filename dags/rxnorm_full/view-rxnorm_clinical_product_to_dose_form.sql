@@ -11,6 +11,8 @@ AS
         , rdf.dose_form_rxcui
         , dose_form_name
         , dose_form_tty
+        , rcp.active
+        , rcp.prescribable
     FROM staging.rxnorm_clinical_product rcp 
     LEFT JOIN staging.rxnorm_clinical_product_component_link rcpcl 
         ON rcp.clinical_product_rxcui = rcpcl.clinical_product_rxcui 

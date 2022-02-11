@@ -1,5 +1,5 @@
 /* datasource.cms_noc_pricing */
-DROP TABLE IF EXISTS datasource.cms_noc_pricing;
+DROP TABLE IF EXISTS datasource.cms_noc_pricing CASCADE;
 
 CREATE TABLE datasource.cms_noc_pricing (
 generic_name      TEXT,

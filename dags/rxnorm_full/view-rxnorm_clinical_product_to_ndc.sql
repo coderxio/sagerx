@@ -16,6 +16,8 @@ AS
         , ingredient_tty
         , brand_product_rxcui
         , ndc
+        , rcp.active
+        , rcp.prescribable
     FROM staging.rxnorm_clinical_product rcp 
     LEFT JOIN staging.rxnorm_clinical_product_component_link rcpcl 
         ON rcp.clinical_product_rxcui = rcpcl.clinical_product_rxcui 

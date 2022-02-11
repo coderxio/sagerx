@@ -1,5 +1,5 @@
 /* datasource.noc_ndc_hcpcs */
-DROP TABLE IF EXISTS datasource.noc_ndc_hcpcs;
+DROP TABLE IF EXISTS datasource.noc_ndc_hcpcs CASCADE;
 
 CREATE TABLE datasource.noc_ndc_hcpcs (
 

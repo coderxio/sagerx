@@ -1,5 +1,5 @@
 /* datasource.cms_asp_pricing */
-DROP TABLE IF EXISTS datasource.cms_asp_pricing;
+DROP TABLE IF EXISTS datasource.cms_asp_pricing CASCADE;
 
 CREATE TABLE datasource.cms_asp_pricing (
 hcpcs               TEXT,

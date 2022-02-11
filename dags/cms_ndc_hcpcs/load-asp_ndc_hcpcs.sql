@@ -1,5 +1,5 @@
 /* datasource.asp_ndc_hcpcs */
-DROP TABLE IF EXISTS datasource.asp_ndc_hcpcs;
+DROP TABLE IF EXISTS datasource.asp_ndc_hcpcs CASCADE;
 
 CREATE TABLE datasource.asp_ndc_hcpcs (
 

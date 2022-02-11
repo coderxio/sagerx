@@ -1,4 +1,17 @@
-SELECT z.*
+/* flatfile.cms_all */
+CREATE OR REPLACE VIEW flatfile.cms_all
+AS
+SELECT z.source_type
+	,z.hcpcs
+	,z.short_description
+	,z.labeler_name
+	,ndc_to_11(z.ndc) AS ndc
+	,z.drug_name
+	,z.hcpcs_dosage
+	,z.pkg_size
+	,z.pkg_qty
+	,z.billing_units
+	,z.bill_units_pkg
 	,asp_p.payment_limit AS asp_payment_limit
 	,noc_p.payment_limit AS noc_payment_limit
 	,COALESCE(add_b.si,'NOC') AS si

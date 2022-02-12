@@ -208,7 +208,7 @@ for ds in data_set_list:
         "email_on_failure": False,
         "email_on_retry": False,
         "retries": 1,
-        "retry_delay": timedelta(minutes=1),
+        "retry_delay": timedelta(minutes=5),
         # none airflow common dag elements
         "retrieve_dataset_function": get_dataset,
         "on_failure_callback": alert_slack_channel,

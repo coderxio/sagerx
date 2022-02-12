@@ -9,6 +9,8 @@ x-airflow-common:
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW_CONN_POSTGRES_DEFAULT: postgresql://sagerx:sagerx@postgres/sagerx
     AIRFLOW_VAR_UMLS_API: ${UMLS_API}
+    AIRFLOW_CONN_SLACK: http://:@https://hooks.slack.com/services?__extra__=${SLACK_TOKEN}
+    ENV: ${ENV}
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
   volumes:
     - ./dags:/opt/airflow/dags

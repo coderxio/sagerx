@@ -1,4 +1,8 @@
 from pathlib import Path
+from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperator
+import os
+
+ENV = os.environ["ENV"]
 
 # Filesystem functions
 def create_path(*args):
@@ -107,3 +111,27 @@ def get_sql_list(pre_str: str = "", ds_path: Path = Path.cwd()):
 
     sql_file_list = [path.name for path in ds_path.glob(pre_str + "*.sql")]
     return sql_file_list
+
+
+# Slack webhook function
+def alert_slack_channel(context):
+    if ENV == "PRD":
+        msg = """
+                :red_circle: Task Failed
+                *Task*: {task}  
+                *Dag*: {dag} 
+                *Execution Time*: {exec_date}  
+                *Log Url*: {log_url} 
+                """.format(
+                task=context.get('task_instance').task_id,
+                dag=context.get('task_instance').dag_id,
+                ti=context.get('task_instance'),
+                exec_date=context.get('execution_date'),
+                log_url=context.get('task_instance').log_url,
+            )
+
+        SlackWebhookOperator(
+            task_id='alert_slack_channel',
+            http_conn_id='slack',
+            message=msg,
+        ).execute(context=None)

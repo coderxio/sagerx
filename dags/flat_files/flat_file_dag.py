@@ -3,7 +3,7 @@ from textwrap import dedent
 from pathlib import Path
 import calendar
 
-from sagerx import read_sql_file, get_sql_list
+from sagerx import read_sql_file, get_sql_list, alert_slack_channel
 
 ds = {"dag_id": "flat_files", "schedule_interval": "0 0 1 1 *"}  # yearly
 
@@ -61,6 +61,7 @@ default_args = {
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
     # none airflow common dag elements
+    "on_failure_callback": alert_slack_channel,
 }
 
 dag_args = {**default_args, **ds}

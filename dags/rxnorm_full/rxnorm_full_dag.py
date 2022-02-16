@@ -1,12 +1,12 @@
+from airflow.models import Variable
 from datetime import date, timedelta
 from textwrap import dedent
 from pathlib import Path
-import os
 
 from sagerx import get_dataset, read_sql_file, get_sql_list, alert_slack_channel
 
 download_url = "https://download.nlm.nih.gov/umls/kss/rxnorm/RxNorm_full_current.zip"
-apikey = os.environ["AIRFLOW_VAR_UMLS_API"]
+apikey =  Variable.get('umls_api')
 
 ds = {
     "dag_id": "rxnorm_full",

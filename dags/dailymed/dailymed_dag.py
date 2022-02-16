@@ -96,7 +96,7 @@ default_args = {
     "owner": "airflow",
     "start_date": days_ago(0),
     "depends_on_past": False,
-    "email": ["airflow@example.com"],
+    "email": ["admin@sagerx.io"],
     "email_on_failure": False,
     "email_on_retry": False,
     "retries": 1,

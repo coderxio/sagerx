@@ -6,7 +6,7 @@ from pathlib import Path
 from sagerx import get_dataset, read_sql_file, get_sql_list, alert_slack_channel
 
 download_url = "https://download.nlm.nih.gov/umls/kss/rxnorm/RxNorm_full_current.zip"
-apikey =  Variable.get('umls_api')
+apikey = Variable.get('umls_api')
 
 ds = {
     "dag_id": "rxnorm_full",

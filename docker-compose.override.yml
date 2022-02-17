@@ -28,7 +28,17 @@ services:
       - ./postgres:/docker-entrypoint-initdb.d
       - ./data:/opt/airflow/data
       - ./extracts:/opt/airflow/extracts
-
+      - ./logs/postgresql:/var/log/postgresql
+    command:
+      [
+        "postgres",
+        "-c",
+        "logging_collector=on",
+        "-c",
+        "log_directory=/var/log/postgresql",
+        "-c",
+        "log_destination=csvlog"
+      ]
   pgadmin:
     environment:
       PGADMIN_DEFAULT_EMAIL: pgadmin@pgadmin.org
@@ -46,9 +56,10 @@ services:
     command:
       - -c
       - |
-        mkdir -p /sources/logs /sources/dags /sources/plugins /sources/data /sources/extracts
+        mkdir -p /sources/logs/postgresql /sources/dags /sources/plugins /sources/data /sources/extracts
         chown -R "${AIRFLOW_UID}:${AIRFLOW_GID-0}" /sources/{logs,dags,plugins,data,extracts}
-        chmod o+rw /sources/extracts
+        chmod -R o+rw /sources/extracts
+        chmod -R o+rw /sources/logs
         exec /entrypoint airflow version
     environment:
       <<: *airflow-common-env

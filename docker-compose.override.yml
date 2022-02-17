@@ -28,16 +28,7 @@ services:
       - ./postgres:/docker-entrypoint-initdb.d
       - ./data:/opt/airflow/data
       - ./extracts:/opt/airflow/extracts
-    command:
-      [
-        "postgres",
-        "-c",
-        "shared_preload_libraries=pg_stat_statements",
-        "-c",
-        "pg_stat_statements.max=10000",
-        "-c",
-        "pg_stat_statements.track=all"
-      ]
+
   pgadmin:
     environment:
       PGADMIN_DEFAULT_EMAIL: pgadmin@pgadmin.org

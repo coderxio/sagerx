@@ -3,7 +3,7 @@ from textwrap import dedent
 from pathlib import Path
 import calendar
 
-from sagerx import get_dataset, read_sql_file, get_sql_list
+from sagerx import get_dataset, read_sql_file, get_sql_list, alert_slack_channel
 
 import user_macros
 
@@ -204,13 +204,14 @@ for ds in data_set_list:
         "owner": "airflow",
         "start_date": days_ago(0),
         "depends_on_past": False,
-        "email": ["airflow@example.com"],
+        "email": ["admin@sagerx.io"],
         "email_on_failure": False,
         "email_on_retry": False,
         "retries": 1,
         "retry_delay": timedelta(minutes=5),
         # none airflow common dag elements
         "retrieve_dataset_function": get_dataset,
+        "on_failure_callback": alert_slack_channel,
     }
 
     dag_args = {**default_args, **ds}

@@ -1,12 +1,12 @@
+from airflow.models import Variable
 from datetime import date, timedelta
 from textwrap import dedent
 from pathlib import Path
-import os
 
-from sagerx import get_dataset, read_sql_file, get_sql_list
+from sagerx import get_dataset, read_sql_file, get_sql_list, alert_slack_channel
 
 download_url = "https://download.nlm.nih.gov/umls/kss/rxnorm/RxNorm_full_current.zip"
-apikey = os.environ["AIRFLOW_VAR_UMLS_API"]
+apikey = Variable.get('umls_api')
 
 ds = {
     "dag_id": "rxnorm_full",
@@ -63,13 +63,14 @@ default_args = {
     "owner": "airflow",
     "start_date": days_ago(0),
     "depends_on_past": False,
-    "email": ["airflow@example.com"],
+    "email": ["admin@sagerx.io"],
     "email_on_failure": False,
     "email_on_retry": False,
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
     # none airflow common dag elements
     "retrieve_dataset_function": get_dataset,
+    "on_failure_callback": alert_slack_channel,
 }
 
 dag_args = {**default_args, **ds}

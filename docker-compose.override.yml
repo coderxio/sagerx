@@ -50,7 +50,7 @@ services:
       - |
         mkdir -p /sources/logs /sources/dags /sources/plugins /sources/data /sources/extracts
         chown -R "${AIRFLOW_UID}:${AIRFLOW_GID-0}" /sources/{logs,dags,plugins,data,extracts}
-        chmod o+rw /sources/extracts
+        chmod -R o+rw /sources/extracts
         exec /entrypoint airflow version
     environment:
       <<: *airflow-common-env

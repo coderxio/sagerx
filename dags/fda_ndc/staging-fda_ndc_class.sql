@@ -3,11 +3,10 @@ DROP TABLE IF EXISTS staging.fda_ndc_class;
 
 CREATE TABLE staging.fda_ndc_class (
 	productid	TEXT NOT NULL,
-	productndc 	TEXT NOT NULL,
 	class_line 	TEXT NOT NULL,
 	class_name 	TEXT,
 	class_type 	TEXT,
-	PRIMARY KEY (productid,productndc,class_line)
+	PRIMARY KEY (productid,class_line)
 );
 
 INSERT INTO staging.fda_ndc_class

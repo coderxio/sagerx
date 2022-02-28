@@ -1,4 +1,3 @@
-
 CREATE OR REPLACE VIEW flatfile.nadac_current
 AS 
 SELECT *

@@ -1,5 +1,5 @@
 <xsl:transform version="1.0" 
-        					 xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+            				 xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
 							 xmlns:v3="urn:hl7-org:v3" 
 							 xmlns:v="http://validator.pragmaticdata.com/result" 
 							 xmlns:str="http://exslt.org/strings" 
@@ -13,6 +13,7 @@
     <dailymed>
         <xsl:apply-templates select="v3:document"/>
         <xsl:apply-templates select="v3:document/v3:component"/>
+        <xsl:apply-templates select="//v3:code[@code='34073-7']"/>
         <xsl:apply-templates select="/v3:document/v3:author/v3:assignedEntity/v3:representedOrganization"/>
     </dailymed>
 </xsl:template>
@@ -34,6 +35,14 @@
         <NDC><xsl:value-of select="./@code"/></NDC>
     </xsl:for-each>
     </ndc_list>
+</xsl:template>
+
+<!--Drug Interactions -->
+<xsl:template match="//v3:code[@code='34073-7']"> 
+    <InteractionText>
+        <xsl:value-of select=".."/>
+    </InteractionText>
+
 </xsl:template>
 
 <!-- establishment info -->
@@ -68,7 +77,7 @@
                         <name><xsl:value-of select="@displayName"/></name>
                         <item_list>
                         	    <xsl:for-each select="../../../v3:performance/v3:actDefinition[v3:code/@code = $code]/v3:product/v3:manufacturedProduct/v3:manufacturedMaterialKind/v3:code/@code">
-								                <item><xsl:value-of select="."/></item>
+								<item><xsl:value-of select="."/></item>
                               </xsl:for-each>
                         </item_list>
                     </function>

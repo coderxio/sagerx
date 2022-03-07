@@ -13,7 +13,7 @@ from sagerx import (
 
 ds = {
     "dag_id": "dailymed_daily",
-    "schedule_interval": "45 7 * * *",  # at 7:45 am once daily)
+    "schedule_interval": "45 7 * * 1-5",  # at 7:45 am once daily)
     "url": "https://dailymed-data.nlm.nih.gov/public-release-files/dm_spl_daily_update_{{ macros.ds_format(macros.ds_add(ds,-1), '%Y-%m-%d', '%m%d%Y') }}.zip",
 }
 

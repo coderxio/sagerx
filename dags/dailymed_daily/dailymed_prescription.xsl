@@ -23,6 +23,8 @@
     <SetId><xsl:value-of select="/v3:document/v3:setId/@root"/></SetId>
     <VersionNumber><xsl:value-of select="/v3:document/v3:versionNumber/@value"/></VersionNumber>
     <EffectiveDate><xsl:value-of select="/v3:document/v3:effectiveTime/@value"/></EffectiveDate>
+    <MarketStatus><xsl:value-of select="//v3:subjectOf/v3:approval/v3:code/@displayName"/></MarketStatus>
+    <ApplicationNumber><xsl:value-of select="//v3:subjectOf/v3:approval/v3:id/@extension"/></ApplicationNumber>
 </xsl:template>
 
 <!-- NDC -->

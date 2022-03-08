@@ -115,8 +115,13 @@ data_set_list = [
     },
     {
         "dag_id": "dailymed_pharm_class_mapping",
-        "schedule_interval": "30 5 * * *",  # run at 5:30am every day
+        "schedule_interval": "0 5 * * *",  # run at 5am every day
         "url": "https://dailymed-data.nlm.nih.gov/public-release-files/pharmacologic_class_mappings.zip",
+    },
+    {
+        "dag_id": "dailymed_zip_file_metadata_mapping",
+        "schedule_interval": "0 5 * * *",  # run at 5am every day
+        "url": "https://dailymed-data.nlm.nih.gov/public-release-files/dm_spl_zip_files_meta_data.zip",
     },
 ]
 

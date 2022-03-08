@@ -113,6 +113,11 @@ data_set_list = [
         "schedule_interval": "0 5 * * *",  # run at 5am every day
         "url": "https://dailymed-data.nlm.nih.gov/public-release-files/rxnorm_mappings.zip",
     },
+    {
+        "dag_id": "dailymed_pharm_class_mapping",
+        "schedule_interval": "30 5 * * *",  # run at 5:30am every day
+        "url": "https://dailymed-data.nlm.nih.gov/public-release-files/pharmacologic_class_mappings.zip",
+    },
 ]
 
 

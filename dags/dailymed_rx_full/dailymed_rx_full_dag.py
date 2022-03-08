@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 from textwrap import dedent
 from pathlib import Path
+from lxml import etree
 
 from sagerx import create_path, read_sql_file, get_sql_list, alert_slack_channel
 
@@ -10,7 +11,7 @@ file_set = "dm_spl_release_human_rx_part"
 
 ds = {
     "dag_id": "dailymed_rx_full",
-    "schedule_interval": "0 0 1 * *",  # run once monthly)
+    "schedule_interval": None,
     "url": "https://dailymed-data.nlm.nih.gov/public-release-files/",
 }
 
@@ -36,6 +37,17 @@ def obtain_ftp_file_list(ftp, file_set: str):
     return file_list
 
 
+def transform_xml(input_xml, xslt):
+    # load xml input
+    dom = etree.parse(input_xml, etree.XMLParser(huge_tree=True))
+    # load XSLT
+    xslt_doc = etree.parse(xslt)
+    xslt_transformer = etree.XSLT(xslt_doc)
+    # apply XSLT on loaded dom
+    new_xml = xslt_transformer(dom)
+    return etree.tostring(new_xml, pretty_print=True).decode("utf-8")
+
+
 def get_dailymed_files(
     ftp,
     data_folder,
@@ -54,30 +66,43 @@ def get_dailymed_files(
     os.remove(zip_path)
 
 
-def load_xml(data_folder):
+def process_dailymed(data_folder, xslt, ti):
     import zipfile
     import re
-    import pandas as pd
-    import sqlalchemy
     import os
     import logging
+    import pandas as pd
+    import sqlalchemy
 
     db_conn_string = os.environ["AIRFLOW_CONN_POSTGRES_DEFAULT"]
     db_conn = sqlalchemy.create_engine(db_conn_string)
 
+    data_folder = (
+        data_folder
+        / "prescription"
+    )
+
     for zip_folder in data_folder.iterdir():
-        unzipped_folder = zipfile.ZipFile(zip_folder, "r")
-        for subfile in unzipped_folder.infolist():
-            if re.match(".*.xml", subfile.filename):
-                file_name = subfile.filename
-                xml_content = unzipped_folder.read(file_name).decode("utf-8")
-                df = pd.DataFrame(
-                    columns=["file", "xml_content"], data=[[file_name, xml_content]]
-                )
-                logging.info(xml_content)
-                df.to_sql(
-                    "dailymed_rx", schema="datasource", con=db_conn, if_exists="append",index=False
-                )
+        logging.info(zip_folder)
+        with zipfile.ZipFile(zip_folder) as unzipped_folder:
+            folder_name = zip_folder.stem
+            for subfile in unzipped_folder.infolist():
+                if re.match(".*.xml", subfile.filename):
+                    new_file = unzipped_folder.extract(subfile, data_folder)
+                    # xslt transform
+                    xml_content = transform_xml(new_file, xslt)
+                    os.remove(new_file)
+                    df = pd.DataFrame(
+                        columns=["spl", "file_name", "xml_content"],
+                        data=[[folder_name, subfile.filename, xml_content]],
+                    )
+                    df.to_sql(
+                        "dailymed_rx_full",
+                        schema="datasource",
+                        con=db_conn,
+                        if_exists="append",
+                        index=False,
+                    )
 
 
 ########################### DYNAMIC DAG DO NOT TOUCH BELOW HERE #################################
@@ -145,12 +170,23 @@ with dag:
     tl.append(
         PythonOperator(
             task_id=f"load_{dag_id}",
-            python_callable=load_xml,
+            python_callable=process_dailymed,
             op_kwargs={
-                "data_folder": data_folder / "prescription",
+                "data_folder": data_folder,
+                "xslt": ds_folder / "dailymed_prescription.xsl",
             },
         )
     )
+
+    for sql in get_sql_list("staging-", ds_folder):
+        sql_path = ds_folder / sql
+        tl.append(
+            PostgresOperator(
+                task_id=sql,
+                postgres_conn_id="postgres_default",
+                sql=read_sql_file(sql_path),
+            )
+        )
 
     for i in range(len(tl)):
         if i not in [0]:

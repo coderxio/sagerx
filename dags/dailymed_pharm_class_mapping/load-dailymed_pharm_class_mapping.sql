@@ -9,4 +9,4 @@ pharma_version      TEXT
 );
 
 COPY datasource.dailymed_pharm_class_mapping
-FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_dailymed_pharm_class_mapping') }}/pharmacologic_class_mappings.txt' DELIMITER '|' CSV HEADER;
+FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_dailymed_pharm_class_mapping') }}/pharmacologic_class_mappings.txt' DELIMITER '|' QUOTE E'\b' CSV HEADER;

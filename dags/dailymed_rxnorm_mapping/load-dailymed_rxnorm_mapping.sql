@@ -10,4 +10,4 @@ rxtty           TEXT
 );
 
 COPY datasource.dailymed_rxnorm_mapping
-FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_dailymed_rxnorm_mapping') }}/rxnorm_mappings.txt' DELIMITER '|' CSV HEADER;
+FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_dailymed_rxnorm_mapping') }}/rxnorm_mappings.txt' DELIMITER '|' QUOTE E'\b' CSV HEADER;

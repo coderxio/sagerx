@@ -108,6 +108,11 @@ data_set_list = [
         "url": "https://download.cms.gov/nppes/NPPES_Data_Dissemination_{{ macros.ds_format(ds, '%Y-%m-%d', '%B_%Y' ) }}.zip",
         # "url": "https://download.cms.gov/nppes/NPPES_Data_Dissemination_November_2021.zip",
     },
+    {
+        "dag_id": "dailymed_rxnorm_mapping",
+        "schedule_interval": "0 5 * * *",  # run at 5am every day
+        "url": "https://dailymed-data.nlm.nih.gov/public-release-files/rxnorm_mappings.zip",
+    },
 ]
 
 

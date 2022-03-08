@@ -109,17 +109,17 @@ data_set_list = [
         # "url": "https://download.cms.gov/nppes/NPPES_Data_Dissemination_November_2021.zip",
     },
     {
-        "dag_id": "dailymed_rxnorm_mapping",
+        "dag_id": "dailymed_rxnorm",
         "schedule_interval": "0 5 * * *",  # run at 5am every day
         "url": "https://dailymed-data.nlm.nih.gov/public-release-files/rxnorm_mappings.zip",
     },
     {
-        "dag_id": "dailymed_pharm_class_mapping",
+        "dag_id": "dailymed_pharm_class",
         "schedule_interval": "0 5 * * *",  # run at 5am every day
         "url": "https://dailymed-data.nlm.nih.gov/public-release-files/pharmacologic_class_mappings.zip",
     },
     {
-        "dag_id": "dailymed_zip_file_metadata_mapping",
+        "dag_id": "dailymed_zip_file_metadata",
         "schedule_interval": "0 5 * * *",  # run at 5am every day
         "url": "https://dailymed-data.nlm.nih.gov/public-release-files/dm_spl_zip_files_meta_data.zip",
     },

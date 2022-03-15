@@ -12,9 +12,33 @@
 <xsl:template match="/">
     <dailymed>
         <xsl:apply-templates select="v3:document"/>
-        <xsl:apply-templates select="v3:document/v3:component"/>
-        <xsl:apply-templates select="//v3:code[@code='34073-7']"/>
-        <xsl:apply-templates select="/v3:document/v3:author/v3:assignedEntity/v3:representedOrganization"/>
+
+        <NDCList>
+            <xsl:apply-templates select="v3:document/v3:component"/>
+        </NDCList>
+        
+        <InteractionText>
+            <xsl:apply-templates select="//v3:code[@code='34073-7']"/>
+        </InteractionText>
+        
+        <Organizations>
+            <xsl:apply-templates select="/v3:document/v3:author/v3:assignedEntity/v3:representedOrganization"/>
+            <xsl:choose>
+                <xsl:when test="//v3:text[contains(.,'Manufactured by')]">
+                    <xsl:apply-templates select="//v3:text[contains(.,'Manufactured by')]"/>
+                </xsl:when>
+                <xsl:when test="//v3:text[contains(.,'Manufactured For')]">
+                    <xsl:apply-templates select="//v3:text[contains(.,'Manufactured For')]"/>
+                </xsl:when>
+                <xsl:when test="//v3:text[contains(.,'Manufactured for')]">
+                <xsl:apply-templates select="//v3:text[contains(.,'Manufactured for')]"/>
+            </xsl:when>
+                <xsl:when test="//v3:text[contains(.,'Made in')]">
+                    <xsl:apply-templates select="//v3:text[contains(.,'Made in')]"/>
+                </xsl:when>
+            </xsl:choose>
+        </Organizations>
+    
     </dailymed>
 </xsl:template>
 
@@ -28,35 +52,29 @@
     <ApplicationNumber><xsl:value-of select="//v3:subjectOf/v3:approval/v3:id/@extension"/></ApplicationNumber>
 </xsl:template>
 
-<!-- NDC -->
+<!-- NDCList -->
 <xsl:template match="v3:document/v3:component">
-    <ndc_list>
     <xsl:for-each select="//v3:containerPackagedProduct/v3:code[@codeSystem='2.16.840.1.113883.6.69']">  
         <NDC><xsl:value-of select="./@code"/></NDC>
     </xsl:for-each>
-    </ndc_list>
 </xsl:template>
 
-<!--Drug Interactions -->
+<!--InteractionText -->
 <xsl:template match="//v3:code[@code='34073-7']"> 
-    <InteractionText>
         <xsl:value-of select=".."/>
-    </InteractionText>
-
 </xsl:template>
 
-<!-- establishment info -->
+<!-- Organizations (establishment) -->
 <xsl:template match="/v3:document/v3:author/v3:assignedEntity/v3:representedOrganization">
-    <Organizations> 
-        <establishment>
-            <DUN><xsl:value-of select="./v3:id/@extension"/></DUN>
-            <name><xsl:value-of select="./v3:name"/></name>
-            <xsl:choose> 
-                <xsl:when test="//v3:asEquivalentEntity/v3:code/@code = 'C64637'">
-                    <type>Repacker</type>
-                    <source_list>
-                    <xsl:for-each select="//v3:asEquivalentEntity/v3:code[@code='C64637']/../v3:definingMaterialKind/v3:code">
-                        <source><xsl:value-of select="./@code"/></source>
+    <establishment>
+        <DUN><xsl:value-of select="./v3:id/@extension"/></DUN>
+        <name><xsl:value-of select="./v3:name"/></name>
+        <xsl:choose> 
+            <xsl:when test="//v3:asEquivalentEntity/v3:code/@code = 'C64637'">
+                <type>Repacker</type>
+                <source_list>
+                <xsl:for-each select="//v3:asEquivalentEntity/v3:code[@code='C64637']/../v3:definingMaterialKind/v3:code">
+                <source><xsl:value-of select="./@code"/></source>
                     </xsl:for-each>
                     </source_list>
                 </xsl:when>
@@ -84,7 +102,13 @@
                 </xsl:for-each>
         </establishment>  
         </xsl:for-each>
-       </Organizations> 
+</xsl:template>
+
+<!-- Organization Text --> 
+<xsl:template match="//v3:text[contains(.,'Manufactured For')]|//v3:text[contains(.,'Manufactured for')]|//v3:text[contains(.,'Manufactured by')]|//v3:text[contains(.,'Made in')]">
+    <OrganizationsText>
+        <xsl:value-of select="."/>
+    </OrganizationsText>
 </xsl:template>
 
 </xsl:transform>

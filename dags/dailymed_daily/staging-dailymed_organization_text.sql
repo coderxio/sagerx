@@ -5,7 +5,8 @@
 	spl 				TEXT NOT NULL,
 	document_id 		TEXT NOT NULL,
 	set_id			 	TEXT,
-	organization_text	TEXT
+	organization_text	TEXT,
+	row_num				TEXT
 ); 
 
 with xml_table as
@@ -15,7 +16,17 @@ from datasource.dailymed_daily
 )
 
 INSERT INTO staging.dailymed_organization_text
-SELECT slp, y.*
+SELECT slp
+		,document_id
+		,set_id 
+		,organization_text
+		,row_num
+FROM (SELECT slp
+		,y.document_id
+		,y.set_id 
+		,y.organization_text
+		--,regexp_matches(organization_text, '(manufactured|distributed) (by|for):([\s\S]*)(?=manufactured|distributed|made)', 'ig') as mfdg_by_match
+		,ROW_NUMBER() OVER (PARTITION BY slp ORDER BY LENGTH(organization_text) DESC) AS row_num
     FROM   xml_table x,
             XMLTABLE('/dailymed/Organizations/OrganizationsText'
               PASSING xml_column
@@ -24,4 +35,6 @@ SELECT slp, y.*
 				set_id  			TEXT PATH '../../SetId',
 				organization_text	TEXT PATH '.' 
 					) y
+	) z
+WHERE row_num = 1
 ON CONFLICT DO NOTHING;

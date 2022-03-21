@@ -27,18 +27,27 @@
                 <xsl:when test="//v3:text[contains(.,'Manufactured by')]">
                     <xsl:apply-templates select="//v3:text[contains(.,'Manufactured by')]"/>
                 </xsl:when>
+                <xsl:when test="//v3:text[contains(.,'Manufactured By')]">
+                    <xsl:apply-templates select="//v3:text[contains(.,'Manufactured By')]"/>
+                </xsl:when>
                 <xsl:when test="//v3:text[contains(.,'Manufactured For')]">
                     <xsl:apply-templates select="//v3:text[contains(.,'Manufactured For')]"/>
                 </xsl:when>
                 <xsl:when test="//v3:text[contains(.,'Manufactured for')]">
-                <xsl:apply-templates select="//v3:text[contains(.,'Manufactured for')]"/>
-            </xsl:when>
-                <xsl:when test="//v3:text[contains(.,'Made in')]">
-                    <xsl:apply-templates select="//v3:text[contains(.,'Made in')]"/>
+                    <xsl:apply-templates select="//v3:text[contains(.,'Manufactured for')]"/>
+                </xsl:when>
+                <xsl:when test="//v3:text[contains(.,'MANUFACTURED For')]">
+                    <xsl:apply-templates select="//v3:text[contains(.,'MANUFACTURED For')]"/>
+                </xsl:when>
+                <xsl:when test="//v3:text[contains(.,'Distributor')]">
+                    <xsl:apply-templates select="//v3:text[contains(.,'Distributor')]"/>
+                </xsl:when>
+                <xsl:when test="//v3:text[contains(.,'Manufactured in ')]">
+                    <xsl:apply-templates select="//v3:text[contains(.,'Manufactured in ')]"/>
                 </xsl:when>
             </xsl:choose>
+            
         </Organizations>
-    
     </dailymed>
 </xsl:template>
 
@@ -103,12 +112,13 @@
         </establishment>  
         </xsl:for-each>
 </xsl:template>
+<!-- 57237-007-05 for registrant -->
 
 <!-- Organization Text --> 
-<xsl:template match="//v3:text[contains(.,'Manufactured For')]|//v3:text[contains(.,'Manufactured for')]|//v3:text[contains(.,'Manufactured by')]|//v3:text[contains(.,'Made in')]">
+<xsl:template match="//v3:text[contains(.,'Manufactured For')]|//v3:text[contains(.,'Manufactured for')]|//v3:text[contains(.,'Manufactured by')]|//v3:text[contains(.,'Made in')]|//v3:text[contains(.,'Manufactured By')]|//v3:text[contains(.,'MANUFACTURED For')]|//v3:text[contains(.,'Distributor')]|//v3:text[contains(.,'Manufactured in ')]">
     <OrganizationsText>
         <xsl:value-of select="."/>
     </OrganizationsText>
 </xsl:template>
-
+<!-- Distributed By  Repackaged By    -->
 </xsl:transform>

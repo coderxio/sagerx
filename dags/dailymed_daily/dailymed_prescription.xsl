@@ -30,6 +30,9 @@
                 <xsl:when test="//v3:text[contains(.,'Manufactured By')]">
                     <xsl:apply-templates select="//v3:text[contains(.,'Manufactured By')]"/>
                 </xsl:when>
+                <xsl:when test="//v3:text[contains(.,'manufactured by')]">
+                    <xsl:apply-templates select="//v3:text[contains(.,'manufactured by')]"/>
+                </xsl:when>
                 <xsl:when test="//v3:text[contains(.,'Manufactured For')]">
                     <xsl:apply-templates select="//v3:text[contains(.,'Manufactured For')]"/>
                 </xsl:when>
@@ -42,8 +45,11 @@
                 <xsl:when test="//v3:text[contains(.,'Distributor')]">
                     <xsl:apply-templates select="//v3:text[contains(.,'Distributor')]"/>
                 </xsl:when>
-                <xsl:when test="//v3:text[contains(.,'Manufactured in ')]">
-                    <xsl:apply-templates select="//v3:text[contains(.,'Manufactured in ')]"/>
+                <xsl:when test="//v3:text[contains(.,'Manufactured in')]">
+                    <xsl:apply-templates select="//v3:text[contains(.,'Manufactured in')]"/>
+                </xsl:when>
+                <xsl:when test="//v3:text[contains(.,'Made in')]">
+                    <xsl:apply-templates select="//v3:text[contains(.,'Made in')]"/>
                 </xsl:when>
             </xsl:choose>
             
@@ -115,7 +121,7 @@
 <!-- 57237-007-05 for registrant -->
 
 <!-- Organization Text --> 
-<xsl:template match="//v3:text[contains(.,'Manufactured For')]|//v3:text[contains(.,'Manufactured for')]|//v3:text[contains(.,'Manufactured by')]|//v3:text[contains(.,'Made in')]|//v3:text[contains(.,'Manufactured By')]|//v3:text[contains(.,'MANUFACTURED For')]|//v3:text[contains(.,'Distributor')]|//v3:text[contains(.,'Manufactured in ')]">
+<xsl:template match="//v3:text[contains(.,'Manufactured For')]|//v3:text[contains(.,'Manufactured for')]|//v3:text[contains(.,'Manufactured by')]|//v3:text[contains(.,'manufactured by')]|//v3:text[contains(.,'Made in')]|//v3:text[contains(.,'Manufactured By')]|//v3:text[contains(.,'MANUFACTURED For')]|//v3:text[contains(.,'Distributor')]|//v3:text[contains(.,'Manufactured in')]|//v3:text[contains(.,'Made in')]">
     <OrganizationsText>
         <xsl:value-of select="."/>
     </OrganizationsText>

@@ -11,12 +11,12 @@
 
 with xml_table as
 (
-select slp, xml_content::xml as xml_column
+select spl, xml_content::xml as xml_column
 from datasource.dailymed_daily
 )
 
 INSERT INTO staging.dailymed_interaction
-SELECT slp, y.*
+SELECT spl, y.*
     FROM   xml_table x,
             XMLTABLE('dailymed/InteractionText'
               PASSING xml_column

@@ -11,12 +11,12 @@
 
 with xml_table as
 (
-select slp, xml_content::xml as xml_column
+select spl, xml_content::xml as xml_column
 from datasource.dailymed_daily
 )
 
 INSERT INTO staging.dailymed_ndc
-SELECT slp, y.*, ndc_to_11(y.ndc) AS ndc11
+SELECT spl, y.*, ndc_to_11(y.ndc) AS ndc11
     FROM   xml_table x,
             XMLTABLE('dailymed/ndc_list/NDC'
               PASSING xml_column

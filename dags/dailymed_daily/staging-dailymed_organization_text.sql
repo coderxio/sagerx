@@ -11,17 +11,17 @@
 
 with xml_table as
 (
-select slp, xml_content::xml as xml_column
+select spl, xml_content::xml as xml_column
 from datasource.dailymed_daily
 )
 
 INSERT INTO staging.dailymed_organization_text
-SELECT slp
+SELECT spl
 		,document_id
 		,set_id 
 		,organization_text
 		,row_num
-FROM (SELECT slp
+FROM (SELECT spl
 		,y.document_id
 		,y.set_id 
 		,y.organization_text

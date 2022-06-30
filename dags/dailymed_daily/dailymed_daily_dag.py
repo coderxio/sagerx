@@ -57,7 +57,7 @@ def process_dailymed(data_folder, xslt, ti):
                     xml_content = transform_xml(new_file, xslt)
                     os.remove(new_file)
                     df = pd.DataFrame(
-                        columns=["slp", "file_name", "xml_content"],
+                        columns=["spl", "file_name", "xml_content"],
                         data=[[folder_name, subfile.filename, xml_content]],
                     )
                     df.to_sql(

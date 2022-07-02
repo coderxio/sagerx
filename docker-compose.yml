@@ -1,7 +1,7 @@
 version: '3.8'
 x-airflow-image:
   &airflow-image
-  image: apache/airflow:2.1.4
+  image: apache/airflow:slim-latest
 
 services:
 
@@ -24,3 +24,8 @@ services:
   airflow-scheduler:
     <<: *airflow-image
     container_name: airflow-scheduler
+
+  webapi:
+    build: .
+    container_name: webapi
+

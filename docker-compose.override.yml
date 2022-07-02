@@ -74,3 +74,12 @@ services:
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler
+
+  webapi:
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn app.main:app --host 0.0.0.0'
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    environment:
+      - DATABASE_URL=postgresql://sagerx:sagerx@db:5432/sagerx

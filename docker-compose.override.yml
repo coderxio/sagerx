@@ -82,4 +82,4 @@ services:
     ports:
       - 8000:8000
     environment:
-      - DATABASE_URL=postgresql://sagerx:sagerx@db:5432/sagerx
+      - DATABASE_URL=postgresql://sagerx:sagerx@postgres:5432/sagerx

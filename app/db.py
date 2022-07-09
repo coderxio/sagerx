@@ -15,7 +15,7 @@ class BaseMeta(ormar.ModelMeta):
 
 class ingredients(ormar.Model):
     class Meta(BaseMeta):
-        tablename = "rxnorm_ingredient"
+        tablename = "api_rxnorm_ingredient"
     ingredient_rxcui: str = ormar.String(max_length=1000, primary_key=True)
     ingredient_name: str = ormar.String(max_length=5000)
     ingredient_tty: str = ormar.String(max_length=1000)

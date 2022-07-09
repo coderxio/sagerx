@@ -1,5 +1,5 @@
 /*  public.rxnorm_ingredient(in/min) */
-CREATE OR REPLACE VIEW public.rxnorm_ingredient
+CREATE OR REPLACE VIEW public.api_rxnorm_ingredient
 AS 
 SELECT
 	ingredient.rxcui ingredient_rxcui

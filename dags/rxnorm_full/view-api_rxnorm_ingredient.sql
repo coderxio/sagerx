@@ -1,4 +1,4 @@
-/*  public.rxnorm_ingredient(in/min) */
+/*  public.api_rxnorm_ingredient(in/min) */
 CREATE OR REPLACE VIEW public.api_rxnorm_ingredient
 AS 
 SELECT

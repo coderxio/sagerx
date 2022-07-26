@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,8 +22,8 @@ app.add_middleware(
 def read_root():
     return {"Welcome": "Hi to SageRx"}
 
-@app.get("/ingredients")
-async def read_root(q: Union[str, None] = None):
+@app.get("/ingredients/", response_model=List[ingredients])
+async def get_ingredients(q: Union[str, None] = None):
     if q:
         return await ingredients.objects.filter(ingredient_name__icontains = q).all()
     return await ingredients.objects.all()

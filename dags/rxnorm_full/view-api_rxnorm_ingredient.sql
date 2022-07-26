@@ -9,5 +9,5 @@ SELECT
 	, CASE WHEN ingredient.cvf = '4096' THEN TRUE ELSE FALSE END AS prescribable
 FROM datasource.rxnorm_rxnconso ingredient
 WHERE ingredient.tty IN('IN', 'MIN')
-	AND ingredient.sab = 'RXNORM'
-LIMIT 100;
+	AND ingredient.sab = 'RXNORM';
+--LIMIT 100;

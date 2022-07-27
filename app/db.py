@@ -24,9 +24,9 @@ class ingredients(ormar.Model):
     prescribable: str = ormar.String(max_length=1000)
 
 
-class clinical_products(ormar.Model):
+class products(ormar.Model):
     class Meta(BaseMeta):
-        tablename = "api_rxnorm_clinical_product"
+        tablename = "api_rxnorm_product"
     rxcui: str = ormar.String(max_length=20, primary_key=True)
     name: str = ormar.String(max_length=5000)
     tty: str = ormar.String(max_length=5)

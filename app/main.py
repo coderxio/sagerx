@@ -3,7 +3,7 @@ from typing import Union, List
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.db import database, ingredients, clinical_products, dailymed_rxnorms
+from app.db import database, ingredients, products, dailymed_rxnorms
 app = FastAPI(title="SageRx")
 
 origins = [
@@ -36,11 +36,11 @@ async def get_dailymed_rxnorms(q: Union[str, None] = None, rxcui: Union[str, Non
         return await dailymed_rxnorms.objects.filter(rxcui = rxcui).all()
     return await dailymed_rxnorms.objects.all()
 
-@app.get("/clinical_products/", response_model=List[clinical_products])
-async def get_clinical_products(q: Union[str, None] = None):
+@app.get("/products/", response_model=List[products])
+async def get_products(q: Union[str, None] = None):
     if q:
-        return await clinical_products.objects.filter(name__icontains = q).all()
-    return await clinical_products.objects.all()
+        return await products.objects.filter(name__icontains = q).all()
+    return await products.objects.all()
 
 @app.on_event("startup")
 async def startup():

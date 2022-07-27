@@ -7,4 +7,5 @@ SELECT
 	, rxcui
 	, rxstr
 	, rxtty
-FROM datasource.dailymed_rxnorm;
+FROM datasource.dailymed_rxnorm
+WHERE rxtty IN ('SCD', 'SBD', 'GPCK', 'BPCK');

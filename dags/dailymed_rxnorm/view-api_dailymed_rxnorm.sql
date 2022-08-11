@@ -1,6 +1,6 @@
 /*  public.api_dailymed_rxnorm */
-CREATE OR REPLACE VIEW public.api_dailymed_rxnorm
-AS 
+TRUNCATE public.api_dailymed_rxnorm;
+INSERT INTO public.api_dailymed_rxnorm
 SELECT
 	CONCAT(setid, rxcui) AS id
 	, setid

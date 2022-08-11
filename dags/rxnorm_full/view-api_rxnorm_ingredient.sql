@@ -1,5 +1,5 @@
 /*  public.api_rxnorm_ingredient(in/min) */
-CREATE OR REPLACE VIEW public.api_rxnorm_ingredient
-AS 
+TRUNCATE TABLE public.api_rxnorm_ingredient;
+INSERT INTO public.api_rxnorm_ingredient
 SELECT *
 FROM staging.rxnorm_ingredient;

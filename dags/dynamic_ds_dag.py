@@ -195,6 +195,16 @@ def create_dag(dag_args):
                 )
             )
 
+        for sql in get_sql_list("api-", ds_folder):
+            sql_path = ds_folder / sql
+            tl.append(
+                PostgresOperator(
+                    task_id=sql,
+                    postgres_conn_id="postgres_default",
+                    sql=read_sql_file(sql_path),
+                )
+            )
+
         for sql in get_sql_list("alter-", ds_folder):
             sql_path = ds_folder / sql
             tl.append(

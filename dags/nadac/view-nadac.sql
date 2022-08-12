@@ -2,6 +2,7 @@
 CREATE OR REPLACE VIEW flatfile.nadac
 AS 
    SELECT ndc
+         ,ndc_description
          ,price_line
    		,nadac_per_unit
    		,pricing_unit 

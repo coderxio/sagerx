@@ -2,21 +2,21 @@
 DROP TABLE IF EXISTS staging.rxnorm_brand_product_component CASCADE;
 
 CREATE TABLE staging.rxnorm_brand_product_component (
-    brand_product_component_rxcui       VARCHAR(8) NOT NULL,
-    brand_product_component_name		TEXT,
-	brand_product_component_tty			VARCHAR(20),
+    rxcui      							VARCHAR(8) NOT NULL,
+    name								TEXT,
+	tty									VARCHAR(20),
     clinical_product_component_rxcui	VARCHAR(8) NOT NULL,
     brand_rxcui    						VARCHAR(8), -- NOTE: brand_product_component SCDs will have NULL for brand_rxcui
 	active								BOOLEAN,
 	prescribable						BOOLEAN,
-	PRIMARY KEY(brand_product_component_rxcui)
+	PRIMARY KEY(rxcui)
 );
 
 INSERT INTO staging.rxnorm_brand_product_component
 SELECT DISTINCT
-	CASE WHEN product.tty = 'SBD' THEN product.rxcui ELSE product_component.rxcui END brand_product_component_rxcui
-	, CASE WHEN product.tty = 'SBD' THEN product.str ELSE product_component.str END brand_product_component_name
-	, CASE WHEN product.tty = 'SBD' THEN product.tty ELSE product_component.tty END brand_product_component_tty
+	CASE WHEN product.tty = 'SBD' THEN product.rxcui ELSE product_component.rxcui END rxcui
+	, CASE WHEN product.tty = 'SBD' THEN product.str ELSE product_component.str END name
+	, CASE WHEN product.tty = 'SBD' THEN product.tty ELSE product_component.tty END tty
 	, CASE WHEN product_component.tty = 'SCD' THEN product_component.rxcui ELSE rxnrel_scd.rxcui1 END clinical_product_component_rxcui
 	, rxnrel_bn.rxcui1 AS brand_rxcui
 	, CASE WHEN 

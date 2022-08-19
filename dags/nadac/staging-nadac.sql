@@ -3,6 +3,7 @@
 
  CREATE TABLE staging.nadac (
 	ndc 				varchar(11) NOT NULL,
+	ndc_description		TEXT NOT NULL,
 	price_line 			int NOT NULL,
 	price_start_date 	date,
 	price_end_date 		date,
@@ -13,6 +14,7 @@
 
 INSERT INTO staging.nadac
 SELECT ndc
+	,ndc_description
 	,ROW_NUMBER() OVER (Partition By ndc ORDER BY effective_date DESC) AS price_line
 	,effective_Date AS price_start_date
 	,LAG(effective_date, 1) OVER (PARTITION BY ndc ORDER BY effective_date DESC) price_end_date
@@ -21,6 +23,7 @@ SELECT ndc
 	
 FROM (Select DISTINCT 
 		n.ndc
+		,ndc_description
 		,n.nadac_per_unit::numeric
 		,n.pricing_unit
 		,n.effective_date::date

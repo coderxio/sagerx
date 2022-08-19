@@ -24,3 +24,8 @@ services:
   airflow-scheduler:
     <<: *airflow-image
     container_name: airflow-scheduler
+
+  webapi:
+    build: .
+    container_name: webapi
+

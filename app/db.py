@@ -52,7 +52,7 @@ class nadac(ormar.Model):
         tablename = "nadac"
 
     id: str = ormar.String(max_length=20, primary_key=True)
-    ndc: str = ormar.String(max_length=11)
+    ndc: str = ormar.String(max_length=13)
     ndc_description: str = ormar.String(max_length=1000)
     price_line: str = ormar.String(max_length=1000)
     nadac_per_unit: str = ormar.String(max_length=100, nullable=True)

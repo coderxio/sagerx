@@ -9,7 +9,7 @@ CREATE TABLE staging.mthspl_substance (
 	unii				VARCHAR(20),
 	active				BOOLEAN,
 	prescribable		BOOLEAN,
-	PRIMARY KEY(rxcui)
+	PRIMARY KEY(rxaui)
 );
 
 INSERT INTO staging.mthspl_substance

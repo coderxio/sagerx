@@ -36,10 +36,10 @@ SELECT
 	, CASE WHEN ingredient_strength.suppress = 'N' THEN TRUE ELSE FALSE END AS active
 	, CASE WHEN ingredient_strength.cvf = '4096' THEN TRUE ELSE FALSE END AS prescribable
 from datasource.rxnorm_rxnconso ingredient_strength
-left join datasource.rxnorm_rxnsat numerator_value on numerator_value.rxcui = ingredient_strength.rxcui and numerator_value.atn = 'RXN_BOSS_NUM_VALUE'
-left join datasource.rxnorm_rxnsat numerator_unit on numerator_unit.rxcui = ingredient_strength.rxcui and numerator_unit.atn = 'RXN_BOSS_NUM_UNIT'
-left join datasource.rxnorm_rxnsat denominator_value on denominator_value.rxcui = ingredient_strength.rxcui and denominator_value.atn = 'RXN_BOSS_DENOM_VALUE'
-left join datasource.rxnorm_rxnsat denominator_unit on denominator_unit.rxcui = ingredient_strength.rxcui and denominator_unit.atn = 'RXN_BOSS_DENOM_UNIT'
+left join datasource.rxnorm_rxnsat numerator_value on numerator_value.rxcui = ingredient_strength.rxcui and numerator_value.atn = 'RXN_BOSS_STRENGTH_NUM_VALUE'
+left join datasource.rxnorm_rxnsat numerator_unit on numerator_unit.rxcui = ingredient_strength.rxcui and numerator_unit.atn = 'RXN_BOSS_STRENGTH_NUM_UNIT'
+left join datasource.rxnorm_rxnsat denominator_value on denominator_value.rxcui = ingredient_strength.rxcui and denominator_value.atn = 'RXN_BOSS_STRENGTH_DENOM_VALUE'
+left join datasource.rxnorm_rxnsat denominator_unit on denominator_unit.rxcui = ingredient_strength.rxcui and denominator_unit.atn = 'RXN_BOSS_STRENGTH_DENOM_UNIT'
 left join datasource.rxnorm_rxnsat text on text.rxcui = ingredient_strength.rxcui and text.atn = 'RXN_STRENGTH'
 left join datasource.rxnorm_rxnsat active_ingredient on active_ingredient.rxcui = ingredient_strength.rxcui and active_ingredient.atn = 'RXN_AI'
 left join datasource.rxnorm_rxnsat active_moeity on active_moeity.rxcui = ingredient_strength.rxcui and active_moeity.atn = 'RXN_AM'

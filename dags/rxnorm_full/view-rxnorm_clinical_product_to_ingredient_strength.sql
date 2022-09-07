@@ -24,9 +24,6 @@ AS
         , ris.denominator_value as strength_denominator_value
         , ris.denominator_unit as strength_denominator_unit
         , ris.text as strength_text
-        , ris.active_ingredient as strength_active_ingredient
-        , ris.active_moeity as strength_active_moeity
-        , ris.boss_from as strength_boss_from
         , rcp.active
         , rcp.prescribable
     FROM staging.rxnorm_clinical_product rcp 

@@ -9,16 +9,6 @@ import user_macros
 
 data_set_list = [
     {
-        "dag_id": "nadac",
-        "schedule_interval": "0 6 * * 5",  # run a 6am every thur (url marco minuses day to get wed)
-        "url": "https://download.medicaid.gov/data/nadac-national-average-drug-acquisition-cost-{{ get_date_of_prior_weekday('wednesday', ds_datetime( ds ), '%m-%d-%Y' ) }}.csv",
-        "user_defined_macros": {
-            "get_date_of_prior_weekday": user_macros.get_date_of_prior_weekday,
-            "ds_datetime": user_macros.ds_datetime,
-        }
-        #   "url": "https://download.medicaid.gov/data/nadac-national-average-drug-acquisition-cost-10-20-2021.csv"
-    },
-    {
         "dag_id": "cms_noc_pricing",
         "schedule_interval": "0 0 20 */3 *",  # runs every quarter on the 20th day of the month
         "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-noc-pricing-file.zip",

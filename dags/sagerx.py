@@ -97,7 +97,8 @@ def get_dataset(ds_url, data_folder, ti):
         file_path = file_path.with_suffix("")
 
     file_path_str = file_path.resolve().as_posix()
-    ti.xcom_push(key="file_path", value=file_path_str)
+    if ti != None:
+        ti.xcom_push(key="file_path", value=file_path_str)
     logging.info(f"created dataset at path: {file_path}")
     return file_path_str
 

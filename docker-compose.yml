@@ -1,7 +1,7 @@
 version: '3.8'
 x-airflow-image:
   &airflow-image
-  image: apache/airflow:2.1.4
+  image: apache/airflow:2.2.5
 
 services:
 
@@ -10,7 +10,7 @@ services:
     container_name: postgres
 
   pgadmin:
-    image: dpage/pgadmin4:6.2
+    image: dpage/pgadmin4:6.13
     container_name: pgadmin
 
   airflow-init:
@@ -28,4 +28,3 @@ services:
   webapi:
     build: .
     container_name: webapi
-

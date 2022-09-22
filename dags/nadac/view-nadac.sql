@@ -17,4 +17,11 @@ AS
          	   WHEN (nadac_per_Unit - LAG(NADAC_Per_Unit) OVER (PARTITION BY ndc ORDER BY price_line DESC)) IS NULL THEN NULL
          	   ELSE -1 END AS change_type
 		
-   FROM staging.nadac nadac;
+   FROM (SELECT ndc
+            ,ndc_description
+            ,ROW_NUMBER() OVER (Partition By ndc ORDER BY effective_date DESC) AS price_line
+            ,effective_Date AS price_start_date
+            ,LAG(effective_date, 1) OVER (PARTITION BY ndc ORDER BY effective_date DESC) price_end_date
+            ,nadac_per_unit
+            ,pricing_unit
+         FROM staging.nadac) nadac;

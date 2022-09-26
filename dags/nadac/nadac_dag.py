@@ -1,5 +1,6 @@
 import datetime
 from pathlib import Path
+import pendulum
 
 from sagerx import get_dataset, read_sql_file, get_sql_list, alert_slack_channel
 
@@ -9,14 +10,16 @@ from airflow.decorators import dag, task
 
 # Operators; we need this to operate!
 from airflow.providers.postgres.operators.postgres import PostgresOperator
-from airflow.utils.dates import days_ago
+
+starting_date = pendulum.parse("2013-12-01")
 
 
 @dag(
-    start_date=days_ago(0),
-    schedule_interval="0 6 * * 5",  # run a 6am every thur
+    start_date=starting_date,
+    schedule_interval="0 6 * * 5",  # run at 6am every thur
     description="Dag for downloading NADAC weekly",
     on_failure_callback=alert_slack_channel,
+    max_active_runs=1,
 )
 def nadac():
 
@@ -56,7 +59,7 @@ def nadac():
         nadac_obj = nadac()
         title, url = nadac_obj.get_download_url(ds_year)
 
-        file = get_dataset(url, data_folder, None)
+        file = get_dataset(url, data_folder, None, file_name="NADAC.csv")
 
         return file
 

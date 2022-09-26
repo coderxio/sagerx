@@ -78,7 +78,7 @@ def download_dataset(url: str, dest: Path = Path.cwd(), file_name: str = None):
 
 
 # Airflow DAG Functions
-def get_dataset(ds_url, data_folder, ti):
+def get_dataset(ds_url, data_folder, ti, file_name=None):
     """retreives a dataset from the web and passes the filepath to airflow xcom
     if file is a zip, it extracts the contents and deletes zip
 
@@ -95,6 +95,11 @@ def get_dataset(ds_url, data_folder, ti):
             zip_ref.extractall(file_path.with_suffix(""))
         Path.unlink(file_path)
         file_path = file_path.with_suffix("")
+
+    # change name of file if one is provided
+    if file_name != None:
+        file_path.rename(file_path.with_name(file_name))
+        file_path = file_path.with_name(file_name)
 
     file_path_str = file_path.resolve().as_posix()
     if ti != None:

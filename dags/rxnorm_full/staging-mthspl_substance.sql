@@ -1,4 +1,4 @@
-/*  staging.mthspl_substance (su) */
+/*  staging.mthspl_substance (SU) */
 DROP TABLE IF EXISTS staging.mthspl_substance CASCADE;
 
 CREATE TABLE staging.mthspl_substance (

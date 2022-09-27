@@ -2,6 +2,7 @@ from airflow.models import Variable
 from datetime import date, timedelta
 from textwrap import dedent
 from pathlib import Path
+from airflow.utils.dates import days_ago
 
 from sagerx import get_dataset, read_sql_file, get_sql_list, alert_slack_channel
 
@@ -10,6 +11,7 @@ apikey = Variable.get("umls_api")
 
 ds = {
     "dag_id": "rxnorm_full",
+    "start_date": days_ago(0),
     "schedule_interval": "0 0 1 * *",  # run once monthly)
     "url": "https://download.nlm.nih.gov/umls/kss/rxnorm/RxNorm_full_current.zip",
 }

@@ -16,7 +16,7 @@ starting_date = pendulum.parse("2013-12-01")
 
 @dag(
     start_date=starting_date,
-    schedule_interval="0 6 * * 5",  # run at 6am every thur
+    schedule_interval="0 6 * * 4",  # run at 6am every thur
     description="Dag for downloading NADAC weekly",
     on_failure_callback=alert_slack_channel,
     max_active_runs=1,

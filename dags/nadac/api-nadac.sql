@@ -1,13 +1,13 @@
-/* flatfile.nadac*/
+/* public.nadac*/
 TRUNCATE TABLE public.nadac;
 INSERT INTO public.nadac
 SELECT ndc || price_line::text AS ID
         ,ndc
         ,ndc_description
         ,price_line
-   		,nadac_per_unit
-   		,pricing_unit 
-   		,price_start_date
+        ,nadac_per_unit
+        ,pricing_unit 
+        ,price_start_date
         ,current_flag
         ,first_price
         ,CASE WHEN dollar_change IS NULL THEN 0 ELSE dollar_change END AS dollar_change
@@ -15,5 +15,5 @@ SELECT ndc || price_line::text AS ID
         ,CASE WHEN fn.change_type = -1 THEN 'decrease'
               WHEN fn.change_type = 1 THEN 'increase'
               ELSE 'none' END AS change_type
-
-FROM flatfile.nadac fn;
+FROM flatfile.nadac fn
+WHERE price_start_date >= current_date - interval '2 years';

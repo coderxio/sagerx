@@ -65,5 +65,20 @@ class nadac(ormar.Model):
     change_type: str = ormar.String(max_length=100, nullable=True)
 
 
+class rxterms_name(ormar.Model):
+    class Meta(BaseMeta):
+        tablename = "rxterms_name"
+
+    name: str = ormar.String(max_length=200, primary_key=True)
+    synonyms: str = ormar.String(max_length=200)
+
+class rxterms_strength(ormar.Model):
+    class Meta(BaseMeta):
+        tablename = "rxterms_strength"
+
+    rxcui: str = ormar.String(max_length=200, primary_key=True)
+    name: str = ormar.String(max_length=200)
+    strength: str = ormar.String(max_length=20)
+
 engine = sqlalchemy.create_engine(settings.db_url)
 metadata.create_all(engine)

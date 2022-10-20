@@ -3,7 +3,7 @@ from typing import Union, List
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.db import database, ingredients, products, dailymed_rxnorms, nadac
+from app.db import database, ingredients, products, dailymed_rxnorms, nadac, rxterms_name, rxterms_strength
 
 app = FastAPI(title="SageRx")
 
@@ -58,6 +58,11 @@ async def get_nadac():
 @app.get("/nadac/{ndc}")
 async def get_nadac(ndc):
     return await nadac.objects.filter(ndc=ndc).all()
+
+
+@app.get("/rxterms_name")
+async def get_rxterms_name():
+    return await rxterms_name.objects.all()
 
 
 @app.on_event("startup")

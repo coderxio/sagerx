@@ -78,8 +78,10 @@ with dag:
         engine = pg_hook.get_sqlalchemy_engine()
 
         df = pd.DataFrame(json_object)
-        df = df.drop("openfda", axis=1)
-        df.to_sql("datasource.fda_enforcement", con=engine, if_exists="replace")
+        df["openfda"] = df["openfda"].astype("str")
+        df.to_sql(
+            "fda_enforcement", con=engine, schema="datasource", if_exists="replace"
+        )
 
     el_ds = extract_load_dataset()
 

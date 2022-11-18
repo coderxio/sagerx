@@ -4,14 +4,14 @@ x-airflow-common:
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
-    AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
     AIRFLOW_CONN_POSTGRES_DEFAULT: postgresql://sagerx:sagerx@postgres:5432/sagerx
     AIRFLOW_VAR_UMLS_API: ${UMLS_API}
     AIRFLOW_VAR_SLACK_API: ${SLACK_API:-}
     AIRFLOW_CONN_SLACK: http://:@https%3A%2F%2Fhooks.slack.com%2Fservices%2F${SLACK_API:-}
-    _PIP_ADDITIONAL_REQUIREMENTS: lxml
+    _PIP_ADDITIONAL_REQUIREMENTS: ''
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
   volumes:
     - ./dags:/opt/airflow/dags

@@ -1,16 +1,17 @@
 version: '3.8'
 x-airflow-image:
   &airflow-image
-  image: apache/airflow:2.2.5
+  image: apache/airflow:2.3.3
+
 
 services:
 
-  db:
+  postgres:
     image: postgres:14-alpine
     container_name: postgres
 
   pgadmin:
-    image: dpage/pgadmin4:6.13
+    image: dpage/pgadmin4:6.15
     container_name: pgadmin
 
   airflow-init:

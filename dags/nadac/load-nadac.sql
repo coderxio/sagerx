@@ -1,7 +1,5 @@
 /* datasource.nadac */
-DROP TABLE IF EXISTS datasource.nadac;
-
-CREATE TABLE datasource.nadac (
+CREATE TABLE IF NOT EXISTS datasource.nadac (
 ndc_description		                            TEXT NOT NULL,
 ndc			                                    VARCHAR (11) NOT NULL,
 nadac_per_unit		                            NUMERIC (12,5),
@@ -16,5 +14,7 @@ corresponding_generic_drug_effective_date		DATE,
 as_of_date  			                        DATE
 );
 
+TRUNCATE datasource.nadac;
+
 COPY datasource.nadac
-FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_nadac') }}' CSV HEADER;
+FROM '{{ ti.xcom_pull(task_ids='download_nadac') }}' CSV HEADER;

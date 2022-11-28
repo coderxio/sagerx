@@ -78,7 +78,7 @@ def download_dataset(url: str, dest: Path = Path.cwd(), file_name: str = None):
 
 
 # Airflow DAG Functions
-def get_dataset(ds_url, data_folder, ti):
+def get_dataset(ds_url, data_folder, ti, file_name=None):
     """retreives a dataset from the web and passes the filepath to airflow xcom
     if file is a zip, it extracts the contents and deletes zip
 
@@ -96,9 +96,16 @@ def get_dataset(ds_url, data_folder, ti):
         Path.unlink(file_path)
         file_path = file_path.with_suffix("")
 
+    # change name of file if one is provided
+    if file_name != None:
+        file_path.rename(file_path.with_name(file_name))
+        file_path = file_path.with_name(file_name)
+
     file_path_str = file_path.resolve().as_posix()
-    ti.xcom_push(key="file_path", value=file_path_str)
+    if ti != None:
+        ti.xcom_push(key="file_path", value=file_path_str)
     logging.info(f"created dataset at path: {file_path}")
+    return file_path_str
 
 
 def get_sql_list(pre_str: str = "", ds_path: Path = Path.cwd()):
@@ -113,7 +120,7 @@ def get_sql_list(pre_str: str = "", ds_path: Path = Path.cwd()):
 
 # Slack webhook function
 def alert_slack_channel(context):
-    slack_api = Variable.get('slack_api')
+    slack_api = Variable.get("slack_api")
     if slack_api:
         msg = """
                 :red_circle: Task Failed
@@ -122,15 +129,15 @@ def alert_slack_channel(context):
                 *Execution Time*: {exec_date}  
                 *Log Url*: {log_url} 
                 """.format(
-                task=context.get('task_instance').task_id,
-                dag=context.get('task_instance').dag_id,
-                ti=context.get('task_instance'),
-                exec_date=context.get('execution_date'),
-                log_url=context.get('task_instance').log_url,
-            )
+            task=context.get("task_instance").task_id,
+            dag=context.get("task_instance").dag_id,
+            ti=context.get("task_instance"),
+            exec_date=context.get("execution_date"),
+            log_url=context.get("task_instance").log_url,
+        )
 
         SlackWebhookOperator(
-            task_id='alert_slack_channel',
-            http_conn_id='slack',
+            task_id="alert_slack_channel",
+            http_conn_id="slack",
             message=msg,
         ).execute(context=None)

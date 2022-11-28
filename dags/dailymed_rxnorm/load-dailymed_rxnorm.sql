@@ -1,5 +1,5 @@
 /* datasource.dailymed_rxnorm */
-DROP TABLE IF EXISTS datasource.dailymed_rxnorm;
+DROP TABLE IF EXISTS datasource.dailymed_rxnorm CASCADE;
 
 CREATE TABLE datasource.dailymed_rxnorm (
 setid           TEXT,

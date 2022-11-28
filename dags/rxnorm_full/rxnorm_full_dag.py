@@ -2,14 +2,16 @@ from airflow.models import Variable
 from datetime import date, timedelta
 from textwrap import dedent
 from pathlib import Path
+from airflow.utils.dates import days_ago
 
 from sagerx import get_dataset, read_sql_file, get_sql_list, alert_slack_channel
 
 download_url = "https://download.nlm.nih.gov/umls/kss/rxnorm/RxNorm_full_current.zip"
-apikey = Variable.get('umls_api')
+apikey = Variable.get("umls_api")
 
 ds = {
     "dag_id": "rxnorm_full",
+    "start_date": days_ago(0),
     "schedule_interval": "0 0 1 * *",  # run once monthly)
     "url": "https://download.nlm.nih.gov/umls/kss/rxnorm/RxNorm_full_current.zip",
 }
@@ -142,6 +144,16 @@ with dag:
         )
 
     for sql in get_sql_list("view-", ds_folder):
+        sql_path = ds_folder / sql
+        tl.append(
+            PostgresOperator(
+                task_id=sql,
+                postgres_conn_id="postgres_default",
+                sql=read_sql_file(sql_path),
+            )
+        )
+
+    for sql in get_sql_list("api-", ds_folder):
         sql_path = ds_folder / sql
         tl.append(
             PostgresOperator(

@@ -37,7 +37,6 @@ default_args = {
     # none airflow common dag elements
     "retrieve_dataset_function": get_dataset,
     "on_failure_callback": alert_slack_channel,
-    "max_active_runs": 1,
 }
 
 dag_args = {**default_args, **ds}
@@ -52,6 +51,7 @@ dag = DAG(
     default_args=dag_args,
     description=f"Processes {dag_id} source",
     user_defined_macros=dag_args.get("user_defined_macros"),
+    max_active_runs=1
 )
 
 ds_folder = Path("/opt/airflow/dags") / dag_id

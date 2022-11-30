@@ -24,3 +24,25 @@ AS
 		ON fda.ndc9 = LEFT(ndc.ndc, 9)
 	LEFT JOIN flatfile.mthspl_product_to_inactive_ingredient spl
 		ON spl.ndc9 = LEFT(ndc.ndc, 9)
+    /*
+    WHERE ing.ingredient_name in (
+        'risperidone'
+        , 'adalimumab'
+        , 'lidocaine'
+        , 'carbamazepine'
+        , 'phenytoin'
+        , 'midazolam'
+        , 'valproate'
+        , 'tacrolimus'
+        , 'amoxicillin'
+        , 'hydrocortisone'
+        , 'cetirizine'
+        , 'pertuzumab'
+        , 'methylphenidate'
+        , 'erythromycin'
+        , 'gabapentin'
+        , 'lopinavir / ritonavir'
+        , 'levothyroxine'
+        , 'albuterol'
+        )
+        */

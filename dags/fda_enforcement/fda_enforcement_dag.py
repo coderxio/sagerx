@@ -1,5 +1,5 @@
 from airflow.models import Variable
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from textwrap import dedent
 from pathlib import Path
 
@@ -7,7 +7,7 @@ from sagerx import get_dataset, read_sql_file, get_sql_list, alert_slack_channel
 
 ds = {
     "dag_id": "fda_enforcement",
-    "schedule_interval": "0 0 * * *",  # run once daily)
+    "schedule_interval": "0 0 * * 4",  # run weekly on Thursday - looks like report dates are usually Wednesdays
 }
 
 
@@ -27,16 +27,17 @@ from airflow.utils.dates import days_ago
 # builds a dag for each data set in data_set_list
 default_args = {
     "owner": "airflow",
-    "start_date": days_ago(5),
+    "start_date": datetime(2012, 1, 1),
     "depends_on_past": False,
     "email": ["admin@sagerx.io"],
     "email_on_failure": False,
     "email_on_retry": False,
     "retries": 1,
-    "retry_delay": timedelta(minutes=5),
+    "retry_delay": timedelta(minutes=0.1),
     # none airflow common dag elements
     "retrieve_dataset_function": get_dataset,
     "on_failure_callback": alert_slack_channel,
+    "max_active_runs": 1,
 }
 
 dag_args = {**default_args, **ds}

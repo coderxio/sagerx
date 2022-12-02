@@ -14,4 +14,3 @@ AS
         ON ndc.clinical_product_rxcui = rcp.rxcui
     LEFT JOIN staging.rxnorm_brand_product rbp
         ON ndc.brand_product_rxcui = rbp.rxcui
-    WHERE ndc.active AND ndc.prescribable

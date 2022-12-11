@@ -7,7 +7,7 @@ from sagerx import get_dataset, read_sql_file, get_sql_list, alert_slack_channel
 
 ds = {
     "dag_id": "fda_enforcement",
-    "schedule_interval": "0 0 * * *",  # run once daily)
+    "schedule_interval": "0 0 * * 0",  # run once daily)
 }
 
 
@@ -27,7 +27,7 @@ from airflow.utils.dates import days_ago
 # builds a dag for each data set in data_set_list
 default_args = {
     "owner": "airflow",
-    "start_date": days_ago(5),
+    "start_date": days_ago(21),
     "depends_on_past": False,
     "email": ["admin@sagerx.io"],
     "email_on_failure": False,
@@ -61,6 +61,7 @@ with dag:
     @task(task_id="EL_fda_enforcement")
     def extract_load_dataset(data_interval_start=None, data_interval_end=None):
         import requests
+        import sqlalchemy
         import pandas as pd
         import pendulum
         import logging
@@ -72,15 +73,20 @@ with dag:
         logging.info(url)
 
         response = requests.get(url)
+        print(response.json())
         json_object = response.json()["results"]
 
         pg_hook = PostgresHook(postgres_conn_id="postgres_default")
         engine = pg_hook.get_sqlalchemy_engine()
 
         df = pd.DataFrame(json_object)
-        df["openfda"] = df["openfda"].astype("str")
+        print(df.info())
         df.to_sql(
-            "fda_enforcement", con=engine, schema="datasource", if_exists="replace"
+            "fda_enforcement",
+            con=engine,
+            schema="datasource",
+            if_exists="replace",
+            dtype={"openfda": sqlalchemy.types.JSON},
         )
 
     el_ds = extract_load_dataset()

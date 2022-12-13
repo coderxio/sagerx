@@ -2,14 +2,14 @@
 DROP TABLE IF EXISTS staging.rxnorm_clinical_product_component CASCADE;
 
 CREATE TABLE staging.rxnorm_clinical_product_component (
-    clinical_product_component_rxcui VARCHAR(8) NOT NULL,
-    clinical_product_compnent_name   TEXT,
-    clinical_product_component_tty   VARCHAR(20),
-	active							BOOLEAN,
-	prescribable					BOOLEAN,
-	ingredient_rxcui				 VARCHAR(8),
-	dose_form_rxcui					 VARCHAR(8),
-	PRIMARY KEY(clinical_product_component_rxcui)
+    rxcui 				VARCHAR(8) NOT NULL,
+    name   				TEXT,
+    tty   				VARCHAR(20),
+	active				BOOLEAN,
+	prescribable		BOOLEAN,
+	ingredient_rxcui	VARCHAR(8),
+	dose_form_rxcui		VARCHAR(8),
+	PRIMARY KEY(rxcui)
 );
 
 INSERT INTO staging.rxnorm_clinical_product_component
@@ -56,9 +56,9 @@ WITH cte AS (
 	) sq
 )
 SELECT DISTINCT
-	CASE WHEN product_component.rxcui IS NULL THEN product.rxcui ELSE product_component.rxcui END clinical_product_component_rxcui
-	, CASE WHEN product_component.str IS NULL THEN product.str ELSE product_component.str END clinical_product_compnent_name 
-	, CASE WHEN product_component.tty IS NULL THEN product.tty ELSE product_component.tty END clinical_product_component_tty
+	CASE WHEN product_component.rxcui IS NULL THEN product.rxcui ELSE product_component.rxcui END rxcui
+	, CASE WHEN product_component.str IS NULL THEN product.str ELSE product_component.str END name 
+	, CASE WHEN product_component.tty IS NULL THEN product.tty ELSE product_component.tty END tty
 	, CASE WHEN 
 		CASE WHEN product_component.rxcui IS NULL THEN product.suppress ELSE product_component.suppress END = 'N' THEN TRUE ELSE FALSE END AS active
 	, CASE WHEN 

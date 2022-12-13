@@ -8,7 +8,8 @@
 4. Run `docker-compose up airflow-init`.
 5. Run `docker-compose up`
 
-### Web UIs
+### server URLs
 
 - Airflow UI is hosted on `'0.0.0.0:8001'`
 - PgAdmin is hosted on `0.0.0.0:8002`
+- WebAPI is hosted on `0.0.0.0:8000`

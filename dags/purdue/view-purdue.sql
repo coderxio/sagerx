@@ -12,7 +12,8 @@ AS
 		, ing.ingredient_rxcui AS active_ingredient_rxcui
 		, ing.ingredient_name AS active_ingredient_name
 		, ing.ingredient_tty AS active_ingredient_tty
-		, fda.recall_number
+		, fda.applicationnumber AS application_number
+		, enf.recall_number
 		, spl.inactive_ingredient_unii
 		, spl.inactive_ingredient_rxcui
 		, spl.inactive_ingredient_name
@@ -20,11 +21,12 @@ AS
 	FROM flatfile.rxnorm_ndc_to_product ndc
 	LEFT JOIN flatfile.rxnorm_clinical_product_to_ingredient ing
 		ON ing.clinical_product_rxcui = ndc.clinical_product_rxcui
-	LEFT JOIN staging.fda_enforcement_ndc fda
-		ON fda.ndc9 = LEFT(ndc.ndc, 9)
+	LEFT JOIN staging.fda_enforcement_ndc enf
+		ON enf.ndc9 = LEFT(ndc.ndc, 9)
 	LEFT JOIN flatfile.mthspl_product_to_inactive_ingredient spl
 		ON spl.ndc9 = LEFT(ndc.ndc, 9)
-    /*
+	LEFT JOIN staging.fda_ndc fda
+		ON fda.ndc11 = ndc.ndc
     WHERE ing.ingredient_name in (
         'risperidone'
         , 'adalimumab'
@@ -45,4 +47,4 @@ AS
         , 'levothyroxine'
         , 'albuterol'
         )
-        */
+		

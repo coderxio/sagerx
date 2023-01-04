@@ -2,15 +2,37 @@ CREATE OR REPLACE VIEW flatfile.purdue
 AS 
 	WITH enf AS (
 		-- UNION RegEx NDCs from description and JSON NDCs from OpenFDA column
-		SELECT 
-			*
-		FROM staging.fda_enforcement_ndc_regex
-		
-		UNION
-		
+		-- NOTE: UNION removes duplicates by default, which is what we want here
 		SELECT
 			*
-		FROM staging.fda_enforcement_ndc_json
+		FROM (
+			-- first get only the NDCs from combined RegEx and JSON enforcement report data
+			SELECT 
+				recall_number
+				, ndc11
+				, ndc9
+			FROM staging.fda_enforcement_ndc_regex
+			
+			UNION
+			
+			SELECT
+				recall_number
+				, ndc11
+				, ndc9
+			FROM staging.fda_enforcement_ndc_json
+		) enf_ndcs
+		-- then, join NDCs with application numbers, where they exist from JSON data
+		LEFT JOIN (
+			-- get distinct NDC11 -> application numbers so as to not blow up granularity
+			SELECT
+				ndc11
+				, app_num
+			FROM staging.fda_enforcement_ndc_json
+			GROUP BY
+				ndc11
+				, app_num
+		) json_app_num
+			ON enf_ndcs.ndc11 = json_app_num.ndc11
 	)
 	SELECT
 		ndc.ndc AS ndc11
@@ -24,7 +46,9 @@ AS
 		, ing.ingredient_rxcui AS active_ingredient_rxcui
 		, ing.ingredient_name AS active_ingredient_name
 		, ing.ingredient_tty AS active_ingredient_tty
-		, fda.applicationnumber AS application_number
+		-- if FDA NDC Directory has an application number, use that...
+		-- otherwise, use the application number from the enforcement report JSON
+		, COALESCE(fda.applicationnumber, enf.app_num) AS application_number
 		, enf.recall_number
 		, spl.inactive_ingredient_unii
 		, spl.inactive_ingredient_rxcui

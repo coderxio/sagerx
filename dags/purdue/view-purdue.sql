@@ -1,5 +1,17 @@
 CREATE OR REPLACE VIEW flatfile.purdue
 AS 
+	WITH enf AS (
+		-- UNION RegEx NDCs from description and JSON NDCs from OpenFDA column
+		SELECT 
+			*
+		FROM staging.fda_enforcement_ndc_regex
+		
+		UNION
+		
+		SELECT
+			*
+		FROM staging.fda_enforcement_ndc_json
+	)
 	SELECT
 		ndc.ndc AS ndc11
 		, LEFT(ndc.ndc, 9) AS ndc9
@@ -18,13 +30,18 @@ AS
 		, spl.inactive_ingredient_rxcui
 		, spl.inactive_ingredient_name
 		, spl.inactive_ingredient_tty
+	-- RxNorm NDCs that have one of the ingredients in the WHERE clause
 	FROM flatfile.rxnorm_ndc_to_product ndc
+	-- clinical product and related active ingredients for each NDC
 	LEFT JOIN flatfile.rxnorm_clinical_product_to_ingredient ing
 		ON ing.clinical_product_rxcui = ndc.clinical_product_rxcui
-	LEFT JOIN staging.fda_enforcement_ndc enf
+	-- FDA enforcement reports (UNION of RegEx and JSON) joined on NDC9
+	LEFT JOIN enf
 		ON enf.ndc9 = LEFT(ndc.ndc, 9)
+	-- DailyMed SPL inactive ingredients joined on NDC9
 	LEFT JOIN flatfile.mthspl_product_to_inactive_ingredient spl
 		ON spl.ndc9 = LEFT(ndc.ndc, 9)
+	-- FDA NDC Directory joined on NDC11 to pull in application number
 	LEFT JOIN staging.fda_ndc fda
 		ON fda.ndc11 = ndc.ndc
     WHERE ing.ingredient_name in (
@@ -47,4 +64,4 @@ AS
         , 'levothyroxine'
         , 'albuterol'
         )
-		
+;

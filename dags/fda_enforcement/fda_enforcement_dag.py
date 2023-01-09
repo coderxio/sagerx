@@ -27,8 +27,8 @@ from airflow.utils.dates import days_ago
 # builds a dag for each data set in data_set_list
 default_args = {
     "owner": "airflow",
-    "start_date": days_ago(365),
-    #"start_date": datetime(2012, 1, 1),
+    #"start_date": days_ago(365),
+    "start_date": datetime(2012, 1, 1),
     "depends_on_past": False,
     "email": ["admin@sagerx.io"],
     "email_on_failure": False,

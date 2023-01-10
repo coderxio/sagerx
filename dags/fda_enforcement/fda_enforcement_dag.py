@@ -2,6 +2,7 @@ from airflow.models import Variable
 from datetime import date, datetime, timedelta
 from textwrap import dedent
 from pathlib import Path
+from typing import Dict
 
 from sagerx import get_dataset, read_sql_file, get_sql_list, alert_slack_channel
 
@@ -17,18 +18,17 @@ ds = {
 from airflow import DAG
 
 # Operators; we need this to operate!
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import ShortCircuitOperator
 from airflow.hooks.postgres_hook import PostgresHook
 from airflow.decorators import task
 from airflow.providers.postgres.operators.postgres import PostgresOperator
-from airflow.utils.dates import days_ago
 
 
 # builds a dag for each data set in data_set_list
 default_args = {
     "owner": "airflow",
     #"start_date": days_ago(365),
-    "start_date": datetime(2012, 1, 1),
+    "start_date": datetime(2022, 9, 1),
     "depends_on_past": False,
     "email": ["admin@sagerx.io"],
     "email_on_failure": False,
@@ -91,9 +91,23 @@ with dag:
             dtype={"openfda": sqlalchemy.types.JSON},
         )
 
+        return df.shape[0]
+
+    def df_has_data(**context) -> bool :
+            df_rows = context['ti'].xcom_pull(task_ids='EL_fda_enforcement')
+            if df_rows > 0:
+                return True
+            else:
+                return False
+
+    test_contains_data = ShortCircuitOperator(
+        task_id = 'data_return_false',
+        python_callable = df_has_data
+    )
+
     el_ds = extract_load_dataset()
 
-    tl = [el_ds]
+    tl = [el_ds, test_contains_data]
     # Task to load data into source db schema
     for sql in get_sql_list(
         "load-",

@@ -16,5 +16,6 @@ SELECT
 FROM datasource.fda_enforcement fdae
 	, json_array_elements(openfda->'package_ndc') with ordinality ndc(id_value, line)
 	, json_array_elements(openfda->'application_number') with ordinality app_num(id_value, line)
+WHERE ndc_to_11(ndc.id_value #>> '{}') IS NOT NULL
 ON CONFLICT DO NOTHING
 ;

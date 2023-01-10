@@ -12,9 +12,11 @@ CREATE TABLE IF NOT EXISTS staging.fda_enforcement_ndc_regex (
 );
 
 INSERT INTO staging.fda_enforcement_ndc_regex
-SELECT recall_number
+SELECT *
+FROM (SELECT recall_number
 	, ndc_to_11((regexp_matches(product_description, '(\m\d{1,5}-\d{1,4}-\d{1,2}\M|\m\d{11}\M)', 'g'))[1]) AS ndc11
 	, LEFT(ndc_to_11((regexp_matches(product_description, '(\m\d{1,5}-\d{1,4}-\d{1,2}\M|\m\d{11}\M)', 'g'))[1]), 9) AS ndc9
-FROM datasource.fda_enforcement
+FROM datasource.fda_enforcement) z
+WHERE ndc11 IS NOT NULL
 ON CONFLICT DO NOTHING
 ;

@@ -28,7 +28,7 @@ from airflow.providers.postgres.operators.postgres import PostgresOperator
 default_args = {
     "owner": "airflow",
     #"start_date": days_ago(365),
-    "start_date": datetime(2022, 9, 1),
+    "start_date": datetime(2012, 1, 1),
     "depends_on_past": False,
     "email": ["admin@sagerx.io"],
     "email_on_failure": False,

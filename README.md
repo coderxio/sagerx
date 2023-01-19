@@ -8,6 +8,10 @@
 4. Run `docker-compose up airflow-init`.
 5. Run `docker-compose up`
 
+If you get issues on folder permisions
+
+`sudo chmod -R 777 postgres,data,extracts,logs,plugins`
+
 ### server URLs
 
 - Airflow UI is hosted on `'0.0.0.0:8001'`

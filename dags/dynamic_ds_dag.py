@@ -113,6 +113,12 @@ data_set_list = [
         "schedule_interval": "0 5 * * *",  # run at 5am every day
         "url": "https://dailymed-data.nlm.nih.gov/public-release-files/dm_spl_zip_files_meta_data.zip",
     },
+    {
+        "dag_id": "rxterms",
+        "schedule_interval": "45 0 15 1 *",  # runs once monthly on the 15th day at 00:45
+        "url": "https://data.lhncbc.nlm.nih.gov/public/rxterms/release/RxTerms{{ macros.ds_format(ds, '%Y-%m-%d', '%Y%m' ) }}.zip",
+    },
+
 ]
 
 

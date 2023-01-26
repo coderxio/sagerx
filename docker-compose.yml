@@ -15,10 +15,10 @@ x-airflow-common:
     _PIP_ADDITIONAL_REQUIREMENTS: ''
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
   volumes:
-    - ./dags:/opt/airflow/dags
-    - ./logs:/opt/airflow/logs
-    - ./plugins:/opt/airflow/plugins
-    - ./data:/opt/airflow/data
+    - ./airflow/dags:/opt/airflow/dags
+    - ./airflow/logs:/opt/airflow/logs
+    - ./airflow/plugins:/opt/airflow/plugins
+    - ./airflow/data:/opt/airflow/data
 
 services:
   postgres:
@@ -32,11 +32,11 @@ services:
       - 5432:5432
     volumes:
       - ./postgres:/docker-entrypoint-initdb.d
-      - ./data:/opt/airflow/data
-      - ./extracts:/opt/airflow/extracts
+      - ./airflow/data:/opt/airflow/data
+      - ./airflow/extracts:/opt/airflow/extracts
 
   pgadmin:
-    image: dpage/pgadmin4:6/15
+    image: dpage/pgadmin4:6.15
     container_name: pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: pgadmin@pgadmin.org
@@ -67,7 +67,7 @@ services:
       _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
     user: '0:0'
     volumes:
-      - .:/sources
+      - ./airflow:/sources
     depends_on:
       - postgres
 

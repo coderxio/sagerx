@@ -48,7 +48,16 @@ services:
     volumes:
       - ./pgadmin/servers.json:/pgadmin4/servers.json
 
-  airflow-init:
+  dbt:
+    build:
+      context: ./dbt
+    image: sagerx_dbt
+    container_name: sagerx_dbt
+    volumes:
+      - ./dbt:/dbt
+    command: tail -f /dev/null
+
+  airflow-init: 
     <<: *airflow-common
     container_name: airflow-init
     entrypoint: /bin/bash

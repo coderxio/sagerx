@@ -1,4 +1,3 @@
-from airflow.decorators.base import task_decorator_factory
 import pendulum
 
 from airflow.decorators import dag, task
@@ -21,9 +20,6 @@ def dbt_example_dag():
         subprocess = SubprocessHook()
         subprocess.run_command(['dbt', 'run'], cwd='/dbt/sagerx_dbt')
 
-    hello_world = hello_world()
-    execute_dbt = execute_dbt()
-
-    hello_world >> execute_dbt
+    hello_world() >> execute_dbt()
 
 dbt_example_dag()

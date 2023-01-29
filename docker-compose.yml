@@ -1,7 +1,9 @@
 version: '3.8'
 x-airflow-common:
   &airflow-common
-  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.5.1}
+  build:
+    context: ./airflow
+  image: sagerx_airflow
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
@@ -13,12 +15,14 @@ x-airflow-common:
     AIRFLOW_VAR_SLACK_API: ${SLACK_API:-}
     AIRFLOW_CONN_SLACK: http://:@https%3A%2F%2Fhooks.slack.com%2Fservices%2F${SLACK_API:-}
     _PIP_ADDITIONAL_REQUIREMENTS: ''
+    DBT_PROFILES_DIR: /dbt
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
   volumes:
     - ./airflow/dags:/opt/airflow/dags
     - ./airflow/logs:/opt/airflow/logs
     - ./airflow/plugins:/opt/airflow/plugins
     - ./airflow/data:/opt/airflow/data
+    - ./dbt:/dbt
 
 services:
   postgres:

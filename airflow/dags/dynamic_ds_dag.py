@@ -64,11 +64,6 @@ data_set_list = [
         "url": "https://www.accessdata.fda.gov/cder/ndc_excluded.zip",
     },
     {
-        "dag_id": "fda_ndc",
-        "schedule_interval": "0 4 * * *",  # run a 4am every day
-        "url": "https://www.accessdata.fda.gov/cder/ndctext.zip",
-    },
-    {
         "dag_id": "fda_unfinished",
         "schedule_interval": "15 4 * * *",  # run a 4:15am every day
         "url": "https://www.accessdata.fda.gov/cder/ndc_unfinished.zip",

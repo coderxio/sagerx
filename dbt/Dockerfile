@@ -11,4 +11,4 @@ WORKDIR /dbt
 
 COPY . .
 
-WORKDIR /dbt/sagerx_dbt
+WORKDIR /dbt/sagerx

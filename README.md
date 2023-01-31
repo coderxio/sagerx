@@ -1,4 +1,4 @@
-# Sagerx
+# SageRx
 
 ## Development Quickstart
 1. Clone the repo.
@@ -13,10 +13,9 @@ If you get issues on folder permissions
 `sudo chmod -R 777 postgres,data,extracts,logs,plugins`
 
 ### Using dbt
-On docker-compose up a dbt container will be created to be used for cli commands. To enter commands run `docker exec -it sagerx_dbt /bin/bash`. This will place you into a bash session in the dbt container. Then you can run dbt commands as you normally would.
+On docker-compose up a dbt container will be created to be used for cli commands. To enter commands run `docker exec -it dbt /bin/bash`. This will place you into a bash session in the dbt container. Then you can run dbt commands as you normally would.
 
-### server URLs
+### Server URLs
 
 - Airflow UI is hosted on `'0.0.0.0:8001'`
 - PgAdmin is hosted on `0.0.0.0:8002`
-- WebAPI is hosted on `0.0.0.0:8000`

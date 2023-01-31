@@ -5,7 +5,7 @@ models:
     description: "FDA NDC Directory"
     columns:
       - name: ndc11
-        description: "The ndcpackagecode field, but normalized to a NDC11 format."
+        description: "The ndcpackagecode field, normalized to a NDC11 format."
         tests:
           - unique
           - not_null

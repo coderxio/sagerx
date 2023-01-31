@@ -38,9 +38,9 @@ select
 	, listing_record_certified_through
 	, ndcpackagecode
 	, packagedescription
-    , package.startmarketingdate as package_startmarketingdate
-    , package.endmarketingdate as package_endmarketingdate
-    , package.ndc_exclude_flag as package_ndc_exclude_flag
+	, package.startmarketingdate as package_startmarketingdate
+	, package.endmarketingdate as package_endmarketingdate
+	, package.ndc_exclude_flag as package_ndc_exclude_flag
 	, sample_package
 from package
 left join product

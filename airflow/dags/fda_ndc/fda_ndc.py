@@ -3,10 +3,8 @@ import pendulum
 
 from sagerx import get_dataset, read_sql_file, alert_slack_channel
 
-# The DAG object; we'll need this to instantiate a DAG
 from airflow.decorators import dag, task
 
-# Operators; we need this to operate!
 from airflow.operators.python_operator import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.hooks.subprocess import SubprocessHook
@@ -17,7 +15,7 @@ from airflow.hooks.subprocess import SubprocessHook
     start_date=pendulum.today(),
     catchup=False,    
 )
-def fda_ndc_dag():
+def fda_ndc():
 
     dag_id = "fda_ndc"
     url = "https://www.accessdata.fda.gov/cder/ndctext.zip"
@@ -64,4 +62,4 @@ def fda_ndc_dag():
 
     extract() >> load_product() >> load_package() >> transform()
 
-fda_ndc_dag()
+fda_ndc()

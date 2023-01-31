@@ -26,4 +26,4 @@ PRIMARY KEY (productid)
 );
 
 COPY datasource.fda_ndc_product
-FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_fda_ndc') }}/product.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;
+FROM '/opt/airflow/data/fda_ndc/ndctext/product.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;

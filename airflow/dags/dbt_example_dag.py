@@ -18,7 +18,8 @@ def dbt_example_dag():
     @task
     def execute_dbt():
         subprocess = SubprocessHook()
-        subprocess.run_command(['dbt', 'run'], cwd='/dbt/sagerx_dbt')
+        result = subprocess.run_command(['dbt', 'test'], cwd='/dbt/sagerx_dbt')
+        print(result.exit_code)
 
     hello_world() >> execute_dbt()
 

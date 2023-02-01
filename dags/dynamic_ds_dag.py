@@ -9,56 +9,6 @@ import user_macros
 
 data_set_list = [
     {
-        "dag_id": "cms_noc_pricing",
-        "schedule_interval": "0 0 20 */3 *",  # runs every quarter on the 20th day of the month
-        "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-noc-pricing-file.zip",
-        #   "url": "https://www.cms.gov/files/zip/october-2021-noc-pricing-file.zip"
-        "user_defined_macros": {
-            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
-            "ds_datetime": user_macros.ds_datetime,
-        },
-    },
-    {
-        "dag_id": "cms_ndc_hcpcs",
-        "schedule_interval": "0 0 20 */3 *",  # runs every quarter on the 20th of the month
-        "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-asp-ndc-hcpcs-crosswalk.zip",
-        # https://www.cms.gov/files/zip/october-2021-asp-ndc-hcpcs-crosswalk.zip
-        "user_defined_macros": {
-            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
-            "ds_datetime": user_macros.ds_datetime,
-        },
-    },
-    {
-        "dag_id": "cms_asp_pricing",
-        "schedule_interval": "0 0 20 */3 *",  # runs once every quarter on the 20th of each month
-        "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-asp-pricing-file.zip",
-        #   "url": "https://www.cms.gov/files/zip/october-2021-asp-pricing-file.zip"
-        "user_defined_macros": {
-            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
-            "ds_datetime": user_macros.ds_datetime,
-        },
-    },
-    {
-        "dag_id": "cms_addendum_a",
-        "schedule_interval": "0 0 20 */3 *",  # runs every quarter on the 20th
-        "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-opps-addendum.zip?agree=yes&next=Accept",
-        # "url":https://www.cms.gov/files/zip/addendum-october-2021.zip?agree=yes&next=Accept
-        "user_defined_macros": {
-            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
-            "ds_datetime": user_macros.ds_datetime,
-        },
-    },
-    {
-        "dag_id": "cms_addendum_b",
-        "schedule_interval": "0 0 20 */3 *",  # runs every quarter on the 20th
-        "url": "https://www.cms.gov/files/zip/{{ get_first_day_of_quarter(ds_datetime( ds ), '%B-%Y' ) }}-opps-addendum-b.zip?agree=yes&next=Accept",
-        # "url": "https://www.cms.gov/license/ama?file=/files/zip/january-2022-opps-addendum-b.zip?agree=yes&next=Accept"
-        "user_defined_macros": {
-            "get_first_day_of_quarter": user_macros.get_first_day_of_quarter,
-            "ds_datetime": user_macros.ds_datetime,
-        },
-    },
-    {
         "dag_id": "fda_excluded",
         "schedule_interval": "30 4 * * *",  # run a 4:30am every day
         "url": "https://www.accessdata.fda.gov/cder/ndc_excluded.zip",
@@ -86,19 +36,6 @@ data_set_list = [
         #   "url": "https://www.fda.gov/media/76860/download"
     },
     {
-        "dag_id": "medicaid_utilization",
-        "schedule_interval": "0 0 1 1 *",  # run a year on jJan 1st
-        "url": "https://download.medicaid.gov/data/state-drug-utilization-data-{{ macros.ds_format(ds, '%Y-%m-%d', '%Y' ) }}.csv",
-        # datetime(1992, 1, 1, 1, 1),  # for backfill if wanted.
-        #'url': 'https://download.medicaid.gov/data/state-drug-utilization-data-2020.csv'
-    },
-    {
-        "dag_id": "nppes_npi",
-        "schedule_interval": "45 0 15 1 *",  # runs once monthly on the 15th day at 00:45
-        "url": "https://download.cms.gov/nppes/NPPES_Data_Dissemination_{{ macros.ds_format(ds, '%Y-%m-%d', '%B_%Y' ) }}.zip",
-        # "url": "https://download.cms.gov/nppes/NPPES_Data_Dissemination_November_2021.zip",
-    },
-    {
         "dag_id": "dailymed_rxnorm",
         "schedule_interval": "0 5 * * *",  # run at 5am every day
         "url": "https://dailymed-data.nlm.nih.gov/public-release-files/rxnorm_mappings.zip",
@@ -118,7 +55,6 @@ data_set_list = [
         "schedule_interval": "45 0 15 1 *",  # runs once monthly on the 15th day at 00:45
         "url": "https://data.lhncbc.nlm.nih.gov/public/rxterms/release/RxTerms{{ macros.ds_format(ds, '%Y-%m-%d', '%Y%m' ) }}.zip",
     },
-
 ]
 
 

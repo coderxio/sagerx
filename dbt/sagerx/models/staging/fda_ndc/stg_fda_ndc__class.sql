@@ -1,4 +1,4 @@
--- stg_fda__fda_ndc_class.sql
+-- stg_fda_ndc__class.sql
 
 select
 	z.productid

@@ -19,6 +19,6 @@ blank		     TEXT
 );
 
 COPY datasource.rxnorm_rxnsat
-FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_rxnorm_full') }}/rrf/RXNSAT.RRF' CSV DELIMITER '|' ENCODING 'UTF8' ESCAPE E'\b' QUOTE E'\b';
+FROM '{{ ti.xcom_pull(task_ids='extract') }}/rrf/RXNSAT.RRF' CSV DELIMITER '|' ENCODING 'UTF8' ESCAPE E'\b' QUOTE E'\b';
 --ESCAPE and QOUTE characters are dummy to remove default
 

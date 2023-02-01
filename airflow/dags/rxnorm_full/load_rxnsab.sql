@@ -31,5 +31,5 @@ CREATE TABLE datasource.rxnorm_rxnsab  (
 );
 
 COPY datasource.rxnorm_rxnsab
-FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_rxnorm_full') }}/rrf/RXNSAB.RRF' CSV DELIMITER '|' ENCODING 'UTF8' ESCAPE E'\b' QUOTE E'\b';
+FROM '{{ ti.xcom_pull(task_ids='extract') }}/rrf/RXNSAB.RRF' CSV DELIMITER '|' ENCODING 'UTF8' ESCAPE E'\b' QUOTE E'\b';
 --ESCAPE and QOUTE characters are dummy to remove default

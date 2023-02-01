@@ -1,7 +1,7 @@
 version: 2
 
 sources:
-  - name: fda
+  - name: fda_ndc
     schema: datasource
     tables:
       - name: fda_ndc_product

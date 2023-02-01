@@ -13,4 +13,4 @@ sample_package      TEXT
 );
 
 COPY datasource.fda_ndc_package
-FROM '/opt/airflow/data/fda_ndc/ndctext/package.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;
+FROM '{{ ti.xcom_pull(key='return_value', task_ids='extract') }}/package.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;

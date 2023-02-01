@@ -1,10 +1,11 @@
 from pathlib import Path
 import pendulum
 
-from sagerx import get_dataset, read_sql_file, alert_slack_channel
+from sagerx import get_dataset, read_sql_file, get_sql_list, alert_slack_channel
 
 from airflow.decorators import dag, task
 
+from airflow.operators.python import get_current_context
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.hooks.postgres_hook import PostgresHook
 from airflow.hooks.subprocess import SubprocessHook
@@ -28,21 +29,18 @@ def fda_ndc():
         data_path = get_dataset(ds_url, data_folder)
         return data_path
 
+    load = []
     # Task to load data into source db schema
-    @task
-    def load_product():
-        sql = "load-fda_ndc_product.sql"
+    for sql in get_sql_list("load", ds_folder):
         sql_path = ds_folder / sql
-        pg_hook = PostgresHook(postgres_conn_id="postgres_default")
-        pg_hook.run(read_sql_file(sql_path))
-
-    # Task to load data into source db schema
-    @task
-    def load_package():
-        sql = "load-fda_ndc_package.sql"
-        sql_path = ds_folder / sql
-        pg_hook = PostgresHook(postgres_conn_id="postgres_default")
-        pg_hook.run(read_sql_file(sql_path))
+        task_id = sql[:-4]
+        load.append(
+            PostgresOperator(
+                task_id=task_id,
+                postgres_conn_id="postgres_default",
+                sql=read_sql_file(sql_path),
+            )
+        )
 
     # Task to transform data using dbt
     @task
@@ -50,6 +48,6 @@ def fda_ndc():
         subprocess = SubprocessHook()
         result = subprocess.run_command(['dbt', 'run'], cwd='/dbt/sagerx') 
 
-    extract() >> load_product() >> load_package() >> transform()
+    extract() >> load >> transform()
 
 fda_ndc()

@@ -129,6 +129,22 @@ models:
     - name: active
     - name: prescribable
 
+  - name: stg_rxnorm__ingredient_strength
+    description: "RxNorm ingredient strengths."
+    columns:
+    - name: rxcui
+      tests:
+        - unique
+        - not_null
+    - name: name
+    - name: numerator_value
+    - name: numerator_unit
+    - name: denominator_value
+    - name: denominator_unit
+    - name: text
+    - name: active
+    - name: prescribable
+
   - name: stg_rxnorm__mthspl_product
     description: "DailyMed SPL products (DP) at NDC9 level."
     columns:

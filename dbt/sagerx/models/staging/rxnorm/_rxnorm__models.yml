@@ -89,4 +89,30 @@ models:
     - name: active
     - name: prescribable
 
+  - name: stg_rxnorm__mthspl_product
+    description: "DailyMed SPL products (DP) at NDC9 level."
+    columns:
+    - name: rxcui
+      tests:
+        - unique
+        - not_null
+    - name: name
+    - name: tty
+    - name: rxaui
+    - name: ndc
+    - name: active
+    - name: prescribable
 
+  - name: stg_rxnorm__mthspl_substance
+    description: "DailyMed SPL substances (SU)."
+    columns:
+    - name: rxcui
+      tests:
+        - unique
+        - not_null
+    - name: name
+    - name: tty
+    - name: rxaui
+    - name: unii
+    - name: active
+    - name: prescribable

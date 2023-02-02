@@ -44,28 +44,28 @@ models:
   - name: stg_rxnorm__clinical_product_component
     description: "RxNorm clinical product components (SCD)."
     columns:
-    - name: rxcui
-      tests:
-        - unique
-        - not_null
-    - name: name
-    - name: tty
-    - name: active
-    - name: prescribable
-    - name: ingredient_rxcui
-    - name: dose_form_rxcui
+      - name: rxcui
+        tests:
+          - unique
+          - not_null
+      - name: name
+      - name: tty
+      - name: active
+      - name: prescribable
+      - name: ingredient_rxcui
+      - name: dose_form_rxcui
 
   - name: stg_rxnorm__dose_form
     description: "RxNorm dose forms (DF)."
     columns:
-    - name: rxcui
-      tests:
-        - unique
-        - not_null
-    - name: name
-    - name: tty
-    - name: active
-    - name: prescribable
+      - name: rxcui
+        tests:
+          - unique
+          - not_null
+      - name: name
+      - name: tty
+      - name: active
+      - name: prescribable
 
   - name: stg_rxnorm__dose_form_group_link
     description: "Links dose forms (DF) to dose form groups (DFG)."
@@ -81,108 +81,123 @@ models:
   - name: stg_rxnorm__dose_form_group
     description: "RxNorm dose form groups (DFG)."
     columns:
-    - name: rxcui
-      tests:
-        - unique
-        - not_null
-    - name: name
-    - name: tty
-    - name: active
-    - name: prescribable
+      - name: rxcui
+        tests:
+          - unique
+          - not_null
+      - name: name
+      - name: tty
+      - name: active
+      - name: prescribable
 
   - name: stg_rxnorm__ingredient
     description: "RxNorm ingredients (IN/MIN)."
     columns:
-    - name: rxcui
-      tests:
-        - unique
-        - not_null
-    - name: name
-    - name: tty
-    - name: active
-    - name: prescribable
+      - name: rxcui
+        tests:
+          - unique
+          - not_null
+      - name: name
+      - name: tty
+      - name: active
+      - name: prescribable
 
   - name: stg_rxnorm__ingredient_component_link
     description: "Links ingredients (IN/MIN) to ingredient components (IN)."
     columns:
-    # TODO: primary key would be ingredient_rxcui + ingredient_component_rxcui
-    - name: ingredient_rxcui
-      tests:
-        - not_null
-    - name: ingredient_component_rxcui
-      tests:
-        - not_null
+      # TODO: primary key would be ingredient_rxcui + ingredient_component_rxcui
+      - name: ingredient_rxcui
+        tests:
+          - not_null
+      - name: ingredient_component_rxcui
+        tests:
+          - not_null
   
   - name: stg_rxnorm__ingredient_component
     description: "RxNorm ingredient components (IN)."
     columns:
-    - name: rxcui
-      tests:
-        - unique
-        - not_null
-    - name: name
-    - name: tty
-      tests:
-        - accepted_values:
-            # TODO: this test is failing because there are 41 MINs - investigate why
-            values: ['IN']
-    - name: active
-    - name: prescribable
+      - name: rxcui
+        tests:
+          - unique
+          - not_null
+      - name: name
+      - name: tty
+        tests:
+          - accepted_values:
+              # TODO: this test is failing because there are 41 MINs - investigate why
+              values: ['IN']
+      - name: active
+      - name: prescribable
+
+  - name: stg_rxnorm__ingredient_strength_link
+    description: "Links combination of clinical product components (SCD) + ingredient components (IN) to ingredient strengths."
+    columns:
+      # TODO: primary key would be clinical_product_component_rxcui
+      # + ingredient_component_rxcui + ingredient_strength_rxcui
+      - name: clinical_product_component_rxcui
+        tests:
+          - not_null
+      - name: ingredient_component_rxcui
+        tests:
+          - not_null
+      - name: ingredient_strength_rxcui
+        tests:
+          - not_null
 
   - name: stg_rxnorm__ingredient_strength
     description: "RxNorm ingredient strengths."
     columns:
-    - name: rxcui
-      tests:
-        - unique
-        - not_null
-    - name: name
-    - name: numerator_value
-    - name: numerator_unit
-    - name: denominator_value
-    - name: denominator_unit
-    - name: text
-    - name: active
-    - name: prescribable
+      - name: rxcui
+        tests:
+          - unique
+          - not_null
+      - name: name
+      - name: numerator_value
+      - name: numerator_unit
+      - name: denominator_value
+      - name: denominator_unit
+      - name: text
+      - name: active
+      - name: prescribable
 
   - name: stg_rxnorm__mthspl_product
     description: "DailyMed SPL products (DP) at NDC9 level."
     columns:
-    - name: rxcui
-      tests:
-        - not_null
-    - name: name
-    - name: tty
-    - name: rxaui
-    - name: ndc
-    - name: active
-    - name: prescribable
+      - name: rxcui
+        tests:
+          - not_null
+      - name: name
+      - name: tty
+      - name: rxaui
+      - name: ndc
+      - name: active
+      - name: prescribable
 
   - name: stg_rxnorm__mthspl_substance
     description: "DailyMed SPL substances (SU)."
     columns:
-    - name: rxcui
-      tests:
-        - not_null
-    - name: name
-    - name: tty
-    - name: rxaui
-    - name: unii
-    - name: active
-    - name: prescribable
+      - name: rxcui
+        tests:
+          - not_null
+      - name: name
+      - name: tty
+      - name: rxaui
+      - name: unii
+      - name: active
+      - name: prescribable
 
   - name: stg_rxnorm__brand_product
     description: "RxNorm brand name products (SBD/BPCK)."
     columns:
-    - name: rxcui
-      tests:
-        - unique
-        - not_null
-    - name: name
-    - name: tty
-    - name: clinical_product_rxcui
-    - name: active
-    - name: prescribable
+      - name: rxcui
+        tests:
+          - unique
+          - not_null
+      - name: name
+      - name: tty
+      - name: clinical_product_rxcui
+      - name: active
+      - name: prescribable
 
   - name: stg_rxnorm__brand_product_component_link
     description: "Links brand products (SBD/BPCK) with brand product components (mostly SBD, but BPCKs can also contain SCD)."
@@ -198,19 +213,19 @@ models:
   - name: stg_rxnorm__brand_product_component
     description: "RxNorm brand product components (mostly SBD, but BPCKs can also contain SCD)."
     columns:
-    - name: rxcui
-      tests:
-        - unique
-        - not_null
-    - name: name
-    - name: tty
-    - name: clinical_product_component_rxcui
-      tests:
-        - not_null
-    - name: brand_rxcui
-      description: "NOTE: brand_product_component SCDs will have NULL for brand_rxcui."
-    - name: active
-    - name: prescribable
+      - name: rxcui
+        tests:
+          - unique
+          - not_null
+      - name: name
+      - name: tty
+      - name: clinical_product_component_rxcui
+        tests:
+          - not_null
+      - name: brand_rxcui
+        description: "NOTE: brand_product_component SCDs will have NULL for brand_rxcui."
+      - name: active
+      - name: prescribable
 
   - name: stg_rxnorm__brand
     description: "RxNorm brand names (BN)."

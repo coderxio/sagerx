@@ -2,9 +2,10 @@
 
 select distinct
 	product.rxcui as clinical_product_rxcui
-	, case when product_component.rxcui is null then product.rxcui 
-                            else product_component.rxcui 
-    end as rxnorm_clinical_product_component_rxcui
+	, case when product_component.rxcui is null
+        then product.rxcui 
+        else product_component.rxcui 
+        end as clinical_product_component_rxcui
 from datasource.rxnorm_rxnconso product
 left join datasource.rxnorm_rxnrel rxnrel on rxnrel.rxcui2 = product.rxcui and rxnrel.rela = 'contains'
 left join datasource.rxnorm_rxnconso product_component

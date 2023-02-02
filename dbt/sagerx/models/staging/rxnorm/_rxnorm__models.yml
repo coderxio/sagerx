@@ -7,9 +7,10 @@ models:
       - name: ndc
         description: "The NDC in NDC11 format."
         tests:
-          # NOTE: there are 8 NDCs not in the correct format, so our
+          # TODO: there are 8 NDCs not in the correct format, so our
           # custom ndc_to_11 function returns NULL, which breaks
           # both the not_null and unique tests
+          # - need to fix that function
           - unique
           - not_null
       - name: clinical_product_rxcui
@@ -32,7 +33,7 @@ models:
   - name: stg_rxnorm__clinical_product_component_link
     description: "Links clinical products (SCD/GPCK) with clinical product components (SCD only)."
     columns:
-      # primary key would be clinical_product_rxcui + clinical_product_component_rxcui
+      # TODO: primary key would be clinical_product_rxcui + clinical_product_component_rxcui
       - name: clinical_product_rxcui
         tests:
           - not_null
@@ -69,7 +70,7 @@ models:
   - name: stg_rxnorm__dose_form_group_link
     description: "Links dose forms (DF) to dose form groups (DFG)."
     columns:
-      # primary key would be dose_form_rxcui + dose_form_group_rxcui
+      # TODO: primary key would be dose_form_rxcui + dose_form_group_rxcui
       - name: dose_form_rxcui
         tests:
           - not_null
@@ -104,7 +105,7 @@ models:
   - name: stg_rxnorm__ingredient_component_link
     description: "Links ingredients (IN/MIN) to ingredient components (IN)."
     columns:
-    # primary key would be ingredient_rxcui + ingredient_component_rxcui
+    # TODO: primary key would be ingredient_rxcui + ingredient_component_rxcui
     - name: ingredient_rxcui
       tests:
         - not_null
@@ -112,6 +113,22 @@ models:
       tests:
         - not_null
   
+  - name: stg_rxnorm__ingredient_component
+    description: "RxNorm ingredient components (IN)."
+    columns:
+    - name: rxcui
+      tests:
+        - unique
+        - not_null
+    - name: name
+    - name: tty
+      tests:
+        - accepted_values:
+            # TODO: this test is failing because there are 41 MINs - investigate why
+            values: ['IN']
+    - name: active
+    - name: prescribable
+
   - name: stg_rxnorm__mthspl_product
     description: "DailyMed SPL products (DP) at NDC9 level."
     columns:
@@ -154,7 +171,7 @@ models:
   - name: stg_rxnorm__brand_product_component_link
     description: "Links brand products (SBD/BPCK) with brand product components (mostly SBD, but BPCKs can also contain SCD)."
     columns: 
-      # primary key would be brand_product_rxcui + brand_product_component_rxcui
+      # TODO: primary key would be brand_product_rxcui + brand_product_component_rxcui
       - name: brand_product_rxcui
         tests:
           - not_null
@@ -191,4 +208,3 @@ models:
       - name: active
       - name: prescribable
       - name: ingredient_rxcui
-

@@ -40,6 +40,20 @@ models:
         tests:
           - not_null
 
+  - name: stg_rxnorm__clinical_product_component
+    description: "RxNorm clinical product components (SCD)."
+    columns:
+    - name: rxcui
+      tests:
+        - unique
+        - not_null
+    - name: name
+    - name: tty
+    - name: active
+    - name: prescribable
+    - name: ingredient_rxcui
+    - name: dose_form_rxcui
+
   - name: stg_rxnorm__dose_form
     description: "RxNorm dose forms (DF)."
     columns:

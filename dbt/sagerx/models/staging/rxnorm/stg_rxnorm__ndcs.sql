@@ -1,4 +1,4 @@
--- stg_rxnorm__ndc.sql
+-- stg_rxnorm__ndcs.sql
 
 select rxnsat.atv as ndc
 	,case when product.tty in ('BPCK','SBD') then clinical_product.rxcui

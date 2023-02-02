@@ -1,4 +1,4 @@
--- stg_rxnorm__ingredient.sql
+-- stg_rxnorm__ingredients.sql
 
 select
 	ingredient.rxcui rxcui

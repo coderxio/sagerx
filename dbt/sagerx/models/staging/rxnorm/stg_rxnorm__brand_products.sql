@@ -1,4 +1,4 @@
--- stg_rxnorm__brand_product.sql
+-- stg_rxnorm__brand_products.sql
 
 select
 	product.rxcui as rxcui

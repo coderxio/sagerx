@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: stg_rxnorm__ndc
+  - name: stg_rxnorm__ndcs
     description: "RxNorm NDCs"
     columns:
       - name: ndc
@@ -18,7 +18,7 @@ models:
       - name: active
       - name: prescribable
 
-  - name: stg_rxnorm__clinical_product
+  - name: stg_rxnorm__clinical_products
     description: "RxNorm clinical products (SCD, GPCK)."
     columns:
       - name: rxcui
@@ -30,7 +30,7 @@ models:
       - name: active
       - name: prescribable
 
-  - name: stg_rxnorm__clinical_product_component_link
+  - name: stg_rxnorm__clinical_product_component_links
     description: "Links clinical products (SCD/GPCK) with clinical product components (SCD only)."
     columns:
       # TODO: primary key would be clinical_product_rxcui + clinical_product_component_rxcui
@@ -41,7 +41,7 @@ models:
         tests:
           - not_null
 
-  - name: stg_rxnorm__clinical_product_component
+  - name: stg_rxnorm__clinical_product_components
     description: "RxNorm clinical product components (SCD)."
     columns:
       - name: rxcui
@@ -55,7 +55,7 @@ models:
       - name: ingredient_rxcui
       - name: dose_form_rxcui
 
-  - name: stg_rxnorm__dose_form
+  - name: stg_rxnorm__dose_forms
     description: "RxNorm dose forms (DF)."
     columns:
       - name: rxcui
@@ -67,7 +67,7 @@ models:
       - name: active
       - name: prescribable
 
-  - name: stg_rxnorm__dose_form_group_link
+  - name: stg_rxnorm__dose_form_group_links
     description: "Links dose forms (DF) to dose form groups (DFG)."
     columns:
       # TODO: primary key would be dose_form_rxcui + dose_form_group_rxcui
@@ -78,7 +78,7 @@ models:
         tests:
           - not_null
 
-  - name: stg_rxnorm__dose_form_group
+  - name: stg_rxnorm__dose_form_groups
     description: "RxNorm dose form groups (DFG)."
     columns:
       - name: rxcui
@@ -90,7 +90,7 @@ models:
       - name: active
       - name: prescribable
 
-  - name: stg_rxnorm__ingredient
+  - name: stg_rxnorm__ingredients
     description: "RxNorm ingredients (IN/MIN)."
     columns:
       - name: rxcui
@@ -102,7 +102,7 @@ models:
       - name: active
       - name: prescribable
 
-  - name: stg_rxnorm__ingredient_component_link
+  - name: stg_rxnorm__ingredient_component_links
     description: "Links ingredients (IN/MIN) to ingredient components (IN)."
     columns:
       # TODO: primary key would be ingredient_rxcui + ingredient_component_rxcui
@@ -113,7 +113,7 @@ models:
         tests:
           - not_null
   
-  - name: stg_rxnorm__ingredient_component
+  - name: stg_rxnorm__ingredient_components
     description: "RxNorm ingredient components (IN)."
     columns:
       - name: rxcui
@@ -129,7 +129,7 @@ models:
       - name: active
       - name: prescribable
 
-  - name: stg_rxnorm__ingredient_strength_link
+  - name: stg_rxnorm__ingredient_strength_links
     description: "Links combination of clinical product components (SCD) + ingredient components (IN) to ingredient strengths."
     columns:
       # TODO: primary key would be clinical_product_component_rxcui
@@ -144,7 +144,7 @@ models:
         tests:
           - not_null
 
-  - name: stg_rxnorm__ingredient_strength
+  - name: stg_rxnorm__ingredient_strengths
     description: "RxNorm ingredient strengths."
     columns:
       - name: rxcui
@@ -160,7 +160,7 @@ models:
       - name: active
       - name: prescribable
 
-  - name: stg_rxnorm__mthspl_product
+  - name: stg_rxnorm__mthspl_products
     description: "DailyMed SPL products (DP) at NDC9 level."
     columns:
       - name: rxcui
@@ -173,7 +173,7 @@ models:
       - name: active
       - name: prescribable
 
-  - name: stg_rxnorm__mthspl_substance
+  - name: stg_rxnorm__mthspl_substances
     description: "DailyMed SPL substances (SU)."
     columns:
       - name: rxcui
@@ -186,7 +186,7 @@ models:
       - name: active
       - name: prescribable
 
-  - name: stg_rxnorm__brand_product
+  - name: stg_rxnorm__brand_products
     description: "RxNorm brand name products (SBD/BPCK)."
     columns:
       - name: rxcui
@@ -199,7 +199,7 @@ models:
       - name: active
       - name: prescribable
 
-  - name: stg_rxnorm__brand_product_component_link
+  - name: stg_rxnorm__brand_product_component_links
     description: "Links brand products (SBD/BPCK) with brand product components (mostly SBD, but BPCKs can also contain SCD)."
     columns: 
       # TODO: primary key would be brand_product_rxcui + brand_product_component_rxcui
@@ -210,7 +210,7 @@ models:
         tests:
           - not_null
 
-  - name: stg_rxnorm__brand_product_component
+  - name: stg_rxnorm__brand_product_components
     description: "RxNorm brand product components (mostly SBD, but BPCKs can also contain SCD)."
     columns:
       - name: rxcui
@@ -227,7 +227,7 @@ models:
       - name: active
       - name: prescribable
 
-  - name: stg_rxnorm__brand
+  - name: stg_rxnorm__brands
     description: "RxNorm brand names (BN)."
     columns:
       - name: rxcui

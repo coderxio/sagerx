@@ -1,4 +1,4 @@
--- stg_rxnorm__ingredient_component.sql
+-- stg_rxnorm__ingredient_components.sql
 
 with cte as (
 	select

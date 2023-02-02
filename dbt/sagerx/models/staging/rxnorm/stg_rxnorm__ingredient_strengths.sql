@@ -1,4 +1,4 @@
--- stg_rxnorm__ingredient_strength.sql
+-- stg_rxnorm__ingredient_strengths.sql
 
 select
 	ingredient_strength.rxcui as rxcui

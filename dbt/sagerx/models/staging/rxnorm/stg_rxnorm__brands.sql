@@ -1,4 +1,4 @@
--- stg_rxnorm__brand.sql
+-- stg_rxnorm__brands.sql
 
 with cte as (
 	select

@@ -1,4 +1,4 @@
--- stg_rxnorm__brand_product_component.sql
+-- stg_rxnorm__brand_product_components.sql
 
 select distinct
 	case when product.tty = 'SBD' then product.rxcui else product_component.rxcui end rxcui

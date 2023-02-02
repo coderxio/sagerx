@@ -1,4 +1,4 @@
--- stg_rxnorm__ingredient_strength_link.sql
+-- stg_rxnorm__ingredient_strength_links.sql
 
 select distinct
 	product_component.rxcui as clinical_product_component_rxcui

@@ -1,4 +1,4 @@
--- stg_rxnorm__clinical_product.sql
+-- stg_rxnorm__clinical_products.sql
 
 select
 	product.rxcui as rxcui

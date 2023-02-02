@@ -1,4 +1,4 @@
--- stg_rxnorm__clinical_product_component.sql
+-- stg_rxnorm__clinical_product_components.sql
 
 with cte as (
 	select

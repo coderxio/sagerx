@@ -1,4 +1,4 @@
--- stg_rxnorm__mthspl_substance.sql
+-- stg_rxnorm__mthspl_substances.sql
 
 select
 	substance.rxcui rxcui

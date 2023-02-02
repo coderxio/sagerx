@@ -1,4 +1,4 @@
--- stg_rxnorm__dose_form.sql
+-- stg_rxnorm__dose_forms.sql
 
 select
 	dose_form.rxcui rxcui

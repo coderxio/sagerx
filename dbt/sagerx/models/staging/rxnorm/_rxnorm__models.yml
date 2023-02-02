@@ -114,6 +114,23 @@ models:
         tests:
           - not_null
 
+  - name: stg_rxnorm__brand_product_component
+    description: "RxNorm brand product components (mostly SBD, but BPCKs can also contain SCD)."
+    columns:
+    - name: rxcui
+      tests:
+        - unique
+        - not_null
+    - name: name
+    - name: tty
+    - name: clinical_product_component_rxcui
+      tests:
+        - not_null
+    - name: brand_rxcui
+      description: "NOTE: brand_product_component SCDs will have NULL for brand_rxcui."
+    - name: active
+    - name: prescribable
+
   - name: stg_rxnorm__brand
     description: "RxNorm brand names (BN)."
     columns:

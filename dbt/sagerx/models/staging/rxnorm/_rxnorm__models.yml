@@ -65,3 +65,14 @@ models:
     - name: active
     - name: prescribable
 
+  - name: stg_rxnorm__dose_form
+    description: "RxNorm dose forms (DF)"
+    columns:
+    - name: rxcui
+      tests:
+        - unique
+        - not_null
+    - name: name
+    - name: tty
+    - name: active
+    - name: prescribable

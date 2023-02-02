@@ -1,0 +1,67 @@
+version: 2
+
+models:
+  - name: stg_rxnorm__ndc
+    description: "RxNorm NDCs"
+    columns:
+      - name: ndc
+        description: "The NDC in NDC11 format."
+        tests:
+          - unique
+          - not_null
+      - name: clinical_product_rxcui
+      - name: brand_product_rxcui
+      - name: active
+      - name: prescribable
+
+  - name: stg_rxnorm__clinical_product
+    description: "RxNorm clinical products (SCD, GPCK)."
+    columns:
+      - name: rxcui
+        tests:
+          - unique
+          - not_null
+      - name: name
+      - name: tty
+      - name: active
+      - name: prescribable
+
+  - name: stg_rxnorm__brand
+    description: "RxNorm brand names (BN)."
+    columns:
+      - name: rxcui
+        tests:
+          - unique
+          - not_null
+      - name: name
+      - name: tty
+      - name: active
+      - name: prescribable
+      - name: ingredient_rxcui
+
+  - name: stg_rxnorm__clinical_product_component_link
+    description: "Links clinical products (SCD/GPCK) with clinical product components (SCD only)."
+    columns:
+      # primary key would be clinical_product_rxcui + clinical_product_component_rxcui
+      - name: clinical_product_rxcui
+        tests:
+          - unique
+          - not_null
+      - name: clinical_product_component_rxcui
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_rxnorm__brand_product
+    description: "RxNorm brand name products (SBD/BPCK)."
+    columns:
+    - name: rxcui
+      tests:
+        - unique
+        - not_null
+    - name: name
+    - name: tty
+    - name: clinical_product_rxcui
+    - name: active
+    - name: prescribable
+

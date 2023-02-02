@@ -16,8 +16,8 @@ from airflow.hooks.subprocess import SubprocessHook
     start_date=pendulum.yesterday(),
     catchup=False,
 )
-def rxnorm_full():
-    dag_id = "rxnorm_full"
+def rxnorm():
+    dag_id = "rxnorm"
     ds_url = "https://download.nlm.nih.gov/umls/kss/rxnorm/RxNorm_full_current.zip"
 
     @task
@@ -83,4 +83,4 @@ def rxnorm_full():
 
     extract(obtain_umls_st(obtain_umls_tgt())) >> load >> transform()
 
-rxnorm_full()
+rxnorm()

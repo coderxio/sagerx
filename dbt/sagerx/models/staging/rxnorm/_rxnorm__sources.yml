@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: rxnorm
+    schema: datasource
+    tables:
+      - name: rxnorm_rxnatomarchive
+      - name: rxnorm_rxnconso
+      - name: rxnorm_rxncui
+      - name: rxnorm_rxncuichanges
+      - name: rxnorm_rxndoc
+      - name: rxnorm_rxnrel
+      - name: rxnorm_rxnsab
+      - name: rxnorm_rxnsat
+      - name: rxnorm_rxnsty

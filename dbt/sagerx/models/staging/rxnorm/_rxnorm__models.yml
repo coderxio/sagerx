@@ -77,6 +77,18 @@ models:
         tests:
           - not_null
 
+  - name: stg_rxnorm__dose_form_group
+    description: "RxNorm dose form groups (DFG)."
+    columns:
+    - name: rxcui
+      tests:
+        - unique
+        - not_null
+    - name: name
+    - name: tty
+    - name: active
+    - name: prescribable
+
   - name: stg_rxnorm__ingredient
     description: "RxNorm ingredients (IN/MIN)."
     columns:

@@ -42,6 +42,7 @@ with cte as (
 			and product_component.sab = 'RXNORM'
 	) sq
 )
+
 select distinct
 	case when product_component.rxcui is null then product.rxcui else product_component.rxcui end rxcui
 	, case when product_component.str is null then product.str else product_component.str end name 

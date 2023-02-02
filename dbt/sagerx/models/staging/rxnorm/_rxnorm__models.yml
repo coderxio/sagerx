@@ -101,6 +101,17 @@ models:
     - name: active
     - name: prescribable
 
+  - name: stg_rxnorm__ingredient_component_link
+    description: "Links ingredients (IN/MIN) to ingredient components (IN)."
+    columns:
+    # primary key would be ingredient_rxcui + ingredient_component_rxcui
+    - name: ingredient_rxcui
+      tests:
+        - not_null
+    - name: ingredient_component_rxcui
+      tests:
+        - not_null
+  
   - name: stg_rxnorm__mthspl_product
     description: "DailyMed SPL products (DP) at NDC9 level."
     columns:

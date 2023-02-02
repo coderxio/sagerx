@@ -66,6 +66,17 @@ models:
     - name: active
     - name: prescribable
 
+  - name: stg_rxnorm__dose_form_group_link
+    description: "Links dose forms (DF) to dose form groups (DFG)."
+    columns:
+      # primary key would be dose_form_rxcui + dose_form_group_rxcui
+      - name: dose_form_rxcui
+        tests:
+          - not_null
+      - name: dose_form_group_rxcui
+        tests:
+          - not_null
+
   - name: stg_rxnorm__ingredient
     description: "RxNorm ingredients (IN/MIN)."
     columns:

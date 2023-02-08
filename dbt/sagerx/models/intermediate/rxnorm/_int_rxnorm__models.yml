@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: int_mthspl_products_to_active_ingredients
+    description: "NLM SPL products to active ingredients."
+    columns:
+      - name: ndc9
+      - name: ndc
+      - name: product_rxcui
+      - name: product_name
+      - name: product_tty
+      - name: active_ingredient_unii
+      - name: active_ingredient_rxcui
+      - name: active_ingredient_name
+      - name: active_ingredient_tty
+      - name: active
+      - name: prescribable

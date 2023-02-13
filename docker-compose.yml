@@ -55,8 +55,8 @@ services:
   dbt:
     build:
       context: ./dbt
-    image: sagerx_dbt
-    container_name: sagerx_dbt
+    image: dbt
+    container_name: dbt
     user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
     volumes:
       - ./dbt:/dbt

@@ -1,4 +1,4 @@
-sagerx_dbt:
+sagerx:
   outputs:
 
     dev:
@@ -9,7 +9,7 @@ sagerx_dbt:
       user: sagerx
       pass: sagerx
       dbname: sagerx
-      schema: warehouse 
+      schema: dev
 
     prod:
       type: postgres

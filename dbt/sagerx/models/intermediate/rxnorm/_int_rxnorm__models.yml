@@ -15,3 +15,20 @@ models:
       - name: active_ingredient_tty
       - name: active
       - name: prescribable
+
+models:
+  - name: int_mthspl_products_to_inactive_ingredients
+    description: "NLM SPL products to inactive ingredients."
+    columns:
+      - name: ndc9
+      - name: ndc
+      - name: product_rxcui
+      - name: product_name
+      - name: product_tty
+      - name: inactive_ingredient_unii
+      - name: inactive_ingredient_rxcui
+      - name: inactive_ingredient_name
+      - name: inactive_ingredient_tty
+      - name: active
+      - name: prescribable
+

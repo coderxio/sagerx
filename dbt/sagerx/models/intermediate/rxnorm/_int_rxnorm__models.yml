@@ -32,3 +32,18 @@ models:
       - name: active
       - name: prescribable
 
+models:
+  - name: int_mthspl_products_to_active_moieties
+    description: "NLM SPL products to active moieties."
+    columns:
+      - name: ndc9
+      - name: ndc
+      - name: product_rxcui
+      - name: product_name
+      - name: product_tty
+      - name: active_moiety_unii
+      - name: active_moiety_rxcui
+      - name: active_moiety_name
+      - name: active_moiety_tty
+      - name: active
+      - name: prescribable

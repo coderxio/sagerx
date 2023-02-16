@@ -16,7 +16,6 @@ models:
       - name: active
       - name: prescribable
 
-models:
   - name: int_mthspl_products_to_inactive_ingredients
     description: "NLM SPL products to inactive ingredients."
     columns:
@@ -32,7 +31,6 @@ models:
       - name: active
       - name: prescribable
 
-models:
   - name: int_mthspl_products_to_active_moieties
     description: "NLM SPL products to active moieties."
     columns:
@@ -47,3 +45,14 @@ models:
       - name: active_moiety_tty
       - name: active
       - name: prescribable
+
+  - name: int_rxnorm_ndcs_to_products
+    description: "RxNorm NDCs to products. Will return brand product if NDC is brand name, or generic product if NDC is generic."
+    columns:
+      - name: ndc
+      - name: product_rxcui
+      - name: product_name
+      - name: product_tty
+      - name: clinical_product_rxcui
+      - name: clinical_product_name
+      - name: clinical_product_tty

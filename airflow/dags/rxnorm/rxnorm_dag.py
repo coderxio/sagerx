@@ -21,7 +21,7 @@ def rxnorm():
     ds_url = "https://download.nlm.nih.gov/umls/kss/rxnorm/RxNorm_full_current.zip"
 
     @task
-    def obtain_umls_tgt():
+    def get_tgt():
         import requests
         import logging
         from airflow.models import Variable
@@ -37,12 +37,10 @@ def rxnorm():
         first, second = tgt_response.text.split("api-key/")
         tgt_ticket, fourth = second.split('" method')
 
-        logging.info(apikey)
-
         return tgt_ticket
 
     @task
-    def obtain_umls_st(tgt_ticket: str):
+    def get_st(tgt_ticket: str):
         import requests
 
         url = f"https://utslogin.nlm.nih.gov/cas/v1/tickets/{tgt_ticket}"

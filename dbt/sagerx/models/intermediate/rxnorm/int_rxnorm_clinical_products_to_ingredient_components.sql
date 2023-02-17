@@ -1,4 +1,4 @@
--- int_rxnorm_clinical_products_to_ingredients.sql
+-- int_rxnorm_clinical_products_to_ingredient_components.sql
 
 with
 
@@ -30,6 +30,18 @@ ri as (
 
     select * from {{ ref('stg_rxnorm__ingredients') }}
 
+),
+
+ricl as (
+
+    select * from {{ ref('stg_rxnorm__ingredient_component_links') }}
+
+),
+
+ric as (
+
+    select * from {{ ref('stg_rxnorm__ingredient_components') }}
+
 )
 
 select
@@ -37,7 +49,7 @@ select
     , rcp.name as clinical_product_name
     , rcp.tty as clinical_product_tty
     , rcpc.rxcui as clinical_product_component_rxcui
-    , rcpc.name as clinical_product_compnent_name
+    , rcpc.name as clinical_product_component_name
     , rcpc.tty as clinical_product_component_tty
     , rdf.rxcui as dose_form_rxcui
     , rdf.name as dose_form_name
@@ -45,8 +57,11 @@ select
     , ri.rxcui as ingredient_rxcui
     , ri.name as ingredient_name
     , ri.tty as ingredient_tty
+    , ric.rxcui as ingredient_component_rxcui
+    , ric.name as ingredient_component_name
+    , ric.tty as ingredient_component_tty
     , rcp.active
-    , rcp.prescribable        
+    , rcp.prescribable
 from rcp 
 left join rcpcl 
     on rcp.rxcui = rcpcl.clinical_product_rxcui 
@@ -56,3 +71,7 @@ left join rdf
     on rcpc.dose_form_rxcui = rdf.rxcui 
 left join ri 
     on rcpc.ingredient_rxcui = ri.rxcui 
+left join ricl 
+    on ri.rxcui = ricl.ingredient_rxcui 
+left join ric 
+    on ricl.ingredient_component_rxcui = ric.rxcui 

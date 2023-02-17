@@ -22,7 +22,7 @@ select distinct
 	, case when cte.name is null then ingredient.str else cte.name end name
 	, case when cte.tty is null then ingredient.tty else cte.tty end tty
 	, case when 
-		case when cte.rxcui is null then ingredient.suppress else cte.suppress end = 'n' then true else false end as active
+		case when cte.rxcui is null then ingredient.suppress else cte.suppress end = 'N' then true else false end as active
 	, case when 
 		case when cte.rxcui is null then ingredient.cvf else cte.cvf end = '4096' then true else false end as prescribable
 from datasource.rxnorm_rxnconso ingredient

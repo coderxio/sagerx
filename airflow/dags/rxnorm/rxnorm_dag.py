@@ -26,36 +26,37 @@ def rxnorm():
         import logging
         from airflow.models import Variable
 
-        apikey = Variable.get("umls_api")
+        api_key = Variable.get("umls_api")
 
         url = "https://utslogin.nlm.nih.gov/cas/v1/api-key"
-        param = { "apikey": apikey }
+        param = { "apikey": api_key }
         headers = { "Content-type": "application/x-www-form-urlencoded" }
 
         tgt_response = requests.post(url, headers=headers, data=param)
 
         first, second = tgt_response.text.split("api-key/")
-        tgt_ticket, fourth = second.split('" method')
+        tgt, fourth = second.split('" method')
 
-        return tgt_ticket
+        return tgt
 
     @task
-    def get_st(tgt_ticket: str):
+    def get_st(tgt: str):
         import requests
 
-        url = f"https://utslogin.nlm.nih.gov/cas/v1/tickets/{tgt_ticket}"
+        url = f"https://utslogin.nlm.nih.gov/cas/v1/tickets/{tgt}"
         param = { "service": ds_url }
         headers = { "Content-type": "application/x-www-form-urlencoded" }
 
         st_response = requests.post(url, headers=headers, data=param)
+        st = st_response.text
 
-        return st_response.text
+        return st
 
     # Task to download data from web location
     @task
-    def extract(st_response: str):
+    def extract(st: str):
         data_folder = Path("/opt/airflow/data") / dag_id
-        data_path = get_dataset(f"{ds_url}?ticket={st_response}", data_folder)
+        data_path = get_dataset(f"{ds_url}?ticket={st}", data_folder)
         return data_path
 
     # Task to load data into source db schema

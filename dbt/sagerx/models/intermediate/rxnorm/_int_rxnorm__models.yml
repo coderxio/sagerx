@@ -83,3 +83,23 @@ models:
       - name: dose_form_tty
       - name: active
       - name: prescribable
+
+  - name: int_rxnorm_clinical_products_to_ndcs
+    description: "RxNorm clinical products to NDCs."
+    columns:
+      - name: clinical_product_rxcui
+      - name: clinical_product_name
+      - name: clinical_product_tty
+      - name: clinical_product_component_rxcui
+      - name: clinical_product_compnent_name
+      - name: clinical_product_component_tty
+      - name: dose_form_rxcui
+      - name: dose_form_name
+      - name: dose_form_tty
+      - name: ingredient_rxcui
+      - name: ingredient_name
+      - name: ingredient_tty
+      - name: brand_product_rxcui
+      - name: ndc
+      - name: active
+      - name: prescribable

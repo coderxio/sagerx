@@ -79,6 +79,6 @@ def rxnorm():
         result = subprocess.run_command(['dbt', 'run'], cwd='/dbt/sagerx')
         print("Result from dbt:", result)
 
-    extract(obtain_umls_st(obtain_umls_tgt())) >> load >> transform()
+    extract(get_st(get_tgt())) >> load >> transform()
 
 rxnorm()

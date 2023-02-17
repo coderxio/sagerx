@@ -56,3 +56,15 @@ models:
       - name: clinical_product_rxcui
       - name: clinical_product_name
       - name: clinical_product_tty
+
+  - name: int_rxnorm_clinical_products_to_clinical_product_components
+    description: "RxNorm clinical products to clinical product components."
+    columns:
+      - name: clinical_product_rxcui
+      - name: clinical_product_name
+      - name: clinical_product_tty
+      - name: clinical_product_component_rxcui
+      - name: clinical_product_compnent_name
+      - name: clinical_product_component_tty
+      - name: active
+      - name: prescribable

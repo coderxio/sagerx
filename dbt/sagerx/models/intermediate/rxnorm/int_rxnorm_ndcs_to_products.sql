@@ -8,13 +8,13 @@ ndc as (
 
 ),
 
-clinical_product as (
+rcp as (
 
     select * from {{ ref('stg_rxnorm__clinical_products') }}
 
 ),
 
-brand_product as (
+rbp as (
 
     select * from {{ ref('stg_rxnorm__brand_products') }}
 
@@ -22,14 +22,14 @@ brand_product as (
 
 select distinct
     ndc
-    , coalesce(brand_product.rxcui, clinical_product.rxcui, null) as product_rxcui
-    , coalesce(brand_product.name, clinical_product.name, null) as product_name
-    , coalesce(brand_product.tty, clinical_product.tty, null) as product_tty
-    , clinical_product.rxcui as clinical_product_rxcui
-    , clinical_product.name as clinical_product_name
-    , clinical_product.tty as clinical_product_tty
+    , coalesce(rbp.rxcui, rcp.rxcui, null) as product_rxcui
+    , coalesce(rbp.name, rcp.name, null) as product_name
+    , coalesce(rbp.tty, rcp.tty, null) as product_tty
+    , rcp.rxcui as clinical_product_rxcui
+    , rcp.name as clinical_product_name
+    , rcp.tty as clinical_product_tty
 from ndc
-left join clinical_product 
-    on ndc.clinical_product_rxcui = clinical_product.rxcui
-left join brand_product
-    on ndc.brand_product_rxcui = brand_product.rxcui
+left join rcp 
+    on ndc.clinical_product_rxcui = rcp.rxcui
+left join rbp
+    on ndc.brand_product_rxcui = rbp.rxcui

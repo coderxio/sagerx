@@ -1,0 +1,172 @@
+version: 2
+
+models:
+  - name: int_mthspl_products_to_active_ingredients
+    description: "NLM SPL products to active ingredients."
+    columns:
+      - name: ndc9
+      - name: ndc
+      - name: product_rxcui
+      - name: product_name
+      - name: product_tty
+      - name: active_ingredient_unii
+      - name: active_ingredient_rxcui
+      - name: active_ingredient_name
+      - name: active_ingredient_tty
+      - name: active
+      - name: prescribable
+
+  - name: int_mthspl_products_to_inactive_ingredients
+    description: "NLM SPL products to inactive ingredients."
+    columns:
+      - name: ndc9
+      - name: ndc
+      - name: product_rxcui
+      - name: product_name
+      - name: product_tty
+      - name: inactive_ingredient_unii
+      - name: inactive_ingredient_rxcui
+      - name: inactive_ingredient_name
+      - name: inactive_ingredient_tty
+      - name: active
+      - name: prescribable
+
+  - name: int_mthspl_products_to_active_moieties
+    description: "NLM SPL products to active moieties."
+    columns:
+      - name: ndc9
+      - name: ndc
+      - name: product_rxcui
+      - name: product_name
+      - name: product_tty
+      - name: active_moiety_unii
+      - name: active_moiety_rxcui
+      - name: active_moiety_name
+      - name: active_moiety_tty
+      - name: active
+      - name: prescribable
+
+  - name: int_rxnorm_ndcs_to_products
+    description: "RxNorm NDCs to products. Will return brand product if NDC is brand name, or generic product if NDC is generic."
+    columns:
+      - name: ndc
+      - name: product_rxcui
+      - name: product_name
+      - name: product_tty
+      - name: clinical_product_rxcui
+      - name: clinical_product_name
+      - name: clinical_product_tty
+
+  - name: int_rxnorm_clinical_products_to_clinical_product_components
+    description: "RxNorm clinical products to clinical product components."
+    columns:
+      - name: clinical_product_rxcui
+      - name: clinical_product_name
+      - name: clinical_product_tty
+      - name: clinical_product_component_rxcui
+      - name: clinical_product_compnent_name
+      - name: clinical_product_component_tty
+      - name: active
+      - name: prescribable
+
+  - name: int_rxnorm_clinical_products_to_dose_forms
+    description: "RxNorm clinical products to dose forms."
+    columns:
+      - name: clinical_product_rxcui
+      - name: clinical_product_name
+      - name: clinical_product_tty
+      - name: clinical_product_component_rxcui
+      - name: clinical_product_compnent_name
+      - name: clinical_product_component_tty
+      - name: dose_form_rxcui
+      - name: dose_form_name
+      - name: dose_form_tty
+      - name: active
+      - name: prescribable
+
+  - name: int_rxnorm_clinical_products_to_ndcs
+    description: "RxNorm clinical products to NDCs."
+    columns:
+      - name: clinical_product_rxcui
+      - name: clinical_product_name
+      - name: clinical_product_tty
+      - name: clinical_product_component_rxcui
+      - name: clinical_product_compnent_name
+      - name: clinical_product_component_tty
+      - name: dose_form_rxcui
+      - name: dose_form_name
+      - name: dose_form_tty
+      - name: ingredient_rxcui
+      - name: ingredient_name
+      - name: ingredient_tty
+      - name: brand_product_rxcui
+      - name: ndc
+      - name: active
+      - name: prescribable
+
+  - name: int_rxnorm_clinical_products_to_ingredients
+    description: "RxNorm clinical products to ingredients."
+    columns:
+      - name: clinical_product_rxcui
+      - name: clinical_product_name
+      - name: clinical_product_tty
+      - name: clinical_product_component_rxcui
+      - name: clinical_product_compnent_name
+      - name: clinical_product_component_tty
+      - name: dose_form_rxcui
+      - name: dose_form_name
+      - name: dose_form_tty
+      - name: ingredient_rxcui
+      - name: ingredient_name
+      - name: ingredient_tty
+      - name: active
+      - name: prescribable
+
+  - name: int_rxnorm_clinical_products_to_ingredient_components
+    description: "RxNorm clinical products to ingredient components."
+    columns:
+      - name: clinical_product_rxcui
+      - name: clinical_product_name
+      - name: clinical_product_tty
+      - name: clinical_product_component_rxcui
+      - name: clinical_product_compnent_name
+      - name: clinical_product_component_tty
+      - name: dose_form_rxcui
+      - name: dose_form_name
+      - name: dose_form_tty
+      - name: ingredient_rxcui
+      - name: ingredient_name
+      - name: ingredient_tty
+      - name: ingredient_component_rxcui
+      - name: ingredient_component_name
+      - name: ingredient_component_tty
+      - name: active
+      - name: prescribable
+
+  - name: int_rxnorm_clinical_products_to_ingredient_strengths
+    description: "RxNorm clinical products to ingredient strengths."
+    columns:
+      - name: clinical_product_rxcui
+      - name: clinical_product_name
+      - name: clinical_product_tty
+      - name: clinical_product_component_rxcui
+      - name: clinical_product_compnent_name
+      - name: clinical_product_component_tty
+      - name: dose_form_rxcui
+      - name: dose_form_name
+      - name: dose_form_tty
+      - name: ingredient_rxcui
+      - name: ingredient_name
+      - name: ingredient_tty
+      - name: ingredient_component_rxcui
+      - name: ingredient_component_name
+      - name: ingredient_component_tty
+      - name: ingredient_strength_rxcui
+      - name: ingredient_strength_name
+      - name: strength_numerator_value
+      - name: strength_numerator_unit
+      - name: strength_denominator_value
+      - name: strength_denominator_unit
+      - name: strength_text
+      - name: active
+      - name: prescribable

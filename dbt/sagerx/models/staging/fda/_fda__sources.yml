@@ -1,8 +1,0 @@
-version: 2
-
-sources:
-  - name: fda
-    schema: datasource
-    tables:
-      - name: fda_ndc_product
-      - name: fda_ndc_package

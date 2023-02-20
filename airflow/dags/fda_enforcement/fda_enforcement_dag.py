@@ -14,7 +14,7 @@ from airflow.hooks.subprocess import SubprocessHook
 
 @dag(
     schedule="0 0 * * 4",
-    start_date=pendulum.datetime(2017, 1, 1),
+    start_date=pendulum.datetime(2012, 1, 1),
     max_active_runs=1,
 )
 def fda_enforcement():
@@ -44,12 +44,13 @@ def fda_enforcement():
 
         df = pd.DataFrame(json_object)
 
+        df.set_index("recall_number")
+
         df.to_sql(
             "fda_enforcement",
             con=engine,
             schema="datasource",
             if_exists="append",
-            index_label="recall_number",
             dtype={"openfda": sqlalchemy.types.JSON},
         )
 

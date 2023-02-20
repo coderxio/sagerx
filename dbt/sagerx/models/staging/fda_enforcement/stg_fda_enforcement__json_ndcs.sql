@@ -1,7 +1,5 @@
 -- stg_fda_enforcement__json_ndcs.sql
 
-{{ config(materialized='table') }}
-
 select
 	fdae.recall_number
 	, ndc_to_11(ndc.id_value #>> '{}') as ndc11

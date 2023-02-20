@@ -1,7 +1,5 @@
 -- stg_fda_enforcement__regex_ndcs.sql
 
-{{ config(materialized='table') }}
-
 with
 
 z as (

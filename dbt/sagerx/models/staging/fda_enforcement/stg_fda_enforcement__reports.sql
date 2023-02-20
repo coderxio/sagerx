@@ -1,7 +1,5 @@
 -- stg_fda_enforcement__reports.sql
 
-{{ config(materialized='table') }}
-
 select
 	status
 	, city

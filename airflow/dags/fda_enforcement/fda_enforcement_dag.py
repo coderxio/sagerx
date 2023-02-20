@@ -48,7 +48,8 @@ def fda_enforcement():
             "fda_enforcement",
             con=engine,
             schema="datasource",
-            if_exists="replace",
+            if_exists="append",
+            index_label="recall_number",
             dtype={"openfda": sqlalchemy.types.JSON},
         )
 

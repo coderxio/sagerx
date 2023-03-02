@@ -69,7 +69,7 @@ fda as (
 
 )
 
-select
+select distinct
     ndc.ndc as ndc11
     , left(ndc.ndc, 9) as ndc9
     , ndc.product_rxcui
@@ -84,6 +84,7 @@ select
     -- if FDA NDC Directory has an application number, use that...
     -- otherwise, use the application number from the enforcement report JSON
     , coalesce(fda.applicationnumber, enf.app_num) as application_number
+    , fda.labelername as labeler
     , enf.recall_number
     , spl.inactive_ingredient_unii
     , spl.inactive_ingredient_rxcui

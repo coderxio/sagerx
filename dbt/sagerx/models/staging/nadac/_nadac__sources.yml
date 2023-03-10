@@ -1,0 +1,7 @@
+version: 2
+
+sources:
+  - name: nadac
+    schema: datasource
+    tables:
+      - name: nadac

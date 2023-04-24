@@ -54,6 +54,18 @@ ris as (
 
     select * from {{ ref('stg_rxnorm__ingredient_strengths') }}
 
+),
+
+pinl as (
+
+    select * from {{ ref('stg_rxnorm__precise_ingredient_links') }}
+
+),
+
+pin as (
+
+    select * from {{ ref('stg_rxnorm__precise_ingredients') }}
+
 )
 
 select
@@ -79,6 +91,9 @@ select
     , ris.denominator_value as strength_denominator_value
     , ris.denominator_unit as strength_denominator_unit
     , ris.text as strength_text
+    , pin.rxcui as precise_ingredient_rxcui
+    , pin.name as precise_ingredient_name
+    , pin.tty as precise_ingredient_tty
     , rcp.active
     , rcp.prescribable
 from rcp 
@@ -99,3 +114,7 @@ left join risl
     and ric.rxcui = risl.ingredient_component_rxcui 
 left join ris 
     on risl.ingredient_strength_rxcui = ris.rxcui
+left join pinl
+    on ris.rxcui = pinl.ingredient_strength_rxcui
+left join pin
+    on pinl.precise_ingredient_rxcui = pin.rxcui

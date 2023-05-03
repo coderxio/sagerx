@@ -1,67 +1,28 @@
-from airflow.models import Variable
-from datetime import date, datetime, timedelta
-from textwrap import dedent
 from pathlib import Path
-from typing import Dict
+import pendulum
 
 from sagerx import get_dataset, read_sql_file, get_sql_list, alert_slack_channel
 
-ds = {
-    "dag_id": "fda_enforcement",
-    "schedule_interval": "0 0 * * 4",  # run weekly on Thursday - looks like report dates are usually Wednesdays
-}
+from airflow.decorators import dag, task
 
-
-########################### DYNAMIC DAG DO NOT TOUCH BELOW HERE #################################
-
-# The DAG object; we'll need this to instantiate a DAG
-from airflow import DAG
-
-# Operators; we need this to operate!
 from airflow.operators.python import ShortCircuitOperator
-from airflow.hooks.postgres_hook import PostgresHook
-from airflow.decorators import task
+from airflow.operators.python import get_current_context
 from airflow.providers.postgres.operators.postgres import PostgresOperator
+from airflow.hooks.postgres_hook import PostgresHook
+from airflow.hooks.subprocess import SubprocessHook
 
 
-# builds a dag for each data set in data_set_list
-default_args = {
-    "owner": "airflow",
-    #"start_date": days_ago(365),
-    "start_date": datetime(2012, 1, 1),
-    "depends_on_past": False,
-    "email": ["admin@sagerx.io"],
-    "email_on_failure": False,
-    "email_on_retry": False,
-    "retries": 1,
-    "retry_delay": timedelta(minutes=0.1),
-    # none airflow common dag elements
-    "retrieve_dataset_function": get_dataset,
-    "on_failure_callback": alert_slack_channel,
-}
-
-dag_args = {**default_args, **ds}
-
-
-dag_id = dag_args["dag_id"]
-retrieve_dataset_function = dag_args["retrieve_dataset_function"]
-
-dag = DAG(
-    dag_id,
-    schedule_interval=dag_args["schedule_interval"],
-    default_args=dag_args,
-    description=f"Processes {dag_id} source",
-    user_defined_macros=dag_args.get("user_defined_macros"),
-    max_active_runs=1
+@dag(
+    schedule="0 0 * * 4",
+    start_date=pendulum.datetime(2012, 1, 1),
+    max_active_runs=1,
 )
+def fda_enforcement():
+    dag_id = "fda_enforcement"
 
-ds_folder = Path("/opt/airflow/dags") / dag_id
-data_folder = Path("/opt/airflow/data") / dag_id
-
-with dag:
-
-    @task(task_id="EL_fda_enforcement")
-    def extract_load_dataset(data_interval_start=None, data_interval_end=None):
+    # Task to download data from web location
+    @task
+    def extract_load(data_interval_start=None, data_interval_end=None):
         import requests
         import sqlalchemy
         import pandas as pd
@@ -75,83 +36,47 @@ with dag:
         logging.info(url)
 
         response = requests.get(url)
-        print(response.json())
+
         json_object = response.json()["results"]
 
         pg_hook = PostgresHook(postgres_conn_id="postgres_default")
         engine = pg_hook.get_sqlalchemy_engine()
 
         df = pd.DataFrame(json_object)
-        print(df.info())
+
+        df.set_index("recall_number")
+
         df.to_sql(
             "fda_enforcement",
             con=engine,
             schema="datasource",
-            if_exists="replace",
+            if_exists="append",
             dtype={"openfda": sqlalchemy.types.JSON},
         )
 
-        return df.shape[0]
+        df_rows = df.shape[0]
+
+        return df_rows
 
     def df_has_data(**context) -> bool :
-            df_rows = context['ti'].xcom_pull(task_ids='EL_fda_enforcement')
-            if df_rows > 0:
-                return True
-            else:
-                return False
+        df_rows = context['ti'].xcom_pull(task_ids='extract_load')
+        if df_rows > 0:
+            return True
+        else:
+            return False
 
     test_contains_data = ShortCircuitOperator(
-        task_id = 'data_return_false',
+        task_id = 'test_contains_data',
         python_callable = df_has_data
     )
 
-    el_ds = extract_load_dataset()
+    # Task to transform data using dbt
+    @task
+    def transform():
+        subprocess = SubprocessHook()
+        result = subprocess.run_command(['dbt', 'run'], cwd='/dbt/sagerx')
+        print("Result from dbt:", result)
 
-    tl = [el_ds, test_contains_data]
-    # Task to load data into source db schema
-    for sql in get_sql_list(
-        "load-",
-        ds_folder,
-    ):
-        sql_path = ds_folder / sql
-        tl.append(
-            PostgresOperator(
-                task_id=sql,
-                postgres_conn_id="postgres_default",
-                sql=read_sql_file(sql_path),
-            )
-        )
+    extract_load() >> test_contains_data >> transform()
 
-    for sql in get_sql_list("staging-", ds_folder):
-        sql_path = ds_folder / sql
-        tl.append(
-            PostgresOperator(
-                task_id=sql,
-                postgres_conn_id="postgres_default",
-                sql=read_sql_file(sql_path),
-            )
-        )
-
-    for sql in get_sql_list("view-", ds_folder):
-        sql_path = ds_folder / sql
-        tl.append(
-            PostgresOperator(
-                task_id=sql,
-                postgres_conn_id="postgres_default",
-                sql=read_sql_file(sql_path),
-            )
-        )
-
-    for sql in get_sql_list("alter-", ds_folder):
-        sql_path = ds_folder / sql
-        tl.append(
-            PostgresOperator(
-                task_id=sql,
-                postgres_conn_id="postgres_default",
-                sql=read_sql_file(sql_path),
-            )
-        )
-
-    for i in range(len(tl)):
-        if i not in [0]:
-            tl[i - 1] >> tl[i]
+fda_enforcement()

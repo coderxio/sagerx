@@ -14,7 +14,7 @@ x-airflow-common:
     AIRFLOW_VAR_UMLS_API: ${UMLS_API}
     AIRFLOW_VAR_SLACK_API: ${SLACK_API:-}
     AIRFLOW_CONN_SLACK: http://:@https%3A%2F%2Fhooks.slack.com%2Fservices%2F${SLACK_API:-}
-    _PIP_ADDITIONAL_REQUIREMENTS: ''
+    _PIP_ADDITIONAL_REQUIREMENTS: 'openpyxl'
     DBT_PROFILES_DIR: /dbt
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
   volumes:

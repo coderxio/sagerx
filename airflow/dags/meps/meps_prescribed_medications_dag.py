@@ -17,13 +17,13 @@ from airflow.hooks.subprocess import SubprocessHook
     catchup=False,
 )
 def meps_prescribed_medications():
-    col_names = ['DUID', 'PID', 'DUPERSID', 'DRUGIDX', 'RXRECIDX', 'LINKIDX','PANEL', 'PURCHRD', 'RXBEGMM', 'RXBEGYRX', 'RXNAME',
-                'RXDRGNAM', 'RXNDC', 'RXQUANTY', 'RXFORM', 'RXFRMUNT','RXSTRENG', 'RXSTRUNT', 'RXDAYSUP', 'PHARTP1', 'PHARTP2',
-                'PHARTP3', 'PHARTP4', 'PHARTP5', 'PHARTP6', 'PHARTP7','PHARTP8', 'PHARTP9', 'RXFLG', 'IMPFLAG', 'PCIMPFLG',
-                'DIABEQUIP', 'INPCFLG', 'PREGCAT', 'TC1', 'TC1S1','TC1S1_1', 'TC1S1_2', 'TC1S2', 'TC1S2_1', 'TC1S3',
-                'TC1S3_1', 'TC2', 'TC2S1', 'TC2S1_1', 'TC2S1_2', 'TC2S2','TC3', 'TC3S1', 'TC3S1_1', 'RXSF18X', 'RXMR18X', 'RXMD18X',
-                'RXPV18X', 'RXVA18X', 'RXTR18X', 'RXOF18X', 'RXSL18X','RXWC18X', 'RXOT18X', 'RXOR18X', 'RXOU18X', 'RXXP18X',
-                'PERWT18F', 'VARSTR', 'VARPSU']
+    col_names = ['duid', 'pid', 'dupersid', 'drugidx', 'rxrecidx', 'linkidx','panel', 'purchrd', 'rxbegmm', 'rxbegyrx', 'rxname',
+                'rxdrgnam', 'rxndc', 'rxquanty', 'rxform', 'rxfrmunt','rxstreng', 'rxstrunt', 'rxdaysup', 'phartp1', 'phartp2',
+                'phartp3', 'phartp4', 'phartp5', 'phartp6', 'phartp7','phartp8', 'phartp9', 'rxflg', 'impflag', 'pcimpflg',
+                'diabequip', 'inpcflg', 'pregcat', 'tc1', 'tc1s1','tc1s1_1', 'tc1s1_2', 'tc1s2', 'tc1s2_1', 'tc1s3',
+                'tc1s3_1', 'tc2', 'tc2s1', 'tc2s1_1', 'tc2s1_2', 'tc2s2','tc3', 'tc3s1', 'tc3s1_1', 'rxsf18x', 'rxmr18x', 'rxmd18x',
+                'rxpv18x', 'rxva18x', 'rxtr18x', 'rxof18x', 'rxsl18x','rxwc18x', 'rxot18x', 'rxor18x', 'rxou18x', 'rxxp18x',
+                'perwt18f', 'varstr', 'varpsu']
 
     col_spaces = [(0,7),(7,10),(10,20),(20,33),(33,52),(52,68),(68,70),(70,71),(71,74),(74,78),(78,128),(128,188),(188,199),
                     (199,206),(206,256),(256,306),(306,356),(356,406),(406,409),(409,412),(412,414),(414,416),(416,418),(418,420),(420,422),
@@ -53,29 +53,27 @@ def meps_prescribed_medications():
         df.columns = df.columns.str.lower()
         '''
         
-        df = pd.read_fwf(
+        pg_hook = PostgresHook(postgres_conn_id="postgres_default")
+        engine = pg_hook.get_sqlalchemy_engine()
+
+        with pd.read_fwf(
             data_path + f'/{filename.upper()}.dat',
             header=None,
             names=col_names,
             converters={col: str for col in col_names},
             colspecs=col_spaces,
-        )
+            chunksize=100
+        ) as reader:
+            reader
+            for chunk in reader:
+                chunk.to_sql(
+                    dag_id,
+                    con=engine,
+                    schema="datasource",
+                    if_exists="append",
+                    index=False
+                )
 
-        # converting columns to lowercase so we don't have to put quotes around everything in postgres
-        df.columns = df.columns.str.lower()
-        
-        print(df.head(10))
-
-        pg_hook = PostgresHook(postgres_conn_id="postgres_default")
-        engine = pg_hook.get_sqlalchemy_engine()
-
-        df.to_sql(
-            dag_id,
-            con=engine,
-            schema="datasource",
-            if_exists="replace",
-            index=False
-        )
 
     load(extract())
 

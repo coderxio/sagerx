@@ -417,7 +417,6 @@ def meps_population_characteristics():
             names=col_names,
             converters={col: str for col in col_names},
             colspecs=col_spaces,
-            usecols=['dupersid', 'region18', 'sex', 'agelast'],
             chunksize=1000
         ) as reader:
             reader

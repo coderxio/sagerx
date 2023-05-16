@@ -48,13 +48,19 @@ def meps_prescribed_medications():
         import pandas as pd
         import sqlalchemy
 
-        '''
-        df = pd.read_excel(data_path + f'/{filename}.xlsx')
-        df.columns = df.columns.str.lower()
-        '''
-        
         pg_hook = PostgresHook(postgres_conn_id="postgres_default")
         engine = pg_hook.get_sqlalchemy_engine()
+
+        # create empty table with columns in postgres
+        # overwrite existing table, if exists
+        df = pd.DataFrame(columns = col_names)
+        df.to_sql(
+            dag_id,
+            con=engine,
+            schema="datasource",
+            if_exists="replace",
+            index=False
+        )
 
         with pd.read_fwf(
             data_path + f'/{filename.upper()}.dat',
@@ -62,7 +68,7 @@ def meps_prescribed_medications():
             names=col_names,
             converters={col: str for col in col_names},
             colspecs=col_spaces,
-            chunksize=100
+            chunksize=1000
         ) as reader:
             reader
             for chunk in reader:
@@ -73,7 +79,6 @@ def meps_prescribed_medications():
                     if_exists="append",
                     index=False
                 )
-
 
     load(extract())
 

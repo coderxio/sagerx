@@ -17,7 +17,7 @@ from airflow.hooks.subprocess import SubprocessHook
     catchup=False,
 )
 def meps_medical_conditions():
-    col_names = ["DUID","PID","DUPERSID","CONDN","CONDIDX","PANEL","CONDRN","AGEDIAG","CRND1","CRND2","CRND3","CRND4","CRND5","INJURY","ACCDNWRK","ICD10CDX","CCSR1X","CCSR2X","CCSR3X","HHNUM","IPNUM","OPNUM","OBNUM","ERNUM","RXNUM","PERWT18F","VARSTR","VARPSU"]
+    col_names = ["duid","pid","dupersid","condn","condidx","panel","condrn","agediag","crnd1","crnd2","crnd3","crnd4","crnd5","injury","accdnwrk","icd10cdx","ccsr1x","ccsr2x","ccsr3x","hhnum","ipnum","opnum","obnum","ernum","rxnum","perwt18f","varstr","varpsu"]
     col_spaces = [(0,7),(7,10),(10,20),(20,23),(23,36),(36,38),(38,39),(39,42),(42,44),(44,46),(46,47),(47,49),(49,51),(51,52),(52,55),(55,58),(58,64),(64,70),(70,76),(76,78),(78,80),(80,83),(83,86),(86,88),(88,90),(90,102),(102,106),(106,107)]
     dag_id = "meps_medical_conditions"
     filename = "h207"
@@ -35,26 +35,12 @@ def meps_medical_conditions():
         import pandas as pd
         import sqlalchemy
 
-        '''
-        df = pd.read_excel(data_path + f'/{filename}.dat')
-        '''
-
-        df = pd.read_fwf(
-            data_path + f'/{filename}.dat',
-            header=None,
-            names=col_names,
-            converters={col: str for col in col_names},
-            colspecs=col_spaces
-        )
-
-        # converting columns to lowercase so we don't have to put quotes around everything in postgres
-        df.columns = df.columns.str.lower()
-
-        print(df.head(10))
-
         pg_hook = PostgresHook(postgres_conn_id="postgres_default")
         engine = pg_hook.get_sqlalchemy_engine()
 
+        # create empty table with columns in postgres
+        # overwrite existing table, if exists
+        df = pd.DataFrame(columns = col_names)
         df.to_sql(
             dag_id,
             con=engine,
@@ -62,6 +48,24 @@ def meps_medical_conditions():
             if_exists="replace",
             index=False
         )
+
+        with pd.read_fwf(
+            data_path + f'/{filename}.dat',
+            header=None,
+            names=col_names,
+            converters={col: str for col in col_names},
+            colspecs=col_spaces,
+            chunksize=1000
+        ) as reader:
+            reader
+            for chunk in reader:
+                chunk.to_sql(
+                    dag_id,
+                    con=engine,
+                    schema="datasource",
+                    if_exists="append",
+                    index=False
+                )
 
     load(extract())
 

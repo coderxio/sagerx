@@ -12,8 +12,8 @@ from airflow.hooks.subprocess import SubprocessHook
 
 
 @dag(
-    schedule="0 0 1 * *",
-    start_date=pendulum.yesterday(),
+    schedule="0 0 10 * *",
+    start_date=pendulum.datetime(2005, 1, 1),
     catchup=False,
 )
 def rxnorm():

@@ -4,8 +4,9 @@
 
 1. Clone the repo.
 2. Add a `.env` file at the root of the repo.
-3. Add the ENV var `AIRFLOW_UID=<uid>` to the .env file.
-    - UID can be found by running `id -u` on linux systems, typically the first user on the system is `1001`
+3. Add ENV vars to the .env file.
+    - `AIRFLOW_UID=<uid>` - UID can be found by running `id -u` on linux systems, typically the first user on the system is `1001`
+    - `UMLS_API=<umls_api_key>` - if you want to use RxNorm, you need an API key from UMLS
 4. Run `docker-compose up airflow-init`.
 5. Run `docker-compose up`
 

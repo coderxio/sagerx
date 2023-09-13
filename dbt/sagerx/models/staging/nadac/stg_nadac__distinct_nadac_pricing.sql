@@ -9,9 +9,9 @@ nadac as (
 )
 
 select distinct 
-	n.ndc
-	, n.ndc_description
-	, n.nadac_per_unit::numeric
-	, n.pricing_unit
-	, n.effective_date::date
-from nadac n
+	ndc
+	, ndc_description
+	, nadac_per_unit::numeric
+	, pricing_unit
+	, effective_date::date
+from nadac

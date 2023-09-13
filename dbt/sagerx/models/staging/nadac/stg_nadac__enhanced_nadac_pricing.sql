@@ -37,3 +37,4 @@ select
 		when (nadac_per_unit - lag(nadac_per_unit) over (partition by ndc order by price_line desc)) = 0 then 0
 		when (nadac_per_unit - lag(nadac_per_unit) over (partition by ndc order by price_line desc)) is null then null
 		else -1 end as change_type
+from nadac

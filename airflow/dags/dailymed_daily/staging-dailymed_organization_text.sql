@@ -26,7 +26,7 @@ FROM (SELECT spl
 		,y.set_id 
 		,y.organization_text
 		--,regexp_matches(organization_text, '(manufactured|distributed) (by|for):([\s\S]*)(?=manufactured|distributed|made)', 'ig') as mfdg_by_match
-		,ROW_NUMBER() OVER (PARTITION BY slp ORDER BY LENGTH(organization_text) DESC) AS row_num
+		,ROW_NUMBER() OVER (PARTITION BY spl ORDER BY LENGTH(organization_text) DESC) AS row_num
     FROM   xml_table x,
             XMLTABLE('/dailymed/Organizations/OrganizationsText'
               PASSING xml_column

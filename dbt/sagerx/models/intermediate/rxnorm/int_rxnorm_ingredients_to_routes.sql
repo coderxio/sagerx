@@ -13,6 +13,6 @@ left join staging.stg_rxnorm__dose_form_group_links dfgl
 	on dfgl.dose_form_rxcui = df.rxcui
 left join staging.stg_rxnorm__dose_form_groups dfg
 	on dfg.rxcui = dfgl.dose_form_group_rxcui
-left join dev.rxnorm_dose_form_group_to_route route
-	on cast(route.dose_form_group_rxcui as varchar) = dfg.rxcui
+left join seeds.rxnorm_dose_form_group_to_route route
+	on route.dose_form_group_rxcui = dfg.rxcui
 where route.route_name is not null

@@ -40,3 +40,10 @@ models:
     marts:
       +schema: marts
       +materialized: view
+
+seeds:
+  +schema: seeds
+  sagerx:
+    rxnorm_dose_form_group_to_route:
+      +column_types:
+        dose_form_group_rxcui: varchar

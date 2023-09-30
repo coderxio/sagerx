@@ -44,6 +44,6 @@ models:
 seeds:
   +schema: seeds
   sagerx:
-    rxnorm_dose_form_group_to_route:
+    rxnorm_dose_form_groups_to_routes:
       +column_types:
         dose_form_group_rxcui: varchar

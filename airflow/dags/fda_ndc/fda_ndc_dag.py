@@ -13,7 +13,7 @@ from airflow.hooks.subprocess import SubprocessHook
 
 @dag(
     schedule="0 4 * * *",
-    start_date=pendulum.today(),
+    start_date=pendulum.yesterday(),
     catchup=False,
 )
 def fda_ndc():
@@ -45,7 +45,7 @@ def fda_ndc():
     @task
     def transform():
         subprocess = SubprocessHook()
-        result = subprocess.run_command(['dbt', 'run'], cwd='/dbt/sagerx')
+        result = subprocess.run_command(['dbt', 'run', '*fda_ndc*'], cwd='/dbt/sagerx')
         print("Result from dbt:", result)
 
     extract() >> load >> transform()

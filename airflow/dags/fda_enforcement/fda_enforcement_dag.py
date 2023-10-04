@@ -74,7 +74,7 @@ def fda_enforcement():
     @task
     def transform():
         subprocess = SubprocessHook()
-        result = subprocess.run_command(['dbt', 'run'], cwd='/dbt/sagerx')
+        result = subprocess.run_command(['dbt', 'run', '--select', 'models/staging/fda_enforcement', 'models/intermediate/fda_enforcement'], cwd='/dbt/sagerx')
         print("Result from dbt:", result)
 
     extract_load() >> test_contains_data >> transform()

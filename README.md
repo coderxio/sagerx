@@ -19,6 +19,8 @@
 5. Run `docker-compose up airflow-init`.
 6. Run `docker-compose up`.
 
+> NOTE: if you have an [M1 Mac](https://stackoverflow.com/questions/62807717/how-can-i-solve-postgresql-scram-authentication-problem) `export DOCKER_DEFAULT_PLATFORM=linux/amd64`, and re-build your images
+
 ## Server URLs
 
 - Airflow UI is hosted on `localhost:8001` or `0.0.0.0:8001`

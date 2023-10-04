@@ -77,7 +77,7 @@ def rxnorm():
     @task
     def transform():
         subprocess = SubprocessHook()
-        result = subprocess.run_command(['dbt', 'run', '*rxnorm*', '*mthspl*'], cwd='/dbt/sagerx')
+        result = subprocess.run_command(['dbt', 'run', '--select', 'models/staging/rxnorm', 'models/intermediate/rxnorm'], cwd='/dbt/sagerx')
         print("Result from dbt:", result)
 
     extract(get_st(get_tgt())) >> load >> transform()

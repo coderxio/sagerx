@@ -45,7 +45,7 @@ def fda_ndc():
     @task
     def transform():
         subprocess = SubprocessHook()
-        result = subprocess.run_command(['dbt', 'run', '*fda_ndc*'], cwd='/dbt/sagerx')
+        result = subprocess.run_command(['dbt', 'run', '--select', 'models/staging/fda_ndc'], cwd='/dbt/sagerx')
         print("Result from dbt:", result)
 
     extract() >> load >> transform()

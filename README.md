@@ -37,3 +37,22 @@ On `docker-compose up` a dbt container will be created to be used for cli comman
 If you get issues on folder permissions:
 
 `sudo chmod -R 777 postgres,data,extracts,logs,plugins`
+
+## Rebuilding Image
+`docker-compose up --build`
+
+## DAGs
+
+### dailymed_daily
+DYNAMIC DAG DO NOT TOUCH BELOW HERE
+
+### dailymed_rx_full
+DYNAMIC DAG DO NOT TOUCH BELOW HERE
+
+### fda_enforcement
+
+### fda_ndc
+
+### nadac
+
+### rxnorm

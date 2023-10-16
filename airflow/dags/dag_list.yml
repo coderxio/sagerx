@@ -1,0 +1,24 @@
+fda_excluded:
+  schedule_interval: "30 4 * * *"  # run a 4:30am every day
+  url: "https://www.accessdata.fda.gov/cder/ndc_excluded.zip"
+fda_unfinished:
+  schedule_interval: "15 4 * * *"  # run a 4:15am every day
+  url: "https://www.accessdata.fda.gov/cder/ndc_unfinished.zip"
+purple_book:
+  schedule_interval: "15 0 24 1 *"  # runs once monthly on the 23rd
+  url: "https://purplebooksearch.fda.gov/files/{{ (execution_date - macros.dateutil.relativedelta.relativedelta(months=1)).strftime('%Y') }}/purplebook-search-{{ (execution_date - macros.dateutil.relativedelta.relativedelta(months=1)).strftime('%B').lower() }}-data-download.csv"
+orange_book:
+  schedule_interval: "15 0 24 1 *"  # runs once monthly on the 24th day at 00:15
+  url: "https://www.fda.gov/media/76860/download"
+dailymed_rxnorm:
+  schedule_interval: "0 5 * * *"  # run at 5am every day
+  url: "https://dailymed-data.nlm.nih.gov/public-release-files/rxnorm_mappings.zip"
+dailymed_pharm_class:
+  schedule_interval: "0 5 * * *"  # run at 5am every day
+  url: "https://dailymed-data.nlm.nih.gov/public-release-files/pharmacologic_class_mappings.zip"
+dailymed_zip_file_metadata:
+  schedule_interval: "0 5 * * *"  # run at 5am every day
+  url: "https://dailymed-data.nlm.nih.gov/public-release-files/dm_spl_zip_files_meta_data.zip"
+rxterms:
+  schedule_interval: "45 0 15 1 *"  # runs once monthly on the 15th day at 00:45
+  url: "https://data.lhncbc.nlm.nih.gov/public/rxterms/release/RxTerms{{ macros.ds_format(ds, '%Y-%m-%d', '%Y%m' ) }}.zip"

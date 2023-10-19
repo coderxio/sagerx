@@ -23,7 +23,7 @@ import user_macros
 )
 def cms_part_d_plans():
     dag_id = "cms_part_d_plans"
-    file_date = "20230602"
+    file_date = "20230908"
     file_date_year = file_date[:4]
     file_date_quarter = user_macros.get_quarter(pendulum.from_format(file_date, 'YYYYMMDD'))
 

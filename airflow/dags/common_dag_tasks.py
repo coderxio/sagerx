@@ -2,6 +2,13 @@ from pathlib import Path
 from sagerx import get_dataset, read_sql_file, get_sql_list
 from airflow.decorators import task
 
+def get_ds_folder(dag_id):
+    return Path("/opt/airflow/dags") / dag_id
+
+def generate_sql_list(dag_id, sql_prefix='load') -> list:
+    ds_folder = get_ds_folder(dag_id)
+    return get_sql_list(sql_prefix, ds_folder)
+
 @task
 def extract(dag_id,url) -> str:
     # Task to download data from web location
@@ -11,35 +18,35 @@ def extract(dag_id,url) -> str:
     print(f"Extraction Completed! Data saved in folder: {data_folder}")
     return data_path
 
-@task
-def load(dag_id,data_path) -> None:
-    # Task to load data into source db schema
-    from airflow.providers.postgres.operators.postgres import PostgresOperator
-
-    load = []
-    ds_folder = Path("/opt/airflow/dags") / dag_id
-    for sql in get_sql_list("load", ds_folder):
-        sql_path = ds_folder / sql
-        task_id = sql[:-4] #remove .sql
-        load.append(
-            PostgresOperator(
-                task_id=task_id,
-                postgres_conn_id="postgres_default",
-                sql=read_sql_file(sql_path).format(data_path=data_path),
-            )
-        )
-    print(f"Loading of Data into PostGres Completed! Loaded {len(load)} tables")
 
 @task
-def transform(dag_id) -> None:
+def transform(dag_id, models_subdir='staging') -> None:
     # Task to transform data using dbt
     from airflow.hooks.subprocess import SubprocessHook
 
     subprocess = SubprocessHook()
-    result = subprocess.run_command(['dbt', 'run', '--select', f'models/staging/{dag_id}'], cwd='/dbt/sagerx')
+    result = subprocess.run_command(['dbt', 'run', '--select', f'models/{models_subdir}/{dag_id}'], cwd='/dbt/sagerx')
     print("Result from dbt:", result)
 
 
 @task
 def check_num_rows(num_rows):
     return num_rows > 0
+
+@task
+def load_df_to_pg(df):
+    from airflow.hooks.postgres_hook import PostgresHook
+    import sqlalchemy
+
+    pg_hook = PostgresHook(postgres_conn_id="postgres_default")
+    engine = pg_hook.get_sqlalchemy_engine()
+
+    num_rows = df.to_sql(
+        "fda_enforcement",
+        con=engine,
+        schema="datasource",
+        if_exists="append",
+        dtype={"openfda": sqlalchemy.types.JSON},
+    )
+
+    return num_rows

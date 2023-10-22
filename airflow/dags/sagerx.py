@@ -108,7 +108,7 @@ def get_dataset(ds_url, data_folder, ti=None, file_name=None):
     return file_path_str
 
 
-def get_sql_list(pre_str: str = "", ds_path: Path = Path.cwd()):
+def get_sql_list(pre_str: str = "", ds_path: Path = Path.cwd()) -> list:
     """When given a folder path returns all .sql files in it as a list
 
     pre_str = determines what sql files to grab by matching str at start of name

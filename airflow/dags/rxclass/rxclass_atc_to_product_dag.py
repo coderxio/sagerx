@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import os
 from time import sleep
 import requests
 from requests.adapters import HTTPAdapter, Retry
@@ -8,7 +7,7 @@ from requests.adapters import HTTPAdapter, Retry
 from pathlib import Path
 import pendulum
 
-from sagerx import get_dataset, read_sql_file, get_sql_list, alert_slack_channel
+from sagerx import get_dataset, read_sql_file, get_sql_list, alert_slack_channel, create_path
 
 from airflow.decorators import dag, task
 
@@ -19,12 +18,34 @@ from airflow.hooks.subprocess import SubprocessHook
 
 
 @dag(
-    schedule="0 4 * * *",
+    schedule="0 0 1 1 *",
     start_date=pendulum.yesterday(),
     catchup=False,
 )
-def rxnorm_historical():
-    dag_id = "rxnorm_historical"
+def rxclass_atc_to_product():
+    dag_id = "rxclass_atc_to_product"
+    data_folder = Path("/opt/airflow/data") / dag_id
+    file_name = f'{dag_id}.csv'
+    file_path = create_path(data_folder) / file_name
+    file_path_str = file_path.resolve().as_posix()
+
+    @task
+    def product_rxcuis_to_csv():
+
+        pg_hook = PostgresHook(postgres_conn_id="postgres_default")
+        engine = pg_hook.get_sqlalchemy_engine()
+
+        df = pd.read_sql(
+            "select distinct rxcui from datasource.rxnorm_rxnconso where tty in ('SCD','SBD','GPCK','BPCK') and sab = 'RXNORM'",
+            con=engine
+        )
+
+        df.to_csv(
+            file_path_str,
+            index=False
+        )
+        
+        return file_path_str
 
     def get_atc_from_rxcui(rxcui):
         try:
@@ -43,11 +64,14 @@ def rxnorm_historical():
 
     # Task to download data from web location
     @task
-    def extract():
+    def extract(file_path):
         # Define list of rxcui
 
         # For example
         rxcui_list = [198335]
+
+        data = pd.read_csv(file_path)
+        rxcui_list = data['rxcui'].to_list()
 
         # Get ATC for full list of RXCUI
         atcs = {}
@@ -63,6 +87,11 @@ def rxnorm_historical():
 
         atc_df = pd.DataFrame.from_dict(atcs, orient='index').reset_index()
         print(atc_df.head(10))
+
+        atc_df.to_csv(
+            file_path_str
+        )
+
 
     # Task to load data into source db schema
     load = []
@@ -86,6 +115,6 @@ def rxnorm_historical():
         print("Result from dbt:", result)
 
     #extract() >> load >> transform()
-    extract()
+    extract(product_rxcuis_to_csv())
 
-rxnorm_historical()
+rxclass_atc_to_product()

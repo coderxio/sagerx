@@ -57,7 +57,6 @@ def rxnorm_historical():
             response = s.get(f'https://rxnav.nlm.nih.gov/REST/rxcui/{rxcui}/allhistoricalndcs.json')
             response.raise_for_status()
             resp = response.json()
-            #resp = jsonResponse["rxclassDrugInfoList"]["rxclassDrugInfo"][0]["rxclassMinConceptItem"]
             return resp
         except Exception as e:
             print(e)
@@ -65,7 +64,7 @@ def rxnorm_historical():
 
     # Task to download data from web location
     @task
-    def extract(file_path):
+    def extract_load(file_path):
         data = pd.read_csv(file_path)
         rxcui_list = data['rxcui'].to_list()
 
@@ -73,7 +72,11 @@ def rxnorm_historical():
         ndcs = {}
         failed_atc = []
 
+        count = 0
         for rxcui in rxcui_list:
+            count += 1
+            if count % 1000 == 0:
+                print(f'MILESTONE {count}')
             sleep(0.1)
             ndc = get_historical_ndcs(rxcui)
             if ndc == -1:
@@ -97,30 +100,13 @@ def rxnorm_historical():
             index=False
         )
 
-
-
-
-    # Task to load data into source db schema
-    load = []
-    ds_folder = Path("/opt/airflow/dags") / dag_id
-    for sql in get_sql_list("load", ds_folder):
-        sql_path = ds_folder / sql
-        task_id = sql[:-4]
-        load.append(
-            PostgresOperator(
-                task_id=task_id,
-                postgres_conn_id="postgres_default",
-                sql=read_sql_file(sql_path),
-            )
-        )
-
     # Task to transform data using dbt
     @task
     def transform():
         subprocess = SubprocessHook()
-        result = subprocess.run_command(['dbt', 'run', '--select', 'models/staging/fda_ndc'], cwd='/dbt/sagerx')
+        result = subprocess.run_command(['dbt', 'run', '--select', 'models/staging/rxnorm_historical'], cwd='/dbt/sagerx')
         print("Result from dbt:", result)
 
-    extract(get_rxcuis())
+    extract_load(get_rxcuis()) >> transform()
 
 rxnorm_historical()

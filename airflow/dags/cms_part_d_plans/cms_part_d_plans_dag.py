@@ -17,7 +17,7 @@ from airflow.hooks.subprocess import SubprocessHook
 import user_macros
 
 @dag(
-    schedule="0 4 * * *",
+    schedule="0 0 1 */3 *",
     start_date=pendulum.yesterday(),
     catchup=False,
 )

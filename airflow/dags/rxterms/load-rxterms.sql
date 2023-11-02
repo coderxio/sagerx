@@ -23,4 +23,4 @@ psn                     TEXT
 );
 
 COPY datasource.rxterms
-FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_rxterms') }}/RxTerms{{ macros.ds_format(ds, '%Y-%m-%d', '%Y%m' ) }}.txt' DELIMITER '|' QUOTE E'\b' CSV HEADER;
+FROM '{data_path}/RxTerms{{ macros.ds_format(ds, '%Y-%m-%d', '%Y%m' ) }}.txt' DELIMITER '|' QUOTE E'\b' CSV HEADER;

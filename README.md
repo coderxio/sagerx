@@ -41,18 +41,9 @@ If you get issues on folder permissions:
 ## Rebuilding Image
 `docker-compose up --build`
 
-## DAGs
-
-### dailymed_daily
-DYNAMIC DAG DO NOT TOUCH BELOW HERE
-
-### dailymed_rx_full
-DYNAMIC DAG DO NOT TOUCH BELOW HERE
-
-### fda_enforcement
-
-### fda_ndc
-
-### nadac
-
-### rxnorm
+### To Do
+- purple book loads SQL fix
+- NADAC fix
+- rxnorm
+- rxterms
+- dailymed

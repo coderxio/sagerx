@@ -20,5 +20,5 @@ PRIMARY KEY (productid)
 );
 
 COPY datasource.fda_unfinished_product
-FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_fda_unfinished') }}/unfinished_product.txt'
+FROM '{data_path}/unfinished_product.txt'
 DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';

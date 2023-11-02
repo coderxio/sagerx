@@ -31,7 +31,7 @@ blank										TEXT
 );
 
 COPY datasource.purple_book_extract
-FROM PROGRAM 'ds_path={{ ti.xcom_pull(key='file_path', task_ids='get_purple_book') }}
+FROM PROGRAM 'ds_path={data_path}
 			lineNum="$(grep -n "Purple Book Database Extract" $ds_path | head -n 1 | cut -d: -f1)"
 			lineNum=$((lineNum + 1))
 			tail -n +$lineNum "$ds_path"'

@@ -9,6 +9,30 @@ def generate_sql_list(dag_id, sql_prefix='load') -> list:
     ds_folder = get_ds_folder(dag_id)
     return get_sql_list(sql_prefix, ds_folder)
 
+def get_ordered_sql_tasks(dag_id):
+    tasks = []
+    tasks.extend(generate_sql_list(dag_id,'load'))
+    tasks.extend(generate_sql_list(dag_id,'staging'))
+    tasks.extend(generate_sql_list(dag_id,'view'))
+    tasks.extend(generate_sql_list(dag_id,'api'))
+    tasks.extend(generate_sql_list(dag_id,'alter'))
+    return tasks
+
+def url_request(url):
+    import requests
+    try:
+        response = requests.get(url)
+    except Exception as e:
+        raise e
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        print(f"Response Status Code: {response.status_code}")
+        print(f"Response Text: {response.text}")
+        raise response
+    return response
+
 @task
 def extract(dag_id,url) -> str:
     # Task to download data from web location
@@ -20,7 +44,7 @@ def extract(dag_id,url) -> str:
 
 
 @task
-def transform(dag_id, models_subdir='staging') -> None:
+def transform(dag_id, models_subdir='staging',task_id="") -> None:
     # Task to transform data using dbt
     from airflow.hooks.subprocess import SubprocessHook
 
@@ -50,3 +74,9 @@ def load_df_to_pg(df):
     )
 
     return num_rows
+
+@task
+def csv_haircut(data_path,rows_to_skip):
+    import pandas as pd
+    df = pd.read_csv(data_path,skiprows=rows_to_skip)
+    df.to_csv(data_path, index=False)

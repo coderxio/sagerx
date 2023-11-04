@@ -8,4 +8,4 @@ ing_rxcui       TEXT
 );
 
 COPY datasource.rxterms_ingredients
-FROM '{data_path}/RxTermsIngredients{{ macros.ds_format(ds, '%Y-%m-%d', '%Y%m' ) }}.txt' DELIMITER '|' QUOTE E'\b' CSV HEADER;
+FROM '{data_path}/RxTermsIngredients{mnth}.txt' DELIMITER '|' QUOTE E'\b' CSV HEADER;

@@ -23,3 +23,15 @@ def fda_enf_extract(data_interval_start=None, data_interval_end=None):
     df.set_index("recall_number")
 
     return df
+
+@task()
+def load_json(data_path):
+    import pandas as pd
+    import json
+    import os
+
+    with open(data_path,'r') as f:
+        json_object = json.load(f)
+        df = pd.DataFrame(pd.json_normalize(json_object["results"]))
+        df.set_index("recall_number")
+    return df

@@ -18,10 +18,10 @@ def get_ordered_sql_tasks(dag_id):
     tasks.extend(generate_sql_list(dag_id,'alter'))
     return tasks
 
-def url_request(url):
+def url_request(url,param=None,headers=None):
     import requests
     try:
-        response = requests.get(url)
+        response = requests.get(url,param,headers)
     except Exception as e:
         raise e
 
@@ -57,26 +57,20 @@ def transform(dag_id, models_subdir='staging',task_id="") -> None:
 def check_num_rows(num_rows):
     return num_rows > 0
 
-@task
-def load_df_to_pg(df):
-    from airflow.hooks.postgres_hook import PostgresHook
-    import sqlalchemy
+# @task
+# def load_df_to_pg(df):
+#     from airflow.hooks.postgres_hook import PostgresHook
+#     import sqlalchemy
 
-    pg_hook = PostgresHook(postgres_conn_id="postgres_default")
-    engine = pg_hook.get_sqlalchemy_engine()
+#     pg_hook = PostgresHook(postgres_conn_id="postgres_default")
+#     engine = pg_hook.get_sqlalchemy_engine()
 
-    num_rows = df.to_sql(
-        "fda_enforcement",
-        con=engine,
-        schema="datasource",
-        if_exists="append",
-        dtype={"openfda": sqlalchemy.types.JSON},
-    )
+#     num_rows = df.to_sql(
+#         "fda_enforcement",
+#         con=engine,
+#         schema="datasource",
+#         if_exists="append",
+#         dtype={"openfda": sqlalchemy.types.JSON},
+#     )
 
-    return num_rows
-
-@task
-def csv_haircut(data_path,rows_to_skip):
-    import pandas as pd
-    df = pd.read_csv(data_path,skiprows=rows_to_skip)
-    df.to_csv(data_path, index=False)
+#     return num_rows

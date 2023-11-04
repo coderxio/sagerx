@@ -1,7 +1,7 @@
 from airflow_operator import create_dag
 from airflow.utils.helpers import chain
 
-from common_dag_tasks import  extract, get_ordered_sql_tasks, get_ds_folder, csv_haircut
+from common_dag_tasks import  extract, get_ordered_sql_tasks, get_ds_folder
 from sagerx import read_sql_file
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 
@@ -20,8 +20,6 @@ with dag:
     ds_folder = get_ds_folder(dag_id)
 
     extract_task = extract(dag_id,url)
-
-    haircut = csv_haircut(extract_task,3)
 
     task_list = [extract_task]
     for sql in get_ordered_sql_tasks(dag_id):

@@ -23,4 +23,4 @@ psn                     TEXT
 );
 
 COPY datasource.rxterms
-FROM '{data_path}/RxTerms{{ macros.ds_format(ds, '%Y-%m-%d', '%Y%m' ) }}.txt' DELIMITER '|' QUOTE E'\b' CSV HEADER;
+FROM '{data_path}/RxTerms{mnth}.txt' DELIMITER '|' QUOTE E'\b' CSV HEADER;

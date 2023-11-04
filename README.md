@@ -42,8 +42,6 @@ If you get issues on folder permissions:
 `docker-compose up --build`
 
 ### To Do
-- purple book loads SQL fix
-- NADAC fix
-- rxnorm
-- rxterms
+- purple book loads SQL does not work
 - dailymed
+- fda enforcement

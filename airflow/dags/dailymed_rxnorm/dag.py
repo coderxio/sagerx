@@ -6,18 +6,17 @@ from sagerx import read_sql_file
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 
 
-dag_id = "rxterms"
+dag_id = "dailymed_rxnorm"
 
 dag = create_dag(
     dag_id=dag_id,
-    schedule= "45 0 15 1 *",  # runs once monthly on the 15th day at 00:45
+    schedule= "0 5 * * *",  # run at 5am every day
     max_active_runs=1,
     concurrency=2,
-)   
+)
 
 with dag:
-    mnth = "{{ macros.ds_format(ds, '%Y-%m-%d', '%Y%m' ) }}"
-    url = f"https://data.lhncbc.nlm.nih.gov/public/rxterms/release/RxTerms{mnth}.zip"
+    url = "https://dailymed-data.nlm.nih.gov/public-release-files/rxnorm_mappings.zip"
     ds_folder = get_ds_folder(dag_id)
 
     extract_task = extract(dag_id,url)
@@ -30,7 +29,7 @@ with dag:
         sql_task = PostgresOperator(
             task_id=task_id,
             postgres_conn_id="postgres_default",
-            sql=read_sql_file(sql_path).format(data_path=extract_task, mnth=mnth),
+            sql=read_sql_file(sql_path).format(data_path=extract_task),
             dag=dag
         )
         task_list.append(sql_task)

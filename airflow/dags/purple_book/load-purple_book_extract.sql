@@ -36,4 +36,3 @@ FROM PROGRAM 'ds_path={data_path}
 			lineNum=$((lineNum + 1))
 			tail -n +$lineNum "$ds_path"'
 CSV HEADER QUOTE '"';
-

@@ -1,8 +1,10 @@
 import pendulum
 from airflow_operator import create_dag
-from common_dag_tasks import  extract,transform, check_num_rows, load_df_to_pg, get_ds_folder
-from fda_enforcement.dag_tasks import fda_enf_extract
-from airflow.operators.python import ShortCircuitOperator
+from common_dag_tasks import  extract,transform, get_ds_folder
+from fda_enforcement.dag_tasks import  load_json
+# from airflow.operators.python import ShortCircuitOperator
+# from airflow.providers.postgres.operators.postgres import PostgresOperator
+# from sagerx import read_sql_file
 
 dag_id = "fda_enforcement"
 
@@ -20,16 +22,17 @@ with dag:
     ds_folder = get_ds_folder(dag_id)
 
     extract_task = extract(dag_id,url)
+    load_task = load_json(extract_task)
     
-    extract_task = fda_enf_extract()
-    load_task = load_df_to_pg(extract_task)
+    #extract_task = fda_enf_extract()
+    #load_task = load_df_to_pg(extract_task)
     transform_staging_task = transform.override(task_id='transform-staging')(dag_id)
     transform_intermediate_task = transform.override(task_id='transform-intermediate')(dag_id,'intermediate')
 
-    test_contains_data = ShortCircuitOperator(
-        task_id = 'test_contains_data',
-        python_callable = check_num_rows,
-        op_kwargs = {"num_rows":load_task}
-    )
+    # test_contains_data = ShortCircuitOperator(
+    #     task_id = 'test_contains_data',
+    #     python_callable = check_num_rows,
+    #     op_kwargs = {"num_rows":load_task}
+    # )
 
-    extract_task >> load_task >> test_contains_data >> transform_staging_task  >> transform_intermediate_task
+    extract_task >> load_task >> transform_staging_task  >> transform_intermediate_task

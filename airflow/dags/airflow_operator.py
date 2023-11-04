@@ -1,4 +1,5 @@
 from airflow import DAG
+from airflow.models.param import Param
 
 from sagerx import get_dataset, read_sql_file, get_sql_list, alert_slack_channel
     

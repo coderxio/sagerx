@@ -51,26 +51,3 @@ def transform(dag_id, models_subdir='staging',task_id="") -> None:
     subprocess = SubprocessHook()
     result = subprocess.run_command(['dbt', 'run', '--select', f'models/{models_subdir}/{dag_id}'], cwd='/dbt/sagerx')
     print("Result from dbt:", result)
-
-
-@task
-def check_num_rows(num_rows):
-    return num_rows > 0
-
-# @task
-# def load_df_to_pg(df):
-#     from airflow.hooks.postgres_hook import PostgresHook
-#     import sqlalchemy
-
-#     pg_hook = PostgresHook(postgres_conn_id="postgres_default")
-#     engine = pg_hook.get_sqlalchemy_engine()
-
-#     num_rows = df.to_sql(
-#         "fda_enforcement",
-#         con=engine,
-#         schema="datasource",
-#         if_exists="append",
-#         dtype={"openfda": sqlalchemy.types.JSON},
-#     )
-
-#     return num_rows

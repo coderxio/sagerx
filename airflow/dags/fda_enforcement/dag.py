@@ -20,19 +20,13 @@ dag = create_dag(
 with dag:
     url = "https://download.open.fda.gov/drug/enforcement/drug-enforcement-0001-of-0001.json.zip"
     ds_folder = get_ds_folder(dag_id)
+    file_name = "/drug-enforcement-0001-of-0001.json"
 
     extract_task = extract(dag_id,url)
-    load_task = load_json(extract_task)
     
-    #extract_task = fda_enf_extract()
-    #load_task = load_df_to_pg(extract_task)
+    load_task = load_json(str(extract_task)+file_name)
+    
     transform_staging_task = transform.override(task_id='transform-staging')(dag_id)
     transform_intermediate_task = transform.override(task_id='transform-intermediate')(dag_id,'intermediate')
-
-    # test_contains_data = ShortCircuitOperator(
-    #     task_id = 'test_contains_data',
-    #     python_callable = check_num_rows,
-    #     op_kwargs = {"num_rows":load_task}
-    # )
 
     extract_task >> load_task >> transform_staging_task  >> transform_intermediate_task

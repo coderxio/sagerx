@@ -1,10 +1,10 @@
 from airflow.decorators import task
 from common_dag_tasks import url_request
+from sagerx import read_json_file
 
 # Task to download data from web location
 @task(task_id='extract')
 def fda_enf_extract(data_interval_start=None, data_interval_end=None):
-    import requests
     import pandas as pd
     import logging
 
@@ -27,11 +27,24 @@ def fda_enf_extract(data_interval_start=None, data_interval_end=None):
 @task()
 def load_json(data_path):
     import pandas as pd
-    import json
-    import os
+    print(f"JSON path: {data_path}")
+    json_object = read_json_file(data_path)
+    df = pd.DataFrame(json_object["results"])
+    df.set_index("recall_number")
+    print(f"Dataframe loaded. Number of rows: {len(df)}")
+    load_df_to_pg(df)
 
-    with open(data_path,'r') as f:
-        json_object = json.load(f)
-        df = pd.DataFrame(pd.json_normalize(json_object["results"]))
-        df.set_index("recall_number")
-    return df
+def load_df_to_pg(df):
+    from airflow.hooks.postgres_hook import PostgresHook
+    import sqlalchemy
+
+    pg_hook = PostgresHook(postgres_conn_id="postgres_default")
+    engine = pg_hook.get_sqlalchemy_engine()
+
+    df.to_sql(
+        "fda_enforcement",
+        con=engine,
+        schema="datasource",
+        if_exists="append",
+        dtype={"openfda": sqlalchemy.types.JSON},
+    )

@@ -13,4 +13,4 @@ sample_package      TEXT
 );
 
 COPY datasource.fda_excluded_package
-FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_fda_excluded') }}/Packages_excluded.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;
+FROM '{data_path}/Packages_excluded.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;

@@ -26,4 +26,4 @@ PRIMARY KEY (productid)
 );
 
 COPY datasource.fda_excluded_product
-FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_fda_excluded') }}/Products_excluded.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;
+FROM '{data_path}/Products_excluded.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;

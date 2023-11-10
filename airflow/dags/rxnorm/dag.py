@@ -23,7 +23,6 @@ def rxnorm():
     @task
     def get_tgt():
         import requests
-        import logging
         from airflow.models import Variable
 
         api_key = Variable.get("umls_api")

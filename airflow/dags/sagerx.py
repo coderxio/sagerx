@@ -11,17 +11,21 @@ def create_path(*args):
         p.mkdir(parents=True)
     return p
 
-
-# SQL functions
 def read_sql_file(sql_path: str):
     """reads a sql file and returns the string when given a path
     sql_path = path as string to sql file"""
-
+    
     fd = open(sql_path, "r")
     sql_string = fd.read()
     fd.close()
     return sql_string
 
+def read_json_file(json_path:str):
+    import json
+
+    with open(json_path,'r') as f:
+        json_object = json.load(f)
+    return json_object
 
 # Web functions
 def download_dataset(url: str, dest: Path = Path.cwd(), file_name: str = None):
@@ -108,7 +112,7 @@ def get_dataset(ds_url, data_folder, ti=None, file_name=None):
     return file_path_str
 
 
-def get_sql_list(pre_str: str = "", ds_path: Path = Path.cwd()):
+def get_sql_list(pre_str: str = "", ds_path: Path = Path.cwd()) -> list:
     """When given a folder path returns all .sql files in it as a list
 
     pre_str = determines what sql files to grab by matching str at start of name

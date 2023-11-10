@@ -38,6 +38,9 @@ services:
       - ./postgres:/docker-entrypoint-initdb.d
       - ./airflow/data:/opt/airflow/data
       - ./airflow/extracts:/opt/airflow/extracts
+    build:
+      context: .
+      shm_size: '4gb'
 
   pgadmin:
     image: dpage/pgadmin4:6.15

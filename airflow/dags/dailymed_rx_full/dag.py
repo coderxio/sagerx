@@ -87,7 +87,7 @@ def process_dailymed(data_folder, xslt, ti):
         with zipfile.ZipFile(zip_folder) as unzipped_folder:
             folder_name = zip_folder.stem
             for subfile in unzipped_folder.infolist():
-                if re.match(".*.xml", subfile.filename):
+                if re.match("\.xml$", subfile.filename):
                     new_file = unzipped_folder.extract(subfile, data_folder)
                     # xslt transform
                     xml_content = transform_xml(new_file, xslt)

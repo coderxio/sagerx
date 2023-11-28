@@ -12,7 +12,7 @@
 with xml_table as
 (
 select spl, xml_content::xml as xml_column
-from datasource.dailymed_daily
+from datasource.dailymed_rx_full
 )
 
 INSERT INTO staging.dailymed_organization_text

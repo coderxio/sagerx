@@ -10,7 +10,7 @@ ftp_dir = "/nlmdata/.dailymed/"
 file_set = "dm_spl_release_human_rx_part"
 
 ds = {
-    "dag_id": "dailymed_rx_full",
+    "dag_id": "dailymed",
     "schedule_interval": None,
     "url": "https://dailymed-data.nlm.nih.gov/public-release-files/",
 }
@@ -97,7 +97,7 @@ def process_dailymed(data_folder, xslt, ti):
                         data=[[folder_name, subfile.filename, xml_content]],
                     )
                     df.to_sql(
-                        "dailymed_rx_full",
+                        "dailymed",
                         schema="datasource",
                         con=db_conn,
                         if_exists="append",
@@ -173,7 +173,7 @@ with dag:
             python_callable=process_dailymed,
             op_kwargs={
                 "data_folder": data_folder,
-                "xslt": ds_folder / "dailymed_prescription.xsl",
+                "xslt": ds_folder / "template.xsl",
             },
         )
     )

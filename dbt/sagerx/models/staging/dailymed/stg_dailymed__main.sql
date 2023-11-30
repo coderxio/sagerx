@@ -3,7 +3,7 @@
 with xml_table as
 (
 	select spl, xml_content::xml as xml_column
-	from datasource.dailymed_rx_full
+	from datasource.dailymed
 )
 
 select spl, y.*, 'https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=' || y.set_id

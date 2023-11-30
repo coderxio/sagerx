@@ -1,5 +1,17 @@
 /* intermediate.int_dailymed_organization_metrics */
 
+with dailymed_main as (
+    select * from {{ ref('stg_dailymed__main') }}
+),
+
+dailymed_organizations as (
+    select * from {{ ref('stg_dailymed__organizations') }}
+),
+
+dailymed_organization_texts as (
+    select * from {{ ref('stg_dailymed__organization_texts') }}
+)
+
 select o.set_id
 	, ma.market_status
 	, sum(case when org_type = 'Functioner' then 1 else 0 end) as functioner_count
@@ -10,9 +22,9 @@ select o.set_id
 				and sum(case when org_type = 'Functioner' then 1 else 0 end) = 0
 			then 'yes' else '' end as labeler_only
 	, count(*)
-from staging.dailymed_organization o
-	inner join staging.dailymed_main ma
+from dailymed_main ma
+	inner join dailymed_organizations o
         on o.set_id = ma.set_id
-	left join staging.dailymed_organization_text ot
+	left join dailymed_organization_texts ot
         on o.set_id = ot.set_id
 group by o.set_id, ma.market_status

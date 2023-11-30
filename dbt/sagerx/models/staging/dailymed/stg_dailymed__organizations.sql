@@ -1,31 +1,20 @@
- /* staging.dailymed_organization */
- --DROP TABLE IF EXISTS staging.dailymed_organization CASCADE;
-
- CREATE TABLE IF NOT EXISTS staging.dailymed_organization (
-	spl 				TEXT NOT NULL,
-	document_id 		TEXT NOT NULL,
-	set_id			 	TEXT,
-	dun					TEXT,
-	org_name			TEXT,
-	org_type			TEXT
-); 
+ /* staging.stg_dailymed__organizations */
 
 with xml_table as
 (
-select spl, xml_content::xml as xml_column
-from datasource.dailymed_rx_full
+	select spl, xml_content::xml as xml_column
+	from datasource.dailymed_rx_full
 )
 
-INSERT INTO staging.dailymed_organization
-SELECT spl, y.*
-    FROM   xml_table x,
-            XMLTABLE('/dailymed/Organizations/establishment'
-              PASSING xml_column
-              COLUMNS 
-                document_id 	TEXT  PATH '../../documentId',
-				set_id  		TEXT  PATH '../../SetId',
-				dun				TEXT  PATH './DUN',
-	            org_name		TEXT  PATH './name',
-	            org_type		TEXT  PATH './type'
+select spl, y.*
+    from   xml_table x,
+            xmltable('/dailymed/Organizations/establishment'
+              passing xml_column
+              columns 
+                document_id 	text  path '../../documentId',
+				set_id  		text  path '../../SetId',
+				version_number	 text  path '../../VersionNumber',
+				dun				text  path './DUN',
+	            org_name		text  path './name',
+	            org_type		text  path './type'
 					) y
-ON CONFLICT DO NOTHING;

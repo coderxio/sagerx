@@ -2,8 +2,8 @@
 
 with xml_table as
 (
-select spl, xml_content::xml as xml_column
-from datasource.dailymed_rx_full
+	select spl, xml_content::xml as xml_column
+	from datasource.dailymed_rx_full
 )
 
 select spl, y.*, ndc_to_11(y.ndc) as ndc11

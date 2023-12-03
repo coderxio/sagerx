@@ -82,7 +82,8 @@ def rxclass_atc_to_product():
 
         atc_df = pd.DataFrame.from_dict(atcs, orient='index').reset_index()
         # Convert columns names from camelCase to lower_case
-        atc_df.columns = ['index', 'class_id', 'class_name', 'class_type']
+        # and change index column name to rxcui
+        atc_df.columns = ['rxcui', 'class_id', 'class_name', 'class_type']
         print(atc_df.head(10))
 
         pg_hook = PostgresHook(postgres_conn_id="postgres_default")

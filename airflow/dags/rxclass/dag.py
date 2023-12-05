@@ -59,7 +59,7 @@ def rxclass_atc_to_product():
             resp = jsonResponse["rxclassDrugInfoList"]["rxclassDrugInfo"][0]["rxclassMinConceptItem"]
             return resp
         except Exception as e:
-            print(e)
+            # print(e)
             return -1
 
     # Task to download data from web location
@@ -72,7 +72,11 @@ def rxclass_atc_to_product():
         atcs = {}
         failed_atc = []
 
+        count = 0
         for rxcui in rxcui_list:
+            count += 1
+            if count % 100 == 0:
+                print(f'MILESTONE {count}')
             sleep(0.1)
             atc = get_atc_from_rxcui(rxcui)
             if atc == -1:

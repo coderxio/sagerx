@@ -1,23 +1,46 @@
-with atc_to_product as (
-    select * from {{ ref('int_atc_codes_to_product_rxcuis') }}
-),
-
-rxnorm_product as (
-    select * from {{ ref('int_rxnorm_clinical_products_to_ingredients') }}
+with clinical_products_to_ingredient_strengths as (
+	select *
+	from intermediate.int_rxnorm_clinical_products_to_ingredient_strengths
+	order by ingredient_component_name asc
+    -- NOTE: would it be more stable to sort each component by rxcui asc?
 )
 
-select
-    --atc_1_name
-    atc_2_name
+, cte as (
+	select
+		clinical_product_rxcui
+		, clinical_product_name
+		, string_agg(ingredient_component_name, ' / ') as ingredient_name
+		, string_agg(coalesce(precise_ingredient_name, ingredient_component_name), ' / ') as precise_ingredient_name
+		, string_agg(distinct dose_form_name, ' / ') as dose_form_name
+		, string_agg(strength_text, ' / ') as strength_name
+	from clinical_products_to_ingredient_strengths
+	group by
+		clinical_product_rxcui
+		, clinical_product_name
+)
+
+select distinct
+    atc_1_name
+    , atc_2_name
     , atc_3_name
     , atc_4_name
-    --, atc_5_name
-    , rxnorm_product.ingredient_name
-    , concat(rxnorm_product.ingredient_name, ' TBD ') as precise_ingredient_name
-    , concat(rxnorm_product.ingredient_name, ' TBD ', dose_form_name) as dose_form_name
-    , concat(rxnorm_product.ingredient_name, ' TBD ', dose_form_name, ' TBD') as strength_name
-    --, rxnorm_product.*
-from atc_to_product
-left join rxnorm_product
-    on rxnorm_product.clinical_product_rxcui = atc_to_product.rxcui::varchar
-where rxnorm_product.clinical_product_rxcui is not null
+	, clinical_product_rxcui
+	, clinical_product_name
+	, cte.ingredient_name as ingredient
+	, precise_ingredient_name as precise_ingredient
+    , concat(
+            precise_ingredient_name
+            , ' '
+            , dose_form_name
+        ) as dose_form
+    , concat(
+            precise_ingredient_name
+            , ' '
+            , dose_form_name
+            , ' '
+            , strength_name
+        ) as strength
+from cte
+left join intermediate.int_atc_codes_to_product_rxcuis atc
+    on atc.rxcui::varchar = cte.clinical_product_rxcui
+order by clinical_product_rxcui

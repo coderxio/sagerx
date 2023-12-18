@@ -6,7 +6,7 @@ Including data from DailyMed, FDA, RxNorm, Orange Book, and more!
 
 SageRx uses Airflow to schedule jobs to extract, load, and transform (using dbt) open drug data.
 
-![Airflow](docs/images/sagerx_airlfow_example.png)
+![Airflow](docs/images/sagerx_airflow_example.png)
 
 Data ends up in a PostgreSQL database and can be queried using pgAdmin (included with SageRx) or via any SQL editor of your choice.
 
@@ -22,7 +22,7 @@ Subscribe to our [newsletter](https://coderxio.substack.com/) to keep ontop of u
 
 ## Contributing
 
-We would love to see you contribute to SageRx. Join our [slack](https://join.slack.com/t/coderx/shared_invite/zt-5b8e9kr4-PsKAVe4crGmECQyyxDIJgQ) channel to get involved.
+We would love to see you contribute to SageRx. Join our [Slack](https://join.slack.com/t/coderx/shared_invite/zt-5b8e9kr4-PsKAVe4crGmECQyyxDIJgQ) channel to get involved.
 
 ## Development Quickstart
 

@@ -5,3 +5,61 @@ sources:
     schema: datasource
     tables:
       - name: nadac
+        description: >
+          National Average Drug Acquisition Cost (NADAC).
+
+          CMS has entered into a contract with Myers & Stauffer, LC, to perform a Retail Price Survey.
+
+          The purpose of this initiative is to perform a monthly nationwide survey of retail community pharmacy covered outpatient drug prices and to provide states with weekly updates on pricing files. These pricing files, entitled the NADAC (National Average Drug Acquisition Cost) files, provide state Medicaid agencies with covered outpatient drug prices by averaging survey invoice prices from retail community pharmacies across the United States. The state agencies have the option of using the NADAC files to meet the new Actual Acquisition Cost (AAC) reimbursement requirements in the Covered Outpatient Drug final rule with comment (CMS 2345-FC).
+
+          The Retail Price Survey focuses on the retail community pharmacy acquisition costs. This provides for a survey of the purchase prices of all covered outpatient drugs by retail community pharmacies. These pharmacies include independent retail community pharmacies and chain pharmacies. The prices are updated on a weekly and monthly basis.  A methodology document titled Methodology for Calculating the National Average Drug Acquisition Cost (NADAC) outlines the processes used to derive the NADAC. NADAC Questions and Responses includes questions and comments received to date regarding the NADAC, along with our responses. To the extent that states consider the NADAC as a reference price when setting their reimbursement methodology, they must submit a State Plan Amendment (SPA) to CMS in accordance with state plan requirements if they decide to use NADAC as a basis for payment.
+
+          Effective November 27, 2013, CMS began posting final NADAC files. To view the NADAC weekly files and the NADAC Week to Week File Comparison, please visit the Pharmacy Drug Pricing Page.  
+
+          Please note that the NADAC file is updated on a weekly basis. Each month, a new file is posted to reflect findings from the previous month’s survey results incorporating the weekly price changes that have occurred in the interim weeks before the next monthly NADAC file. For more information on the fields in the NADAC weekly file, please see the NADAC Data Field Definitions. In addition, to easily identify and understand the pricing changes that occur each week, we are posting a NADAC Week to Week File Comparison which will accompany the weekly NADAC file. This comparison file identifies the drug products with current NADAC rates that are replaced with new NADAC rates. Other changes (e.g. NDC additions and terminations) to the NADAC file are not reflected in this comparison. The explanation of the data fields used in the comparison file are further defined in the NADAC Week to Week Comparison Data Field Definitions.
+
+          The NADAC Equivalency Metrics are published on a quarterly basis and are intended to be utilized for analyzing and monitoring the NADAC pricing relationship to compendia drug pricing values. In addition, the NADAC equivalency metrics can be utilized by state Medicaid programs for evaluating their respective pharmacy reimbursement protocols. A methodology document titled NADAC Equivalency Methodology has been developed to outline the processes used to derive the NADAC Equivalency Metrics file.
+        columns:
+          - name: ndc_description
+            description: Identifies the drug name, strength, and dosage form of the drug product.
+          - name: ndc
+            description: The National Drug Code (NDC) is a numerical code maintained by the FDA that includes the labeler code, product code, and package code. The NDC is an 11-digit code.
+          - name: nadac_per_unit
+            description: The National Average Drug Acquisition Cost per unit.
+          - name: effective_date
+            description: The effective date of the NADAC Per Unit cost.
+          - name: pricing_unit
+            description: Indicates the pricing unit for the associated NDC ('ML', 'GM' or 'EA').
+          - name: pharmacy_type_indicator
+            description: The source of pharmacy survey data used to calculate the NADAC. 'C/I' indicates data was collected from surveys of Chain/Independent pharmacies. Other pharmacy type indicators are not used at this time.
+          - name: otc
+            description: Indicates whether or not the NDC is for an over-the-counter (OTC) product ('Y' or 'N').
+          - name: explanation_code
+            description: >
+              Codes that pertain to how the NADAC was calculated; see explanation code descriptions below. Numbers 1-10, multi-value, comma-delimited.
+              
+              - Code 1: The NADAC was calculated using information from the most recently completed pharmacy survey.
+              - Code 2: The average acquisition cost of the most recent survey was within ± 2% of the current NADAC; therefore, the NADAC was carried forward from the previous file.
+              - Code 3: The NADAC based on survey data has been adjusted to reflect changes in published pricing, or as a result of an inquiry to the help desk.
+              - Code 4: The NADAC was carried forward from the previous file.
+              - Code 5: The NADAC was calculated based on package size.
+              - Code 6: The CMS Covered Outpatient Drug Product File drug category type of 'S/I/N' (Single Source/Innovator/Non-Innovator) has not been applied. Most 'S/I' drugs with the same strength, dosage form and route of administration were grouped together for the purpose of the NADAC calculation and 'N' drugs were also grouped together. In some cases, however, in calculating a NADAC, the CMS 'S/I/N' designation was not applied when the State Medicaid brand or generic payment practices for these drugs generally differed from the Covered Outpatient Drug Product File designation.
+                  
+              > For example, authorized generic drugs are appropriately listed in the CMS covered outpatient drug file as 'I' drugs for the purpose of rebates as they were approved under a New Drug Application (NDA). However, they are grouped as 'N' for the NADAC calculation since they are generally designated as generic by most State Medicaid programs for the purposes of reimbursement. Another example of this occurrence is when proprietary named drugs, approved under an Abbreviated New Drug Application (ANDA) are appropriately in the CMS Covered Outpatient Drug file as 'N' for the purpose of rebates. However, they are grouped as 'S/I' for the NADAC calculation since they are generally reimbursed as brand drugs by State Medicaid programs.
+                  
+              - Codes 7 through 10: Reserved for future use.
+          - name: classification_for_rate_setting
+            description: Indicates whether the NDC was considered brand (‘B’) or generic (‘G’) for the NADAC rate calculation process. If the NDC was considered brand (‘B’) and approved under an Abbreviated New Drug Application (ANDA), the indicator is shown as (‘B-ANDA’). NDCs approved as biosimilar products are considered brand (‘B’) and will be designated as (‘B-BIO’).
+          - name: corresponding_generic_drug_nadac_per_unit
+            description: The NADAC for the corresponding generic drug.
+          - name: corresponding_generic_drug_effective_date
+            description: >
+              The effective date of when the Corresponding Generic Drug NADAC Per Unit is assigned to a multiple source brand drug NDC. This date may not correspond to the NADAC effective date for the generic drug due to the method by which the corresponding generic drug NADAC effective date is assigned.
+
+              The corresponding generic drug NADAC effective date is the latter of the following dates:
+
+              a) date of the NADAC reference file upon which the corresponding generic drug NADAC first appears, 
+              b) the current corresponding generic drug NADAC effective date plus one day - one day is added to the previous date so that there are no overlapping rate segments, or 
+              c) the NADAC Effective Date for the generic drug group. This data assignment process is necessary to eliminate the potential for applying corresponding generic drug NADACs to past claims.
+          - name: as_of_date
+            description: As of date.

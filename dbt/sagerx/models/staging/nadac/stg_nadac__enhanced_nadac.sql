@@ -1,4 +1,4 @@
--- stg_nadac__current_nadac.sql
+-- stg_nadac__enhanced_nadac.sql
 
 with
 
@@ -28,8 +28,8 @@ select
 	, nadac_per_unit
 	, pricing_unit 
 	, price_start_date
-	, case when price_line = 1 then 'y' end as current_flag
-	, case when price_line = first_value(price_line) over (partition by ndc order by price_line desc) then 'y' end as first_price
+	, case when price_line = 1 then true else false end as most_recent_price
+	, case when price_line = first_value(price_line) over (partition by ndc order by price_line desc) then true else false end as first_price
 	, (nadac_per_unit - lag(nadac_per_unit) over (partition by ndc order by price_line desc)) as dollar_change
 	, (nadac_per_unit - lag(nadac_per_unit) over (partition by ndc order by price_line desc)) /
 		lag(nadac_per_unit) over (partition by ndc order by price_line desc) as percent_change

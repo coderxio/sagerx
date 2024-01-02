@@ -13,4 +13,4 @@ sample_package      TEXT
 );
 
 COPY datasource.fda_ndc_package
-FROM '{{ ti.xcom_pull(task_ids='extract') }}/package.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;
+FROM '{data_path}/package.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;

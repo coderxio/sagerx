@@ -1,0 +1,53 @@
+version: 2
+
+models:
+  - name: stg_fda_enforcement__reports
+    description: "FDA enforcement reports"
+    columns:
+      - name: status
+      - name: city
+      - name: state
+      - name: country
+      - name: classification
+      - name: openfda
+      - name: product_type
+      - name: event_id
+      - name: recalling_firm
+      - name: address_1
+      - name: address_2
+      - name: postal_code
+      - name: voluntary_mandated
+      - name: initial_firm_notification
+      - name: distribution_pattern
+      - name: recall_number
+        description: "The recall number."
+        tests:
+          - unique
+          - not_null
+      - name: product_description
+      - name: product_quantity
+      - name: reason_for_recall
+      - name: recall_initiation_date
+      - name: center_classification_date
+      - name: report_date
+      - name: code_info
+
+models:
+  - name: stg_fda_enforcement__regex_ndcs
+    description: "FDA enforcement NDCs from RegEx."
+    columns:
+    # primary key would be recall_number + ndc11
+      - name: recall_number
+      - name: ndc11
+      - name: ndc9
+
+models:
+  - name: stg_fda_enforcement__json_ndcs
+    description: "FDA enforcement NDCs from JSON."
+    columns:
+    # primary key would be recall_number + ndc11
+      - name: recall_number
+      - name: ndc11
+      - name: ndc9
+      - name: app_num
+

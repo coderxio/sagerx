@@ -15,4 +15,4 @@ Submission_Date             TEXT
 );
 
 COPY datasource.orange_book_patent
-FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_orange_book') }}/patent.txt' DELIMITER '~' CSV HEADER;
+FROM '{data_path}/patent.txt' DELIMITER '~' CSV HEADER;

@@ -55,6 +55,7 @@ def nadac():
         # hit OpenFDA API to get
         ds_year = data_interval_start.strftime("%Y")
         nadac_obj = nadac()
+
         title, ds_url = nadac_obj.get_download_url(ds_year)
 
         data_path = get_dataset(ds_url, data_folder, file_name="NADAC.csv")

@@ -10,4 +10,4 @@ title           TEXT
 );
 
 COPY datasource.dailymed_zip_file_metadata
-FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_dailymed_zip_file_metadata') }}/dm_spl_zip_files_meta_data.txt' DELIMITER '|' QUOTE E'\b' CSV HEADER;
+FROM '{data_path}/dm_spl_zip_files_meta_data.txt' DELIMITER '|' QUOTE E'\b' CSV HEADER;

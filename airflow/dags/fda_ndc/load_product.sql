@@ -26,4 +26,4 @@ PRIMARY KEY (productid)
 );
 
 COPY datasource.fda_ndc_product
-FROM '{{ ti.xcom_pull(task_ids='extract') }}/product.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;
+FROM '{data_path}/product.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;

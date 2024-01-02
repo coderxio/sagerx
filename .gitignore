@@ -12,3 +12,6 @@ plugins
 
 # dbt
 .user.yml
+
+# Desktop Services Store
+.DS_Store

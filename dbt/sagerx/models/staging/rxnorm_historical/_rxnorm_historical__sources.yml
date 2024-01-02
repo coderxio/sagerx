@@ -1,0 +1,7 @@
+version: 2
+
+sources:
+  - name: rxnorm_historical
+    schema: datasource
+    tables:
+      - name: rxnorm_historical

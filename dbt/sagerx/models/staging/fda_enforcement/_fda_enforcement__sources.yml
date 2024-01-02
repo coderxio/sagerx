@@ -1,0 +1,7 @@
+version: 2
+
+sources:
+  - name: fda_enforcement
+    schema: datasource
+    tables:
+      - name: fda_enforcement

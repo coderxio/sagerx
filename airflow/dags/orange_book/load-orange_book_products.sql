@@ -19,4 +19,4 @@ applicant_full_name    TEXT
 );
 
 COPY datasource.orange_book_products
-FROM '{{ ti.xcom_pull(key='file_path',task_ids='get_orange_book') }}/products.txt' DELIMITER '~' CSV HEADER;
+FROM '{data_path}/products.txt' DELIMITER '~' CSV HEADER;

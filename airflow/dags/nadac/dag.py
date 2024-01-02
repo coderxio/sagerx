@@ -79,7 +79,7 @@ def nadac():
     @task
     def transform():
         subprocess = SubprocessHook()
-        result = subprocess.run_command(['dbt', 'run'], cwd='/dbt/sagerx')
+        result = subprocess.run_command(['dbt', 'run', '--select', 'models/staging/nadac'], cwd='/dbt/sagerx')
         print("Result from dbt:", result)
 
     extract() >> load >> transform()

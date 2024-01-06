@@ -17,4 +17,4 @@ as_of_date  			                        DATE
 TRUNCATE datasource.nadac;
 
 COPY datasource.nadac
-FROM '{{ ti.xcom_pull(task_ids='download_nadac') }}' CSV HEADER;
+FROM '{{ ti.xcom_pull(task_ids='extract') }}' CSV HEADER;

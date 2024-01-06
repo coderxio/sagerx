@@ -4,12 +4,10 @@ import pendulum
 
 from sagerx import get_dataset, read_sql_file, get_sql_list, alert_slack_channel
 
-
-# The DAG object; we'll need this to instantiate a DAG
 from airflow.decorators import dag, task
 
-# Operators; we need this to operate!
 from airflow.providers.postgres.operators.postgres import PostgresOperator
+from airflow.hooks.subprocess import SubprocessHook
 
 starting_date = pendulum.parse("2013-12-01")
 
@@ -27,8 +25,8 @@ def nadac():
     ds_folder = Path("/opt/airflow/dags") / dag_id
     data_folder = Path("/opt/airflow/data") / dag_id
 
-    @task(task_id="download_nadac")
-    def download_nadac(data_interval_start=None):
+    @task()
+    def extract(data_interval_start=None):
         import requests
 
         class nadac:
@@ -57,28 +55,34 @@ def nadac():
         # hit OpenFDA API to get
         ds_year = data_interval_start.strftime("%Y")
         nadac_obj = nadac()
-        title, url = nadac_obj.get_download_url(ds_year)
 
-        file = get_dataset(url, data_folder, None, file_name="NADAC.csv")
+        title, ds_url = nadac_obj.get_download_url(ds_year)
 
-        return file
+        data_path = get_dataset(ds_url, data_folder, file_name="NADAC.csv")
 
-    tl = [download_nadac()]
-    for types in ["load-", "staging-", "view-", "api-", "alter-"]:
-        # Task to load data into source db schema
-        for sql in get_sql_list(types, ds_folder):
-            sql_path = ds_folder / sql
-            tl.append(
-                PostgresOperator(
-                    task_id=sql,
-                    postgres_conn_id="postgres_default",
-                    sql=read_sql_file(sql_path),
-                )
+        return data_path
+
+    # Task to load data into source db schema
+    load = []
+    ds_folder = Path("/opt/airflow/dags") / dag_id
+    for sql in get_sql_list("load", ds_folder):
+        sql_path = ds_folder / sql
+        task_id = sql[:-4]
+        load.append(
+            PostgresOperator(
+                task_id=task_id,
+                postgres_conn_id="postgres_default",
+                sql=read_sql_file(sql_path),
             )
+        )
 
-    for i in range(len(tl)):
-        if i not in [0]:
-            tl[i - 1] >> tl[i]
+    # Task to transform data using dbt
+    @task
+    def transform():
+        subprocess = SubprocessHook()
+        result = subprocess.run_command(['dbt', 'run', '--select', 'models/staging/nadac'], cwd='/dbt/sagerx')
+        print("Result from dbt:", result)
 
+    extract() >> load >> transform()
 
-nadac = nadac()
+nadac()

@@ -5,7 +5,7 @@ sources:
     schema: datasource
     tables:
       - name: fda_excluded_package
-        description:
+        description: "Packages of product that have been removed/excluded from the NDC Directory for failure to respond to the FDA"
         columns:
           - name: productid
             description: "ProductID is a concatenation of the NDCproduct code and SPL documentID. It is included to help prevent duplicate rows from appearing when joining the product and package files together. It has no regulatory value or significance."
@@ -20,11 +20,11 @@ sources:
           - name: endmarketingdate
             description: "This is the date the product will no longer be available on the market. If a product is no longer being manufactured, in most cases, the FDA recommends firms use the expiration date of the last lot produced as the EndMarketingDate, to reflect the potential for drug product to remain available after manufacturing has ceased. Products that are the subject of ongoing manufacturing will not ordinarily have any EndMarketingDate. Products with a value in the EndMarketingDate will be removed from the NDC Directory when the EndMarketingDate is reached."
           - name: ndc_exclude_flag
-            description: "Values = ‘Y’, ‘N’, ‘E’, or ‘I’. This indicates whether the PACKAGE has been removed/excluded from the NDC Directory for failure to respond to FDA’s requests for correction to deficient or non-compliant submissions (‘Y’), or because the listing certification is expired (‘E’), or because the listing data was inactivated by FDA (‘I’). The PACKAGE.XLS and PACKAGE.TXT files only contain listing records where NDC_EXCLUDE_FLAG=’N’. The PACKAGES_EXCLUDED.XLS and PACKAGES_EXCLUDED.TXT file contains all listing records with an NDC_EXCLUDE_FLAG of ‘Y’, ‘E’, and ‘I’."
+            description: "Values = ‘Y’, ‘N’, ‘E’, or ‘I’. This indicates whether the PACKAGE has been removed/excluded from the NDC Directory for failure to respond to FDA’s requests for correction to deficient or non-compliant submissions (‘Y’), or because the listing certification is expired (‘E’), or because the listing data was inactivated by FDA (‘I’)."
           - name: sample_package
             description: "This indicates if the package is to be distributed as a sample package. Values = ‘Y’ or ‘N’'"
       - name: fda_excluded_product
-        description:
+        description: "Products that have been removed/excluded from the NDC Directory for failure to respond to the FDA"
         columns:
           - name: productid
             description: "ProductID is a concatenation of the NDCproduct code and SPL documentID. It is included to help prevent duplicate rows from appearing when joining the product and package files together. It has no regulatory value or significance."
@@ -63,6 +63,6 @@ sources:
           - name: deaschedule
             description: "This is the assigned DEA Schedule number as reported by the labeler. Values are CI, CII, CIII, CIV, and CV."
           - name: ndc_exclude_flag
-            description: "Values = ‘Y’, ‘N’, ‘E’, or ‘I’. This indicates whether the product has been removed/excluded from the NDC Directory for failure to respond to FDA’s requests for correction to deficient or non-compliant submissions (‘Y’), or because the listing certification is expired (‘E’), or because the listing data was inactivated by FDA (‘I’). The PRODUCT.XLS and PRODUCT.TXT files only contain listing records where NDC_EXCLUDE_FLAG=’N’. The PRODUCTS_EXCLUDED.XLS and PRODUCTS_EXCLUDED.TXT file contains all listing records with an NDC_EXCLUDE_FLAG of ‘Y’, ‘E’, and ‘I’."
+            description: "Values = ‘Y’, ‘N’, ‘E’, or ‘I’. This indicates whether the product has been removed/excluded from the NDC Directory for failure to respond to FDA’s requests for correction to deficient or non-compliant submissions (‘Y’), or because the listing certification is expired (‘E’), or because the listing data was inactivated by FDA (‘I’)."
           - name: listing_record_certified_through
             description: "This is the date when the listing record will expire if not updated or certified by the firm."

@@ -61,6 +61,8 @@ services:
     image: dbt
     container_name: dbt
     user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
+    ports:
+      - 8080:8080 # default dbt docs port
     volumes:
       - ./dbt:/dbt
     command: tail -f /dev/null
@@ -93,7 +95,7 @@ services:
     container_name: airflow-webserver
     command: webserver
     ports:
-      - 8001:8080
+      - 8001:8079
 
   airflow-scheduler:
     <<: *airflow-common

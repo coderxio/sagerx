@@ -25,4 +25,4 @@ SELECT
 	, sample_package
 FROM {{source('fda_excluded','fda_excluded_package')}} AS pack
 LEFT JOIN {{source('fda_excluded','fda_excluded_product')}} AS prod
-	ON pack.productid = prod.productid;
+	ON pack.productid = prod.productid

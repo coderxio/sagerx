@@ -1,6 +1,5 @@
 sagerx:
   outputs:
-
     dev:
       type: postgres
       threads: 1

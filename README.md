@@ -4,7 +4,7 @@ SageRx is a medication ontology and medication-related data aggregator created f
 
 Including data from DailyMed, FDA, RxNorm, Orange Book, and more!
 
-SageRx uses Airflow to schedule jobs to extract, load, and transform (using DBT) open drug data.
+SageRx uses Airflow to schedule jobs to extract, load, and transform (using dbt) open drug data.
 
 ![Airflow](docs/images/sagerx_airflow_example.png)
 
@@ -52,11 +52,11 @@ We would love to see you contribute to SageRx. Join our [Slack](https://join.sla
 - PgAdmin is hosted on `localhost:8002` or `0.0.0.0:8002`
   - Username/password = `sagerx` / `sagerx`
 
-### Using DBT
+### Using dbt
 
-On `docker-compose up` a DBT container will be created to be used for cli commands. To enter commands run `docker exec -it dbt /bin/bash`. This will place you into a bash session in the DBT container. Then you can run DBT commands as you normally would.
+On `docker-compose up` a dbt container will be created to be used for cli commands. To enter commands run `docker exec -it dbt /bin/bash`. This will place you into a bash session in the dbt container. Then you can run dbt commands as you normally would.
 
-To serve DBT documentation locally, enter the commands in the DBT container `dbt docs generate` then `dbt docs serve`. They should generate on `http://localhost:8080`
+To serve dbt documentation locally, enter the commands in the dbt container `dbt docs generate` then `dbt docs serve`. They should generate on `http://localhost:8080`
 
 ### Troubleshooting
 

@@ -63,3 +63,5 @@ To serve dbt documentation locally, enter the commands in the dbt container `dbt
 If you get issues on folder permissions:
 
 `sudo chmod -R 777 postgres,data,extracts,logs,plugins`
+
+If you get trouble from the postgres container with errors such as `password authentication failed for user "airflow"` or `role "airflow" does not exist`, these are all from the same issue that postgres is not setting itself up correctly. This is because of a file permission issue solved by running `chmod +x ./postgres/0_pg_stat_statement.sh`. You might need to remove any existing database configuration with `rm -rf airflow/data` and `docker-compose down --volumes`.

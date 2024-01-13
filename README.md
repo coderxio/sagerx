@@ -56,7 +56,7 @@ We would love to see you contribute to SageRx. Join our [Slack](https://join.sla
 
 On `docker-compose up` a dbt container will be created to be used for cli commands. To enter commands run `docker exec -it dbt /bin/bash`. This will place you into a bash session in the dbt container. Then you can run dbt commands as you normally would.
 
-To serve dbt documentation locally, enter the commands in the dbt container `dbt docs generate` then `dbt docs serve`. They should generate on `http://localhost:8080`
+To serve dbt documentation locally, enter the commands in the dbt container `dbt docs generate` then `dbt docs serve  --port 8081`. They should generate on `http://localhost:8081`
 
 ### Troubleshooting
 

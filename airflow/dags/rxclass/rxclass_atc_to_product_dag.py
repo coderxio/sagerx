@@ -59,7 +59,7 @@ def rxclass_atc_to_product():
             resp = jsonResponse["rxclassDrugInfoList"]["rxclassDrugInfo"][0]["rxclassMinConceptItem"]
             return resp
         except Exception as e:
-            print(e)
+            #print(e)
             return -1
 
     # Task to download data from web location

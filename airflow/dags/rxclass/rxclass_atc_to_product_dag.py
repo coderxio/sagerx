@@ -36,7 +36,7 @@ def rxclass_atc_to_product():
         engine = pg_hook.get_sqlalchemy_engine()
 
         df = pd.read_sql(
-            "select distinct rxcui from datasource.rxnorm_rxnconso where tty in ('SCD','SBD','GPCK','BPCK') and sab = 'RXNORM' limit 100",
+            "select distinct rxcui from datasource.rxnorm_rxnconso where tty in ('SCD','SBD','GPCK','BPCK') and sab = 'RXNORM'",
             con=engine
         )
 

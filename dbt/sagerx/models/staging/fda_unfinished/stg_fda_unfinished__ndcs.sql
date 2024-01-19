@@ -36,4 +36,4 @@ select
 	, package.endmarketingdate as package_endmarketingdate
 from package
 left join product
-	on package.productid = product.productid;
+	on package.productid = product.productid

@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: stg_fda_ndc__ndc
+  - name: stg_fda_ndc__ndcs
     description: "FDA NDC Directory"
     columns:
       - name: ndc11
@@ -62,7 +62,7 @@ models:
       - name: sample_package
         description: "This indicates if the package is to be distributed as a sample package. Values = Y or N."
 
-  - name: stg_fda_ndc__class
+  - name: stg_fda_ndc__classes
     description: "Product-level class information"
     columns:
       # primary key would be productid + class_line
@@ -71,7 +71,7 @@ models:
       - name: class_name
       - name: class_type
 
-  - name: stg_fda_ndc__substance
+  - name: stg_fda_ndc__substances
     description: "Product-level substance information"
     columns:
       # primary key would be productid + substance_line

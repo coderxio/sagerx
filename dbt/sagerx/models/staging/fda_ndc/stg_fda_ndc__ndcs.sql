@@ -1,4 +1,4 @@
--- stg_fda_ndc__ndc.sql
+-- stg_fda_ndc__ndcs.sql
 
 with
 

@@ -1,4 +1,4 @@
--- stg_fda_ndc__substance.sql
+-- stg_fda_ndc__substances.sql
 
 select distinct
 	prod.productid

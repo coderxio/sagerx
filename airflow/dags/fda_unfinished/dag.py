@@ -23,6 +23,7 @@ with dag:
     extract_task = extract(dag_id,url)
     transform_task = transform(dag_id)
 
+    sql_tasks = []
     for sql in get_ordered_sql_tasks(dag_id):
         sql_path = ds_folder / sql
         task_id = sql[:-4] #remove .sql
@@ -32,5 +33,6 @@ with dag:
             sql=read_sql_file(sql_path).format(data_path=extract_task),
             dag=dag
         )
+        sql_tasks.append(sql_task)
     
-    extract_task >> sql_task >> transform_task
+    extract_task >> sql_tasks >> transform_task

@@ -1,10 +1,10 @@
--- stg_fda_ndc__classes.sql
+-- stg_fda_excluded__classes.sql
 
 with
 
 product as (
     
-    select * from {{ source('fda_ndc', 'fda_ndc_product') }}
+    select * from {{ source('fda_excluded', 'fda_excluded_product') }}
 
 )
 

@@ -1,0 +1,57 @@
+version: 2
+
+models:
+  - name: stg_fda_unfinished__ndcs
+    description: "FDA Excluded"
+    columns:
+      - name: ndc11
+        description: "The ndcpackagecode field, normalized to a NDC11 format."
+        tests:
+          - unique
+          - not_null
+      - name: productid
+        description: "ProductID is a concatenation of the NDCproduct code and SPL documentID. It is included to help prevent duplicate rows from appearing when joining the product and package files together. It has no regulatory value or significance."
+      - name: productndc
+        description: "The labeler code and product code segments of the National Drug Code number, separated by a hyphen. Asterisks are no longer used or included within the product code segment to indicate certain configurations of the NDC.  www.fda.gov/edrls under Structured Product Labeling Resources."
+      - name: producttypename
+        description: "Indicates the type of product, such as Human Prescription Drug or Human OTC Drug. This data element corresponds to the Document Type of the SPL submission for the listing."
+      - name: nonproprietaryname
+        description: "Sometimes called the generic name, this is usually the active ingredient(s) of the product."
+      - name: dosageformname
+        description: "The translation of the DosageForm Code submitted by the firm. The complete list of codes and translations can be found www.fda.gov/edrls under Structured Product Labeling Resources."
+      - name: product_startmarketingdate
+        description: "This is the date that the labeler indicates was the start of its marketing of the drug product."
+      - name: product_endmarketingdate
+        description: "This is the date the product will no longer be available on the market. If a product is no longer being manufactured, in most cases, the FDA recommends firms use the expiration date of the last lot produced as the EndMarketingDate, to reflect the potential for drug product to remain available after manufacturing has ceased. Products that are the subject of ongoing manufacturing will not ordinarily have any EndMarketingDate. Products with a value in the EndMarketingDate will be removed from the NDC Directory when the EndMarketingDate is reached."
+      - name: marketingcategoryname
+        description: "Product types are broken down into several potential Marketing Categories, such as NDA/ANDA/BLA, OTC Monograph, or Unapproved Drug. One and only one Marketing Category may be chosen for a product, not all marketing categories are available to all product types. Currently, only final marketed product categories are included. The complete list of codes and translations can be found at www.fda.gov/edrls under Structured Product Labeling Resources."
+      - name: labelername
+        description: "Name of Company corresponding to the labeler code segment of the ProductNDC."
+      - name: substancename
+        description: "This is the active ingredient list. Each ingredient name is the preferred term of the UNII code submitted."
+      - name: active_numerator_strength
+        description: "These are the strength values (to be used with units below) of each active ingredient, listed in the same order as the SubstanceName field above."
+      - name: active_ingred_unit
+        description: "These are the units to be used with the strength values above, listed in the same order as the SubstanceName and SubstanceNumber (ActiveNumeratorStrength)."
+      - name: deaschedule
+        description: "This is the assigned DEA Schedule number as reported by the labeler. Values are CI, CII, CIII, CIV, and CV."
+      - name: listing_record_certified_through
+        description: "This is the date when the listing record will expire if not updated or certified by the firm."
+      - name: ndcpackagecode
+        description: "The labeler code, product code, and package code segments of the National Drug Code number, separated by hyphens. Asterisks are no longer used or included within the product and package code segments to indicate certain configurations of the NDC."
+      - name: packagedescription
+        description: "A description of the size and type of packaging in sentence form. Multilevel packages will have the descriptions concatenated together. For example: 4 BOTTLES in 1 CARTON/100 TABLETS in 1 BOTTLE."
+      - name: package_startmarketingdate
+        description: "This is the date that the labeler indicates was the start of its marketing of the drug product."
+      - name: package_endmarketingdate
+        description: "This is the date the product will no longer be available on the market. If a product is no longer being manufactured, in most cases, the FDA recommends firms use the expiration date of the last lot produced as the EndMarketingDate, to reflect the potential for drug product to remain available after manufacturing has ceased. Products that are the subject of ongoing manufacturing will not ordinarily have any EndMarketingDate. Products with a value in the EndMarketingDate will be removed from the NDC Directory when the EndMarketingDate is reached."
+
+  - name: stg_fda_unfinished__substances
+    description: "Product-level substance information"
+    columns:
+      # primary key would be productid + substance_line
+      - name: productid
+      - name: substance_line
+      - name: substancename
+      - name: active_numerator_strength
+      - name: active_ingred_unit

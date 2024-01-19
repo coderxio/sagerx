@@ -2,6 +2,7 @@ version: 2
 
 sources:
   - name: fda_excluded
+    description: Products removed / excluded from the NDC Directory for failure to respond to FDA's requests for correction for various reasons.
     schema: datasource
     tables:
       - name: fda_excluded_package
@@ -20,9 +21,9 @@ sources:
           - name: endmarketingdate
             description: "This is the date the product will no longer be available on the market. If a product is no longer being manufactured, in most cases, the FDA recommends firms use the expiration date of the last lot produced as the EndMarketingDate, to reflect the potential for drug product to remain available after manufacturing has ceased. Products that are the subject of ongoing manufacturing will not ordinarily have any EndMarketingDate. Products with a value in the EndMarketingDate will be removed from the NDC Directory when the EndMarketingDate is reached."
           - name: ndc_exclude_flag
-            description: "Values = ‘Y’, ‘N’, ‘E’, or ‘I’. This indicates whether the PACKAGE has been removed/excluded from the NDC Directory for failure to respond to FDA’s requests for correction to deficient or non-compliant submissions (‘Y’), or because the listing certification is expired (‘E’), or because the listing data was inactivated by FDA (‘I’)."
+            description: "Values = 'Y', 'N', 'E', or 'I'. This indicates whether the PACKAGE has been removed/excluded from the NDC Directory for failure to respond to FDA's requests for correction to deficient or non-compliant submissions ('Y'), or because the listing certification is expired ('E'), or because the listing data was inactivated by FDA ('I')."
           - name: sample_package
-            description: "This indicates if the package is to be distributed as a sample package. Values = ‘Y’ or ‘N’'"
+            description: "This indicates if the package is to be distributed as a sample package. Values = 'Y' or 'N''"
       - name: fda_excluded_product
         description: "Products that have been removed/excluded from the NDC Directory for failure to respond to the FDA"
         columns:
@@ -63,6 +64,6 @@ sources:
           - name: deaschedule
             description: "This is the assigned DEA Schedule number as reported by the labeler. Values are CI, CII, CIII, CIV, and CV."
           - name: ndc_exclude_flag
-            description: "Values = ‘Y’, ‘N’, ‘E’, or ‘I’. This indicates whether the product has been removed/excluded from the NDC Directory for failure to respond to FDA’s requests for correction to deficient or non-compliant submissions (‘Y’), or because the listing certification is expired (‘E’), or because the listing data was inactivated by FDA (‘I’)."
+            description: "Values = 'Y', 'N', 'E', or 'I'. This indicates whether the product has been removed/excluded from the NDC Directory for failure to respond to FDA's requests for correction to deficient or non-compliant submissions ('Y'), or because the listing certification is expired ('E'), or because the listing data was inactivated by FDA ('I')."
           - name: listing_record_certified_through
             description: "This is the date when the listing record will expire if not updated or certified by the firm."

@@ -2,6 +2,7 @@ version: 2
 
 sources:
   - name: fda_ndc
+    description: Product listing data submitted for all finished drugs including prescription and over-the-counter drugs, approved and unapproved drugs and repackaged and relabeled drugs.
     schema: datasource
     tables:
       - name: fda_ndc_product

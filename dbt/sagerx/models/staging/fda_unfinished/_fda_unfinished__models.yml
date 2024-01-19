@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: stg_fda_unfinished__ndcs
-    description: "FDA Excluded"
+    description: "FDA unfinished NDCs"
     columns:
       - name: ndc11
         description: "The ndcpackagecode field, normalized to a NDC11 format."

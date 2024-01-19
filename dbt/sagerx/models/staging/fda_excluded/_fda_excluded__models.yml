@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: stg_fda_excluded__ndcs
-    description: "FDA Excluded"
+    description: "FDA excluded NDCs"
     columns:
       - name: ndc11
         description: "The ndcpackagecode field, normalized to a NDC11 format."
@@ -68,8 +68,11 @@ models:
       # primary key would be productid + class_line
       - name: productid
       - name: class_line
+        description: Product can have multiple classes. This is the line number of the class.
       - name: class_name
+        description: Name of the pharmaceutical class.
       - name: class_type
+        description: Options include Chemical/Ingredient, EXT, PE, MoA, CS, and EPC.
 
   - name: stg_fda_excluded__substances
     description: "Product-level substance information"

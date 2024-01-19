@@ -2,6 +2,7 @@ version: 2
 
 sources:
   - name: fda_unfinished
+    description: Product listing data submitted for all unfinished drugs, including active pharmaceutical ingredients, drugs for further processing and bulk drug substances for compounding.
     schema: datasource
     tables:
       - name: fda_unfinished_package

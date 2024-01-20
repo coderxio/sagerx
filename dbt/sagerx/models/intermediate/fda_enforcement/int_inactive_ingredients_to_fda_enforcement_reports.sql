@@ -65,7 +65,7 @@ spl as (
 
 fda as (
 
-    select * from {{ ref('stg_fda_ndc__ndc') }}
+    select * from {{ ref('stg_fda_ndc__ndcs') }}
 
 )
 

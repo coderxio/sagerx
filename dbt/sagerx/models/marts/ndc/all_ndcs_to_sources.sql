@@ -18,19 +18,19 @@ with rxnorm_historical_ndcs as
 , fda_ndc_ndcs as
 (
     select distinct ndc11 as ndc
-    from {{ ref('stg_fda_ndc__ndc') }}
+    from {{ ref('stg_fda_ndc__ndcs') }}
 )
 
 , fda_excluded_ndcs as
 (
     select distinct ndc11 as ndc
-    from staging.fda_excluded
+    from {{ ref('stg_fda_excluded__ndcs') }}
 )
 
 , fda_unfinished_ndcs as
 (
     select distinct ndc11 as ndc
-    from staging.fda_unfinished
+    from {{ ref('stg_fda_unfinished__ndcs') }}
 )
 
 , all_distinct_ndcs as

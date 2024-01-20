@@ -1,8 +1,8 @@
 version: 2
 
 models:
-  - name: stg_fda_ndc__ndcs
-    description: "FDA NDC Directory NDCs"
+  - name: stg_fda_excluded__ndcs
+    description: "FDA excluded NDCs"
     columns:
       - name: ndc11
         description: "The ndcpackagecode field, normalized to a NDC11 format."
@@ -62,7 +62,7 @@ models:
       - name: sample_package
         description: "This indicates if the package is to be distributed as a sample package. Values = Y or N."
 
-  - name: stg_fda_ndc__classes
+  - name: stg_fda_excluded__classes
     description: "Product-level class information"
     columns:
       # primary key would be productid + class_line
@@ -74,7 +74,7 @@ models:
       - name: class_type
         description: Options include Chemical/Ingredient, EXT, PE, MoA, CS, and EPC.
 
-  - name: stg_fda_ndc__substances
+  - name: stg_fda_excluded__substances
     description: "Product-level substance information"
     columns:
       # primary key would be productid + substance_line

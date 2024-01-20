@@ -1,16 +1,16 @@
--- stg_fda_ndc__ndc.sql
+-- stg_fda_excluded__ndcs.sql
 
 with
 
 product as (
     
-    select * from {{ source('fda_ndc', 'fda_ndc_product') }}
+    select * from {{ source('fda_excluded', 'fda_excluded_product') }}
 
 ),
 
 package as (
 
-    select * from {{ source('fda_ndc', 'fda_ndc_package') }}
+    select * from {{ source('fda_excluded', 'fda_excluded_package') }}
 
 )
 

@@ -1,7 +1,7 @@
 from airflow_operator import create_dag
 from airflow.utils.helpers import chain
 
-from common_dag_tasks import  extract, get_ordered_sql_tasks, get_ds_folder
+from common_dag_tasks import  extract, transform, get_ordered_sql_tasks, get_ds_folder
 from sagerx import read_sql_file
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 
@@ -21,8 +21,9 @@ with dag:
     ds_folder = get_ds_folder(dag_id)
 
     extract_task = extract(dag_id,url)
+    transform_task = transform(dag_id)
 
-    task_list = [extract_task]
+    sql_tasks = []
     for sql in get_ordered_sql_tasks(dag_id):
         sql_path = ds_folder / sql
         task_id = sql[:-4] #remove .sql
@@ -33,7 +34,7 @@ with dag:
             sql=read_sql_file(sql_path).format(data_path=extract_task, mnth=mnth),
             dag=dag
         )
-        task_list.append(sql_task)
+        sql_tasks.append(sql_task)
     
-    chain(*task_list) 
+    extract_task >> sql_tasks >> transform_task
    

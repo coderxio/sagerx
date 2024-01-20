@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: stg_rxterms__names
+    description: Table of drug names and commonly used synonyms or abbreviations for the drugs. Only un-suppressed and not retired terms.
+    columns:
+      - name: name
+        description: Drug name (either generic or brand name) and intended route.
+      - name: synonyms
+        description: Commonly used synonyms or abbreviations for the drug.
+
+  - name: stg_rxterms__strengths
+    description: Tables of drug strengths and their corresponding rxcuis. Only un-suppressed and not retired terms.
+    columns:
+      - name: rxcui
+        description: The RxNorm concept unique identifier for the drug.
+      - name: name
+        description: Drug name (either generic or brand name) and intended route.
+      - name: strength
+        description: Strength information parsed from the RxNorm full name. Concatenated strength and dose form values.

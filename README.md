@@ -24,6 +24,8 @@ Subscribe to our [newsletter](https://coderxio.substack.com/) to keep ontop of u
 
 We would love to see you contribute to SageRx. Join our [Slack](https://join.slack.com/t/coderx/shared_invite/zt-5b8e9kr4-PsKAVe4crGmECQyyxDIJgQ) channel to get involved.
 
+[Style Guide](docs/style_guide.md): How we think about the structure and naming conventions of SageRx.
+
 ## Development Quickstart
 
 ### Prerequisites

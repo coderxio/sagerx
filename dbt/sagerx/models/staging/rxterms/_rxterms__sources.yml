@@ -1,0 +1,65 @@
+version: 2
+
+sources:
+  - name: rxterms
+    description: RxTerms is a drug interface terminology derived from RxNorm for prescription writing or medication history recording (e.g. in e-prescribing systems, PHRs).
+    schema: datasource
+    tables:
+      - name: rxterms_ingredients
+        description: Lists the ingredients and their RXCUIs for every drug in RxTerms that is not suppressible or retired.
+        columns:
+          - name: rxcui
+            description: the RxNorm uniquie identifier for the clinical drug
+          - name: ingredient
+            description: name of ingredient
+          - name: ing_rxcui
+            description: RXCUI of ingredient
+      - name: rxterms
+        description: Main RxTerms data that retains the broad coverage of RxNorm for U.S. prescribable drugs.
+        columns:
+          - name: rxcui
+            description: >
+              The RxNorm unique identifier for the clinical drug, which can be one of the following term types:
+                - Semantic Clinical Drug (SCD) e.g. azithromycin 250 MG Oral Capsule.
+                - Semantic Branded Drug (SBD) e.g. azithromycin 250 MG Oral Capsule [Zithromax].
+                - Generic Pack (GPCK) e.g. {6 (azithromycin 250 MG Oral Tablet) } Pack
+                - Branded Pack (BPCK) e.g. {6 (azithromycin 250 MG Oral Tablet [Zithromax]) } Pack [Z-PAKS].
+          - name: generic_rxcui
+            description: this is the corresponding generic clinical drug for SBD and BPCK (null for SCD).
+          - name: tty
+            description: term type in RxNorm.
+          - name: full_name
+            description: the full RxNorm name of the clinical drug.
+          - name: rxn_dose_form
+            description: dose form and intended route information from RxNorm.
+          - name: full_generic_name
+            description: the generic part of the full RxNorm name.
+          - name: brand_name
+            description: the brand name part of the full RxNorm name (null for SCD). Brand names are in all uppercase to distinguish them from generic names.
+          - name: display_name
+            description: drug name (either generic or brand name) and intended route e.g. INDERAL (Oral-pill).
+          - name: route
+            description: intended route derived from RXN_DOSE_FORM.
+          - name: new_dose_form
+            description: dose form derived from RXN_DOSE_FORM.
+          - name: strength
+            description: strength information parsed from the RxNorm full name.
+          - name: suppress_for
+            description: >
+              To flag drug names deemed not likely to be useful for data entry. 
+              For example, long generic drug names with multiple ingredients (e.g. Bacitracin/Hydrocortisone/Neomycin/Polymyxin B) are suppressed because they are almost always prescribed by their brand names (e.g. CORTISPORIN OINTMENT). 
+              Any non-null value means that a row should be suppressed.
+          - name: display_name_synonym
+            description: commonly used synonyms or abbreviations for the drug e.g. MOM for Milk of Magnesia.
+          - name: is_retired
+            description: to flag records that existed in earlier versions but not in the latest version.
+          - name: sxdg_rxcui
+            description: >
+              The RxNorm unique identifier for the entity represented by the DISPLAY_NAME (drug + intended route). 
+              The corresponding TTY (term type) in RxNorm is either SCDG (Semantic Clinical Doseform Group) or SBDG (Semantic Branded Doseform Group), as represented in the field SXDG_TTY.
+          - name: sxdg_tty
+            description: the RxNorm TTY of the semantic doseform group.
+          - name: sxdg_name
+            description: the RxNorm name of the semantic doseform group.
+          - name: psn
+            description: the RxNorm prescribable name.

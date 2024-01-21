@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This guide will help you understand how we structure this project such as table and schema names.
+This guide will help you understand how we structure this project, such as table and schema names.
 
 ## Table Names
 
@@ -18,9 +18,10 @@ We recommend putting as much clear information into the file name as possible, i
 
 **Intermediates**:
 
-- Name format: int*[entity]s*[verb]s
+- Name format: int\_[entity]s\_[verb]s
 - Verbs should capture the business logic or transformations conducted
 - Name should be plural
+- Staging table references should be in a CTE
 
 **Staging**:
 

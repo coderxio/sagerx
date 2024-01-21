@@ -1,4 +1,4 @@
-/* datasource.purple_book_extract */
+/* datasource.purple_book */
 DROP TABLE IF EXISTS datasource.purple_book;
 
 CREATE TABLE datasource.purple_book (

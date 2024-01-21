@@ -2,6 +2,12 @@ version: 2
 
 sources:
   - name: purple_book
+    description: |
+      The “Purple Book” began as two lists (one for the CDER and one for CBER) that kept track of each Center's licensed biological products.
+      In February 2020, FDA released a searchable, online database that now replaces both lists because information about FDA-approved biological products is available in the Purple Book database.
+      
+      Currently, the database contains information about all FDA-licensed biological products regulated by the CDER, including any biosimilar and interchangeable biological products, licensed (approved) by the FDA and FDA-licensed allergenic, cellular and gene therapy, hematologic, and vaccine products regulated by CBER.
+      The Purple Book database offers information about FDA- licensed biological products. It also includes information pertaining to exclusivity if the FDA has determined that a biological product is eligible for a relevant period of exclusivity.
     schema: datasource
     tables:
       - name: purple_book
@@ -79,7 +85,7 @@ sources:
             description: The date on which all applicable periods of exclusivity expire.
           - name: first_interchangeable_exclusivity_exp_date
             description: >
-              The date a first interchangeable product’s period of exclusivity ends.
+              The date a first interchangeable product's period of exclusivity ends.
               An interchangeable product is a biological product that meets the requirements for a biosimilar product and is approved based on information that is sufficient to show that it can be expected to produce the same clinical result as the reference product in any given patient; 
               and for a biological product that is administered more than once to an individual, there is not a greater safety risk or risk of reduced efficacy from alternating or switching between use of the interchangeable product and its reference product. 
               An interchangeable product may be substituted for the reference product without the intervention of the prescribing health care provider.

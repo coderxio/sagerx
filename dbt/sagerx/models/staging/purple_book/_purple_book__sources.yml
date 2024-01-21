@@ -25,16 +25,16 @@ sources:
             description: The trademark or brand name.
           - name: proper_name
             description: >
-            The proper name means the nonproprietary name designated by FDA in the license for a biological product licensed under the PHS Act. 
-            The nonproprietary name means a name unprotected by trademark rights that is in the public domain. 
-            Under the naming convention described in FDA Guidance, Nonproprietary Naming of Biological Products, the proper name is a combination of the core name and a distinguishing suffix that is devoid of meaning and composed of four lowercase letters (e.g., -cznm, -hjxf).
-            Core name: The component shared among an originator biological product and any related biological product, biosimilar product, or interchangeable product as part of the proper names of those products. Two examples of a core name are filgrastim and epoetin alfa.
+              The proper name means the nonproprietary name designated by FDA in the license for a biological product licensed under the PHS Act. 
+              The nonproprietary name means a name unprotected by trademark rights that is in the public domain. 
+              Under the naming convention described in FDA Guidance, Nonproprietary Naming of Biological Products, the proper name is a combination of the core name and a distinguishing suffix that is devoid of meaning and composed of four lowercase letters (e.g., -cznm, -hjxf).
+              Core name = The component shared among an originator biological product and any related biological product, biosimilar product, or interchangeable product as part of the proper names of those products. Two examples of a core name are filgrastim and epoetin alfa.
           - name: bla_type
-            description: > 
+            description: >
               The type of License: 351(a), 351(k) Biosimilar, or 351(k) Interchangeable.
-              351(a): A biological product licensed under section 351(a) of the PHS Act. A 351(a) BLA must contain all data and information necessary to demonstrate that the proposed product is safe, pure and potent (safe and effective). A biological product licensed under section 351(a) of the PHS Act can serve as the reference product for a 351(k) application.
-              351(k) Biosimilar: A biological product licensed under section 351(k) of the PHS Act. Among other things, a 351(k) Biosimilar BLA must contain data and information to demonstrate that the proposed product is biosimilar to the reference product.
-              351(k) Interchangeable: A biological product licensed under section 351(k) of the PHS Act. Among other things, a 351(k) Interchangeable BLA meets the requirements for biosimilarity and also contains data and information to demonstrate that the proposed product is interchangeable with the reference product.
+              351(a) = A biological product licensed under section 351(a) of the PHS Act. A 351(a) BLA must contain all data and information necessary to demonstrate that the proposed product is safe, pure and potent (safe and effective). A biological product licensed under section 351(a) of the PHS Act can serve as the reference product for a 351(k) application.
+              351(k) Biosimilar = A biological product licensed under section 351(k) of the PHS Act. Among other things, a 351(k) Biosimilar BLA must contain data and information to demonstrate that the proposed product is biosimilar to the reference product.
+              351(k) Interchangeable = A biological product licensed under section 351(k) of the PHS Act. Among other things, a 351(k) Interchangeable BLA meets the requirements for biosimilarity and also contains data and information to demonstrate that the proposed product is interchangeable with the reference product.
           - name: strength
             description: "For more information on strength, see Q.I.12 in FDA Draft Guidance for Industry: New and Revised Draft Q&As on Biosimilar Development and the BPCI Act (Revision 2)."
           - name: dosage_form
@@ -46,10 +46,10 @@ sources:
           - name: status
             description: >
               Marketing Status indicates how a biological product is sold in the United States, Prescription (Rx), Over the Counter (OTC), Discontinued (Disc).
-              RX: Rx is a symbol for "prescription." A prescription biological product requires a health care provider's authorization to purchase.
-              OTC: Drugs that are safe and effective for use by the general public without a doctor's prescription
-              Disc.: Discontinued Status- The product has been discontinued.
-              Disc.*: Discontinued Status- FDA has determined that the product has been discontinued for reasons other than safety, purity, and potency.
+              RX = Rx is a symbol for "prescription." A prescription biological product requires a health care provider's authorization to purchase.
+              OTC = Drugs that are safe and effective for use by the general public without a doctor's prescription
+              Disc. = Discontinued Status- The product has been discontinued.
+              Disc.* = Discontinued Status- FDA has determined that the product has been discontinued for reasons other than safety, purity, and potency.
           - name: licensure
             description: Status of the product license, e.g., whether the product is currently licensed or whether the license has been revoked.
           - name: approval_date
@@ -57,7 +57,7 @@ sources:
           - name: ref_product_proper_name
             description: A reference product is the single biological product, licensed (approved) by FDA under section 351(a) of the Public Health Service Act, against which a proposed biosimilar or interchangeable product is compared.
           - name: ref_Product_proprietary_name
-            description: The trademark or brand name of the reference product. 
+            description: The trademark or brand name of the reference product.
           - name: supplement_number
             description: Manufacturers may submit supplements to request approval for a change to an approved BLA. A number is assigned to each supplement which is usually, but not always, sequential, starting with 001.
           - name: submission_type

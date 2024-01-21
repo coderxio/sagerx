@@ -1,0 +1,89 @@
+version: 2
+
+sources:
+  - name: purple_book
+    schema: datasource
+    tables:
+      - name: purple_book
+        description: >
+          The Purple Book database contains information on all FDA-licensed (approved) biological products regulated by the Center for Drug Evaluation and Research (CDER), including licensed biosimilar and interchangeable products, and their reference products. 
+          The Purple Book also contains information about all FDA-licensed allergenic, cellular and gene therapy, hematologic, and vaccine products regulated by the Center for Biologics Evaluation and Research (CBER).
+        columns:
+          - name: nru
+            description: >
+              The changes that occurred during that month in three different categories: updated products (U), newly approved products (N), and products added in current release (R).
+              Updated products (U) include FDA-approved products previously in the Purple Book that experienced changes during the month, resulting in an update of the applicable product(s) information (e.g., change in applicant or proprietary name).
+              Newly approved products (N) include those that received initial FDA-approval during the month.
+              Products added in current release (R) include a set of products that are not newly approved but were not previously included in the database.
+          - name: applicant
+            description: The manufacturer or company that submits an application to FDA for approval of a drug, including a biological product.
+          - name: bla_number
+            description: >
+              The number assigned by FDA staff to each application for approval to market a biological product in the United States.
+              The Biologics License Application (BLA) is an application for FDA approval of a biological product. If the data and information submitted meets FDA requirements, the application is approved and a license is issued allowing the firm to market the product.
+          - name: proprietary_name
+            description: The trademark or brand name.
+          - name: proper_name
+            description: >
+            The proper name means the nonproprietary name designated by FDA in the license for a biological product licensed under the PHS Act. 
+            The nonproprietary name means a name unprotected by trademark rights that is in the public domain. 
+            Under the naming convention described in FDA Guidance, Nonproprietary Naming of Biological Products, the proper name is a combination of the core name and a distinguishing suffix that is devoid of meaning and composed of four lowercase letters (e.g., -cznm, -hjxf).
+            Core name: The component shared among an originator biological product and any related biological product, biosimilar product, or interchangeable product as part of the proper names of those products. Two examples of a core name are filgrastim and epoetin alfa.
+          - name: bla_type
+            description: > 
+              The type of License: 351(a), 351(k) Biosimilar, or 351(k) Interchangeable.
+              351(a): A biological product licensed under section 351(a) of the PHS Act. A 351(a) BLA must contain all data and information necessary to demonstrate that the proposed product is safe, pure and potent (safe and effective). A biological product licensed under section 351(a) of the PHS Act can serve as the reference product for a 351(k) application.
+              351(k) Biosimilar: A biological product licensed under section 351(k) of the PHS Act. Among other things, a 351(k) Biosimilar BLA must contain data and information to demonstrate that the proposed product is biosimilar to the reference product.
+              351(k) Interchangeable: A biological product licensed under section 351(k) of the PHS Act. Among other things, a 351(k) Interchangeable BLA meets the requirements for biosimilarity and also contains data and information to demonstrate that the proposed product is interchangeable with the reference product.
+          - name: strength
+            description: "For more information on strength, see Q.I.12 in FDA Draft Guidance for Industry: New and Revised Draft Q&As on Biosimilar Development and the BPCI Act (Revision 2)."
+          - name: dosage_form
+            description: A dosage form is the physical form that delivers a dose of the drug, such as a tablet, a capsule, or an injection.
+          - name: route_of_administration
+            description: A route of administration is a way of administering a drug to a site in a patient (for example, intravenous or subcutaneous).
+          - name: product_presentation
+            description: A dosage form is the physical form that delivers a dose of the drug, such as a tablet, a capsule, or an injection.
+          - name: status
+            description: >
+              Marketing Status indicates how a biological product is sold in the United States, Prescription (Rx), Over the Counter (OTC), Discontinued (Disc).
+              RX: Rx is a symbol for "prescription." A prescription biological product requires a health care provider's authorization to purchase.
+              OTC: Drugs that are safe and effective for use by the general public without a doctor's prescription
+              Disc.: Discontinued Status- The product has been discontinued.
+              Disc.*: Discontinued Status- FDA has determined that the product has been discontinued for reasons other than safety, purity, and potency.
+          - name: licensure
+            description: Status of the product license, e.g., whether the product is currently licensed or whether the license has been revoked.
+          - name: approval_date
+            description: The date FDA approved the application or supplement.
+          - name: ref_product_proper_name
+            description: A reference product is the single biological product, licensed (approved) by FDA under section 351(a) of the Public Health Service Act, against which a proposed biosimilar or interchangeable product is compared.
+          - name: ref_Product_proprietary_name
+            description: The trademark or brand name of the reference product. 
+          - name: supplement_number
+            description: Manufacturers may submit supplements to request approval for a change to an approved BLA. A number is assigned to each supplement which is usually, but not always, sequential, starting with 001.
+          - name: submission_type
+            description: The type of submission, for example, the original application or a supplemental application.
+          - name: license_number
+            description: The number of the license granted to the manufacturer by the FDA.
+          - name: product_number
+            description: >
+              A product number is assigned to each biological product associated with a BLA (Biologics License Application). 
+              For example, if the biological product is available in multiple strengths, there are multiple product numbers.
+          - name: center
+            description: Refers to either FDA's Center for Biologics Evaluation and Research (CBER) or Center for Drug Evaluation and Research (CDER).
+          - name: date_of_first_licensure
+            description: >
+              The date on which any applicable reference product exclusivity begins to run. 
+              FDA has not made a determination of first licensure for each 351(a) biological product included in the Purple Book. 
+              The absence of a date of first licensure in the Purple Book does not mean that a biological product on the list is not, or was not, eligible for the periods of exclusivity described in section 351(k)(7) of the PHS Act.
+          - name: exclusivity_expiration_date
+            description: The date on which all applicable periods of exclusivity expire.
+          - name: first_interchangeable_exclusivity_exp_date
+            description: >
+              The date a first interchangeable product’s period of exclusivity ends.
+              An interchangeable product is a biological product that meets the requirements for a biosimilar product and is approved based on information that is sufficient to show that it can be expected to produce the same clinical result as the reference product in any given patient; 
+              and for a biological product that is administered more than once to an individual, there is not a greater safety risk or risk of reduced efficacy from alternating or switching between use of the interchangeable product and its reference product. 
+              An interchangeable product may be substituted for the reference product without the intervention of the prescribing health care provider.
+          - name: ref_product_exclusivity_exp_date
+            description: The date on which the 12-year period of reference product exclusivity expires, including any applicable pediatric extension.
+          - name: orphan_exclusivity_exp_date
+            description: The latest date on which a period of seven-year period of orphan exclusivity expires, including any applicable pediatric extension.

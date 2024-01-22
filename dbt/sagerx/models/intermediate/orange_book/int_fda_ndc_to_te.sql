@@ -1,21 +1,22 @@
--- DISCLAIMER: because I can't figure out NDC-level mapping, I only include applications with a single OB TE code
-WITH cte AS (
-    SELECT
+-- DISCLAIMER: This model is under development and incomplete.
+
+with cte as (
+    select
         fda.ndc11
         , obp.te_code
-        , COUNT(fda.ndc11) OVER( PARTITION BY fda.ndc11 ) AS num_te_codes
-    FROM {{ source('orange_book', 'orange_book_products') }} AS obp
-    INNER JOIN {{ ref('stg_fda_ndc__ndcs') }} AS fda 
-        ON concat(CASE WHEN obp.appl_type = 'A' THEN 'ANDA' ELSE 'NDA' END, obp.appl_no) = fda.applicationnumber
-    GROUP BY fda.ndc11, obp.te_code
+        , count(fda.ndc11) over( partition by fda.ndc11 ) as num_te_codes
+    from {{ source('orange_book', 'orange_book_products') }} as obp
+    inner join {{ ref('stg_fda_ndc__ndcs') }} as fda 
+        on concat(case when obp.appl_type = 'A' then 'ANDA' else 'NDA' end, obp.appl_no) = fda.applicationnumber
+    group by fda.ndc11, obp.te_code
 )
-SELECT
+select
     fda.ndc11
-    , fda.applicationnumber AS application_number
+    , fda.applicationnumber as application_number
     , cte.te_code
-    , LEFT(cte.te_code, 2) AS first_two_te_code
-    , LEFT(cte.te_code, 1) AS first_one_te_code
-FROM {{ ref('stg_fda_ndc__ndcs') }} AS fda 
-INNER JOIN cte 
-    ON fda.ndc11 = cte.ndc11 
-    AND cte.num_te_codes = 1
+    , left(cte.te_code, 2) as first_two_te_code
+    , left(cte.te_code, 1) as first_one_te_code
+from {{ ref('stg_fda_ndc__ndcs') }} as fda 
+inner join cte 
+    on fda.ndc11 = cte.ndc11 
+    and cte.num_te_codes = 1

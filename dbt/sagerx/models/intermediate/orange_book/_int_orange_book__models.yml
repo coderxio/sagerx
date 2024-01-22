@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: int_fda_ndc_to_te
+    description: |
+      > DISCLAIMER: This model is under development and incomplete.
+      
+      This is an attempt at an NDC-level mapping of Orange Book TE codes. There are cases in Orange Book where two different strengths of a given ANDA have different TE codes. This means within an ANDA, two different NDCs could have different TE codes.
+
+      The problem we're encountering is that there's not a reliable / programmatic way to get from the strength of a product in Orange Book and the strength of the product in the FDA NDC Directory.
+
+      Because I can't figure out NDC-level mapping, I only include applications with a single OB TE code.
+
+      Again - please only treat this as the beginning of a proof of concept and do not use for clinical or other purposes.
+    columns:
+      - name: ndc11
+        description: The NDC11 of the product.
+      - name: application_number
+        description: The ANDA / NDA / etc number.
+      - name: te_code
+        description: The full therapeutic equvalency (TE) code as listed within Orange Book.
+      - name: first_two_te_code
+        description: Just the first two characters of the TE code - for ease of use downstream.
+      - name: first_one_te_code
+        description: Just the first character of the TE code - for ease of use downstream.

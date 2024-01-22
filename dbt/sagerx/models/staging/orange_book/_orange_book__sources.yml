@@ -1,0 +1,86 @@
+version: 2
+
+sources:
+  - name: orange_book
+    description: >
+      The publication Approved Drug Products with Therapeutic Equivalence Evaluations (commonly known as the Orange Book) 
+      identifies drug products approved on the basis of safety and effectiveness by the Food and Drug Administration (FDA) 
+      under the Federal Food, Drug, and Cosmetic Act (the Act) and related patent and exclusivity information. 
+      For more information on the Orange Book including its history, see the Orange Book Preface.
+    schema: datasource
+    tables:
+      - name: orange_book_exlusivity
+        description: Related exclusivity information of  drug products approved on the basis of safety and effectiveness by the Food and Drug Administration (FDA) under the Federal Food, Drug, and Cosmetic Act (the Act).
+        columns:
+          - name: appl_type
+            description: The type of new drug application approval. New Drug Applications (NDA or innovator) are 'N'. Abbreviated New Drug Applications (ANDA or generic) are 'A'.
+          - name: appl_no
+            description: The FDA assigned New Drug Application (NDA) number to the application. Format is nnnnnn.
+          - name: product_no
+            description: The FDA assigned number to identify the application products. Each strength is a separate product. May repeat for multiple part products. Format is nnn.
+          - name: exclusivity_code
+            description: Code to designate exclusivity granted by the FDA to a drug product. Format is nnnnnnnnnn.
+          - name: exclusivity_date
+            description: The date the exclusivity expires. Format is MMM DD, YYYY.
+
+      - name: orange_book_patent
+        description: Related patent information of drug products approved on the basis of safety and effectiveness by the Food and Drug Administration (FDA) under the Federal Food, Drug, and Cosmetic Act (the Act).
+        columns:
+          - name: appl_type
+            description: The type of new drug application approval.  New Drug Applications (NDA or innovator) are 'N'.  Abbreviated New Drug Applications (ANDA or generic) are 'A'.
+          - name: appl_no
+            description: The FDA assigned number to the New Drug Application (NDA). Format is nnnnnn.
+          - name: product_no
+            description: The FDA assigned number to identify the application products. Each strength is a separate product. May repeat for multiple part products. Format is nnn.
+          - name: patent_no
+            description: Patent numbers as submitted by the applicant holder for patents covered by the statutory provisions. May repeat for multiple applications and multiple products. Includes pediatric exclusivity granted by the agency. Format is nnnnnnnnnnn.
+          - name: patent_expire_date_text
+            description: The date the patent expires as submitted by the applicant holder including applicable extensions. The format is MMM DD, YYYY.
+          - name: drug_substance_flag
+            description: Patents submitted on FDA Form 3542 and listed after August 18, 2003 may have a drug substance flag indicating the sponsor submitted the patent as claiming the drug substance. Format is Y or null.
+          - name: drug_product_flag
+            description: Patents submitted on FDA Form 3542 and listed after August 18, 2003 may have a drug product flag indicating the sponsor submitted the patent as claiming the drug product. Format is Y or null.
+          - name: patent_use_code
+            description: Code to designate a use patent that covers the approved indication or use of a drug product.  May repeat for multiple applications, multiple products and multiple patents. Format is nnnnnnnnnn.
+          - name: delist_flag
+            description: >
+              Sponsor has requested patent be delisted. 
+              This patent has remained listed because, under Section 505(j)(5)(D)(i) of the Act, a first applicant may retain eligibility for 180-day exclusivity based on a paragraph IV certification to this patent for a certain period.
+              Applicants under Section 505(b)(2) are not required to certify to patents where this flag is set to Y. 
+              Format is Y or null.
+          - name: submission_date
+            description: The date on which the FDA receives patent information from the new drug application (NDA) holder. Format is Mmm d, yyyy.
+
+      - name: orange_book_products
+        description: Drug products approved on the basis of safety and effectiveness by the Food and Drug Administration (FDA) under the Federal Food, Drug, and Cosmetic Act (the Act).
+        columns:
+          - name: ingredient
+            description: The active ingredient(s) for the product. Multiple ingredients are in alphabetical order, separated by a semicolon.
+          - name: df_route
+            description: The product dosage form and route separated by a semi-colon. The format is not all uppercase.
+          - name: trade_name
+            description: The trade name of the product as shown on the labeling.
+          - name: applicant
+            description: The firm name holding legal responsibility for the new drug application. The firm name is condensed to a maximum twenty character unique string.
+          - name: strength
+            description: The potency of the active ingredient. May repeat for multiple part products.
+          - name: appl_type
+            description: The type of new drug application approval. New Drug Applications (NDA or innovator) are ”N”. Abbreviated New Drug Applications (ANDA or generic) are “A”.
+          - name: appl_no
+            description: The FDA assigned number to the application. Format is nnnnnn.
+          - name: product_no
+            description: The FDA assigned number to identify the application products. Each strength is a separate product. May repeat for multiple part products. Format is nnn.
+          - name: te_code
+            description: The Therapeutic Equivalence (TE) Code indicates the therapeutic equivalence rating of generic to innovator Rx products.
+          - name: approval_date
+            description: >
+              The date the product was approved as stated in the FDA approval letter to the applicant.  
+              The format is Mmm dd, yyyy. Products approved prior to the January 1, 1982 contain the phrase: 'Approved prior to Jan 1, 1982'.
+          - name: rld
+            description: The Reference Listed Drug (RLD) is a drug product approved under section 505(c) of the FD&C Act for which FDA has made a finding of safety and effectiveness. In the electronic Orange Book, an RLD is identified by 'RLD' in the RLD column.
+          - name: rs
+            description: A 'reference standard' is the drug product selected by FDA that an applicant seeking approval of an ANDA must use in conducting an in vivo bioequivalence study required for approval of an ANDA. In the electronic Orange Book, a reference standard is identified by 'RS' in the RS column.
+          - name: type
+            description: The group or category of approved drugs. Format is RX, OTC, DISCN.
+          - name: applicant_full_name
+            description: The full name of the firm holding legal responsibility for the new drug application.

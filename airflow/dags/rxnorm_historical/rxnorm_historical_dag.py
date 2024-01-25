@@ -37,7 +37,7 @@ def rxnorm_historical():
         engine = pg_hook.get_sqlalchemy_engine()
 
         df = pd.read_sql(
-            "select distinct rxcui from datasource.rxnorm_rxnconso where tty in ('SCD','SBD','GPCK','BPCK') and sab = 'RXNORM'",
+            "select distinct rxcui from sagerx_lake.rxnorm_rxnconso where tty in ('SCD','SBD','GPCK','BPCK') and sab = 'RXNORM'",
             con=engine
         )
 
@@ -94,7 +94,7 @@ def rxnorm_historical():
         ndc_df.to_sql(
             "rxnorm_historical",
             con=engine,
-            schema="datasource",
+            schema="sagerx_lake",
             if_exists="replace",
             dtype={"ndcs": sqlalchemy.types.JSON},
             index=False

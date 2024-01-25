@@ -22,16 +22,16 @@ select distinct
         then true
         else false
         end as prescribable
-from datasource.rxnorm_rxnconso product
-left join datasource.rxnorm_rxnrel rxnrel on rxnrel.rxcui2 = product.rxcui and rxnrel.rela = 'contains'
-left join datasource.rxnorm_rxnconso product_component
+from sagerx_lake.rxnorm_rxnconso product
+left join sagerx_lake.rxnorm_rxnrel rxnrel on rxnrel.rxcui2 = product.rxcui and rxnrel.rela = 'contains'
+left join sagerx_lake.rxnorm_rxnconso product_component
 	on rxnrel.rxcui1 = product_component.rxcui
 	and product_component.tty in ('SBD', 'SCD') -- NOTE: BPCKs can contain SBDs AND SCDs
 	and product_component.sab = 'RXNORM'
-left join datasource.rxnorm_rxnrel rxnrel_scd 
+left join sagerx_lake.rxnorm_rxnrel rxnrel_scd 
 	on rxnrel_scd.rxcui2 = case when product_component.rxcui is null then product.rxcui else product_component.rxcui end 
 	and rxnrel_scd.rela = 'tradename_of' -- rxnrel_scd.rxcui1 = clinical_product_component_rxcui
-left join datasource.rxnorm_rxnrel rxnrel_bn 
+left join sagerx_lake.rxnorm_rxnrel rxnrel_bn 
 	on rxnrel_bn.rxcui2 = case when product_component.rxcui is null then product.rxcui else product_component.rxcui end 
 	and rxnrel_bn.rela = 'has_ingredient' -- rxnrel_bn.rxcui1 = brand_rxcui
 where product.tty in ('SBD', 'BPCK')

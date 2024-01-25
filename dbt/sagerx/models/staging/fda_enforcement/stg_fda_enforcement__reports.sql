@@ -24,4 +24,4 @@ select
 	, center_classification_date
 	, report_date
 	, code_info
-from datasource.fda_enforcement
+from sagerx_lake.fda_enforcement

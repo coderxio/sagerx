@@ -36,7 +36,7 @@ def rxclass_atc_to_product():
         engine = pg_hook.get_sqlalchemy_engine()
 
         df = pd.read_sql(
-            "select distinct rxcui from datasource.rxnorm_rxnconso where tty in ('SCD','SBD','GPCK','BPCK') and sab = 'RXNORM'",
+            "select distinct rxcui from sagerx_lake.rxnorm_rxnconso where tty in ('SCD','SBD','GPCK','BPCK') and sab = 'RXNORM'",
             con=engine
         )
 
@@ -93,7 +93,7 @@ def rxclass_atc_to_product():
         atc_df.to_sql(
             "rxclass_atc_to_product",
             con=engine,
-            schema="datasource",
+            schema="sagerx_lake",
             if_exists="replace",
             index=False
         )

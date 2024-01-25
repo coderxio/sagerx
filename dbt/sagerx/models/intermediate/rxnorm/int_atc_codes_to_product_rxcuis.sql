@@ -1,5 +1,5 @@
 with atc_codes_to_products as (
-	select * from datasource.rxclass_atc_to_product
+	select * from sagerx_lake.rxclass_atc_to_product
 ),
 
 atc_codes as (

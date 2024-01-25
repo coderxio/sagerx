@@ -8,6 +8,6 @@ select
     case when item->>'status' = 'indirect'
         then item->>'rxcui'
         end as indirect_rxcui
-from datasource.rxnorm_historical
+from sagerx_lake.rxnorm_historical
     cross join lateral json_array_elements(ndcs->'historicalNdcTime') as item
     cross join lateral json_array_elements(item->'ndcTime') as ndc_item

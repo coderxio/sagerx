@@ -9,8 +9,8 @@ with cte as (
 		, ingredient_component.suppress
 		, ingredient_component.cvf
 	from
-		datasource.rxnorm_rxnrel rxnrel
-	inner join datasource.rxnorm_rxnconso ingredient_component
+		sagerx_lake.rxnorm_rxnrel rxnrel
+	inner join sagerx_lake.rxnorm_rxnconso ingredient_component
 		on rxnrel.rxcui1 = ingredient_component.rxcui
 	where rxnrel.rela = 'has_part'
 		and ingredient_component.tty = 'IN'
@@ -25,7 +25,7 @@ select distinct
 		case when cte.rxcui is null then ingredient.suppress else cte.suppress end = 'N' then true else false end as active
 	, case when 
 		case when cte.rxcui is null then ingredient.cvf else cte.cvf end = '4096' then true else false end as prescribable
-from datasource.rxnorm_rxnconso ingredient
+from sagerx_lake.rxnorm_rxnconso ingredient
 left join cte on ingredient.rxcui = cte.ingredient_rxcui
 where ingredient.tty in('IN', 'MIN')
 	and ingredient.sab = 'RXNORM'

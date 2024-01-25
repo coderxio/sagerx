@@ -44,7 +44,7 @@ def load_df_to_pg(df):
     df.to_sql(
         "fda_enforcement",
         con=engine,
-        schema="datasource",
+        schema="sagerx_lake",
         if_exists="append",
         dtype={"openfda": sqlalchemy.types.JSON},
     )

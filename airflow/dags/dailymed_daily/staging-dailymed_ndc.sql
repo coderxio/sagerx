@@ -1,7 +1,7 @@
- /* staging.dailymed_ndc */
- --DROP TABLE IF EXISTS staging.dailymed_ndc CASCADE;
+ /* sagerx.dailymed_ndc */
+ --DROP TABLE IF EXISTS sagerx.dailymed_ndc CASCADE;
 
- CREATE TABLE IF NOT EXISTS staging.dailymed_ndc (
+ CREATE TABLE IF NOT EXISTS sagerx.dailymed_ndc (
 	spl 				TEXT NOT NULL,
 	document_id 		TEXT NOT NULL,
 	set_id			 	TEXT,
@@ -12,10 +12,10 @@
 with xml_table as
 (
 select spl, xml_content::xml as xml_column
-from datasource.dailymed_daily
+from sagerx_lake.dailymed_daily
 )
 
-INSERT INTO staging.dailymed_ndc
+INSERT INTO sagerx.dailymed_ndc
 SELECT spl, y.*, ndc_to_11(y.ndc) AS ndc11
     FROM   xml_table x,
             XMLTABLE('dailymed/ndc_list/NDC'

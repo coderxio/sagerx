@@ -1,7 +1,7 @@
- /* staging.dailymed_interaction */
- DROP TABLE IF EXISTS staging.dailymed_interaction CASCADE;
+ /* sagerx.dailymed_interaction */
+ DROP TABLE IF EXISTS sagerx.dailymed_interaction CASCADE;
 
- CREATE TABLE IF NOT EXISTS staging.dailymed_interaction (
+ CREATE TABLE IF NOT EXISTS sagerx.dailymed_interaction (
 	spl 					TEXT NOT NULL,
 	document_id 			TEXT NOT NULL,
 	set_id			 		TEXT,
@@ -12,10 +12,10 @@
 with xml_table as
 (
 select spl, xml_content::xml as xml_column
-from datasource.dailymed_daily
+from sagerx_lake.dailymed_daily
 )
 
-INSERT INTO staging.dailymed_interaction
+INSERT INTO sagerx.dailymed_interaction
 SELECT spl, y.*
     FROM   xml_table x,
             XMLTABLE('dailymed/InteractionText'

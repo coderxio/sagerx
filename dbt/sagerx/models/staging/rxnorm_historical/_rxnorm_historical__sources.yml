@@ -2,6 +2,6 @@ version: 2
 
 sources:
   - name: rxnorm_historical
-    schema: datasource
+    schema: sagerx_lake
     tables:
       - name: rxnorm_historical

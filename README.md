@@ -43,7 +43,7 @@ We would love to see you contribute to SageRx. Join our [Slack](https://join.sla
    - `UMLS_API=<umls_api_key>` - if you want to use RxNorm, you need an API key from [UMLS](https://uts.nlm.nih.gov/uts/signup-login).
 4. Make sure Docker is installed
 5. Run `docker compose up airflow-init`.
-6. Run `docker compose up`.
+6. Run `docker compose up`. 
 
 > NOTE: if you have an [M1 Mac](https://stackoverflow.com/questions/62807717/how-can-i-solve-postgresql-scram-authentication-problem) `export DOCKER_DEFAULT_PLATFORM=linux/amd64`, and re-build your images
 

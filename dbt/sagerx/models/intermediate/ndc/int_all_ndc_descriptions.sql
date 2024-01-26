@@ -42,7 +42,24 @@ and somehow filter out any parts that are wrong?
     select
         ndc11 as ndc
         , null as rxcui
-        , concat(proprietaryname, ' ', proprietarynamesuffix, ' (', nonproprietaryname, ')') as name
+        , concat(
+            nonproprietaryname
+            , ' '
+            , active_numerator_strength
+            , ' '
+            , active_ingred_unit
+            , ' '
+            , lower(dosageformname)
+            , case when proprietaryname is not null then concat(
+                ' ['
+                , proprietaryname
+                , case when proprietarynamesuffix is not null then concat(
+                    ' '
+                    , proprietarynamesuffix
+                    ) else '' end
+                , ']'
+                ) else '' end
+            ) as name
     from {{ ref('stg_fda_ndc__ndcs') }}
 
 )

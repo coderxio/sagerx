@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: int_all_ndc_descriptions
+    description: "NDC to best possible description, preferring RxNorm descriptions if possible."
+    columns:
+      - name: ndc
+        description: The NDC in NDC11 format. This column contains only unique values.
+        tests:
+          - unique
+          - not_null
+      - name: rxcui
+        description: >
+          If NDC was found in an RxNorm sources, we have an associated RXCUI.
+          If NULL, the source is likely FDA.
+      - name: name
+        description: The best available description for the NDC - preferring RxNorm descriptions if possible.

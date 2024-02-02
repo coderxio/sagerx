@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: int_all_ndc_descriptions
+  - name: all_ndc_descriptions
     description: |
       NDC to RxNorm description (with RXCUI) and FDA description.
 

@@ -1,4 +1,4 @@
--- int_all_ndc_descriptions.sql
+-- all_ndc_descriptions.sql
 
 with 
 
@@ -14,9 +14,7 @@ rxnorm_ndcs as (
 
 , rxnorm_product_rxcuis as (
 
-    select * from {{ source('rxnorm', 'rxnorm_rxnconso') }}
-    where sab = 'RXNORM'
-        and tty in ('SCD', 'SBD', 'GPCK', 'BPCK')
+    select * from {{ ref('stg_rxnorm__product_rxcuis') }}
 
 )
 
@@ -42,7 +40,7 @@ and somehow filter out any parts that are wrong?
 
     select
         ndc11 as ndc
-        , concat(
+        , trim(concat(
             nonproprietaryname
             , ' '
             , active_numerator_strength
@@ -59,7 +57,7 @@ and somehow filter out any parts that are wrong?
                     ) else '' end
                 , ']'
                 ) else '' end
-            ) as fda_description
+            )) as fda_description
     from {{ ref('stg_fda_ndc__ndcs') }}
 
 )
@@ -68,7 +66,7 @@ and somehow filter out any parts that are wrong?
 
     select
         ndc11 as ndc
-        , concat(
+        , trim(concat(
             nonproprietaryname
             , ' '
             , active_numerator_strength
@@ -76,7 +74,7 @@ and somehow filter out any parts that are wrong?
             , active_ingred_unit
             , ' '
             , lower(dosageformname)
-            ) as fda_description
+            )) as fda_description
     from {{ ref('stg_fda_unfinished__ndcs') }}
 
 )
@@ -85,7 +83,7 @@ and somehow filter out any parts that are wrong?
 
     select
         ndc11 as ndc
-        , concat(
+        , trim(concat(
             nonproprietaryname
             , ' '
             , active_numerator_strength
@@ -102,7 +100,7 @@ and somehow filter out any parts that are wrong?
                     ) else '' end
                 , ']'
                 ) else '' end
-            ) as fda_description
+            )) as fda_description
     from {{ ref('stg_fda_excluded__ndcs') }}
 
 )

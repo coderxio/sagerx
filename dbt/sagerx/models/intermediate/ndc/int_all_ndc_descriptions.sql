@@ -7,10 +7,10 @@ rxnorm_ndcs as (
     select
         ndc
         , product_rxcui as rxcui
-        , product_name as name
+        , product_name as rxnorm_description
     from {{ ref('int_rxnorm_ndcs_to_products') }}
 
-)
+) 
 
 , rxnorm_product_rxcuis as (
 
@@ -30,18 +30,18 @@ and somehow filter out any parts that are wrong?
     select
         rxnorm_historical_most_recent_ndcs.ndc::varchar
         , rxnorm_historical_most_recent_ndcs.rxcui::varchar
-        , rxnorm_product_rxcuis.str as name
+        , rxnorm_product_rxcuis.str as rxnorm_description
     from {{ ref('stg_rxnorm_historical__most_recent_ndcs') }} rxnorm_historical_most_recent_ndcs
     left join rxnorm_product_rxcuis
         on rxnorm_product_rxcuis.rxcui = rxnorm_historical_most_recent_ndcs.rxcui::varchar
 
 )
 
+
 , fda_ndc_ndcs as (
 
     select
         ndc11 as ndc
-        , null as rxcui
         , concat(
             nonproprietaryname
             , ' '
@@ -59,7 +59,7 @@ and somehow filter out any parts that are wrong?
                     ) else '' end
                 , ']'
                 ) else '' end
-            ) as name
+            ) as fda_description
     from {{ ref('stg_fda_ndc__ndcs') }}
 
 )
@@ -68,8 +68,15 @@ and somehow filter out any parts that are wrong?
 
     select
         ndc11 as ndc
-        , null as rxcui
-        , nonproprietaryname as name
+        , concat(
+            nonproprietaryname
+            , ' '
+            , active_numerator_strength
+            , ' '
+            , active_ingred_unit
+            , ' '
+            , lower(dosageformname)
+            ) as fda_description
     from {{ ref('stg_fda_unfinished__ndcs') }}
 
 )
@@ -78,54 +85,113 @@ and somehow filter out any parts that are wrong?
 
     select
         ndc11 as ndc
-        , null as rxcui
-        , concat(proprietaryname, ' ', proprietarynamesuffix, ' (', nonproprietaryname, ')') as name
+        , concat(
+            nonproprietaryname
+            , ' '
+            , active_numerator_strength
+            , ' '
+            , active_ingred_unit
+            , ' '
+            , lower(dosageformname)
+            , case when proprietaryname is not null then concat(
+                ' ['
+                , proprietaryname
+                , case when proprietarynamesuffix is not null then concat(
+                    ' '
+                    , proprietarynamesuffix
+                    ) else '' end
+                , ']'
+                ) else '' end
+            ) as fda_description
     from {{ ref('stg_fda_excluded__ndcs') }}
 
 )
 
 , all_rxnorm_ndcs as (
-
-    select * from rxnorm_ndcs
+    
+    select *, 1 as table_rank from rxnorm_ndcs
 
     union
-    
-    select * from most_recent_rxnorm_historical_ndcs
+
+    select *, 2 as table_rank from most_recent_rxnorm_historical_ndcs
+
+)
+
+, ranked_rxnorm_ndcs as (
+
+    select
+        *
+        , row_number() over (partition by ndc order by table_rank asc) as row_num
+    from all_rxnorm_ndcs
+
+)
+
+, distinct_rxnorm_ndcs as (
+
+    select
+        ndc
+        , rxcui
+        , rxnorm_description
+    from ranked_rxnorm_ndcs
+    where row_num = 1
 
 )
 
 , all_fda_ndcs as (
 
-    select * from fda_ndc_ndcs
+    select *, 1 as table_rank from fda_ndc_ndcs
     
     union
     
-    select * from fda_unfinished_ndcs
-    
+    select *, 2 as table_rank from fda_excluded_ndcs
+
     union
-    
-    select * from fda_excluded_ndcs
+
+    select *, 3 as table_rank from fda_unfinished_ndcs    
 
 )
 
-, all_fda_ndcs_not_in_rxnorm as (
+, ranked_fda_ndcs as (
 
     select
-        all_fda_ndcs.*
+        *
+        , row_number() over (partition by ndc order by table_rank asc) as row_num
     from all_fda_ndcs
-    left join all_rxnorm_ndcs
-        on all_rxnorm_ndcs.ndc = all_fda_ndcs.ndc
-    where all_rxnorm_ndcs.ndc is null
+
+)
+
+, distinct_fda_ndcs as (
+
+    select
+        ndc
+        , fda_description
+    from ranked_fda_ndcs
+    where row_num = 1
+
+)
+
+, all_ndcs as (
+
+    select ndc from distinct_rxnorm_ndcs
+
+    union
+    
+    select ndc from distinct_fda_ndcs
 
 )
 
 , all_ndc_descriptions as (
 
-    select * from all_rxnorm_ndcs
-
-    union
-
-    select * from all_fda_ndcs_not_in_rxnorm
+    select
+        all_ndcs.ndc
+        , rxcui
+        , rxnorm_description
+        , fda_description
+    from all_ndcs
+    left join distinct_rxnorm_ndcs
+        on distinct_rxnorm_ndcs.ndc = all_ndcs.ndc
+    left join distinct_fda_ndcs
+        on distinct_fda_ndcs.ndc = all_ndcs.ndc
 
 )
 

@@ -15,5 +15,6 @@ from datasource.rxnorm_rxnsat rxnsat
 		and clinical_product.tty in ('SCD','GPCK')
 		and clinical_product.sab = 'RXNORM'
 where rxnsat.atn = 'NDC'
+	and rxnsat.sab in ('ATC', 'CVX', 'DRUGBANK', 'MSH', 'MTHCMSFRF', 'MTHSPL', 'RXNORM', 'USP', 'VANDF')
 	and product.tty in ('SCD','SBD','GPCK','BPCK')
 	and product.sab = 'RXNORM'

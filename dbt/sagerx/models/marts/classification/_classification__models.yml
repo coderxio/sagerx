@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: atc_codes_to_rxnorm_products
+    description: |
+      ATC 1-4 codes to product-level RXCUIs and descriptions.
+    columns:
+      - name: rxcui
+        description: >
+          Product-level RxNorm RXCUI.
+        tests:
+          - unique
+          - not_null
+      - name: rxnorm_description
+        description: The RxNorm normalized description (STR).
+      - name: atc_1_name
+        description: The name of the ATC1 level associated with this product.
+      - name: atc_2_name
+        description: The name of the ATC2 level associated with this product.
+      - name: atc_3_name
+        description: The name of the ATC3 level associated with this product.
+      - name: atc_4_name
+        description: The name of the ATC4 level associated with this product.

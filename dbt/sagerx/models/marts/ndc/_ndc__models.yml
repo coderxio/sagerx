@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: all_ndc_descriptions
+    description: |
+      NDC to RxNorm description (with RXCUI) and FDA description.
+
+      NOTE: If RxNorm and RxNorm Historical have same NDCs, we prefer RxNorm.
+      If any of the 3 FDA sources have same NDCs, we prefer FDA NDC, FDA Excluded, FDA Unfinished in that order.
+    columns:
+      - name: ndc
+        description: The NDC in NDC11 format. This column contains only unique values.
+        tests:
+          - unique
+          - not_null
+      - name: rxcui
+        description: >
+          If NDC was found in an RxNorm sources, we have an associated RXCUI.
+          If NULL, the source is likely FDA.
+      - name: rxnorm_description
+        description: If RxNorm source, will have the RxNorm normalized description (STR).
+      - name: fda_description
+        description: If FDA source, will have a description cobbled together from FDA columns for lack of a normalized FDA description.

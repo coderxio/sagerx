@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: rxclass
+    description: |
+      A product-level mapping of RxNorm to ATC1-4 classes.
+
+      RxClass has added RxNorm product-level mapping for ATC. The product-level mapping is now the default source mapping for the ATC classes in the RxClass browser.
+
+      When extended to RxNorm products, an ingredient-level mapping to ATC can lead to inapplicable mappings. For example, through its ingredient, timolol, the RxNorm product 1923428 (timolol 2.5 MG/ML Ophthalmic Solution) is associated with both ophthalmologicals and cardiovascular system medications, while only the former is accurate. In contrast, ATCPROD only associates this product with the ophthalmologicals class Beta blocking agents (S01ED).
+
+      To use the RxNorm product-level mapping for ATC in the RxClass API, the relaSource parameter should be specified as “ATCPROD”.
+      https://rxnav.nlm.nih.gov/REST/rxclass/class/byRxcui.xml?rxcui=1923428&relaSource=ATC
+      https://rxnav.nlm.nih.gov/REST/rxclass/class/byRxcui.xml?rxcui=1923428&relaSource=ATCPROD
+      The RxNorm product-level mapping for ATC was produced by the National Library of Medicine. While not all active RxNorm products are covered by the mapping, the mapping accounts for over 97% of the Medicare Part-D prescriptions from 2012-2020.
+
+      The original ingredient-level mapping to ATC from the WHO Collaborating Centre for Drug Statistics Methodology remains available in RxClass (select ATC under Edit Drug Sources) and through the RxClass API (relaSource=ATC).
+    schema: datasource
+    tables:
+      - name: rxclass_atc_to_product

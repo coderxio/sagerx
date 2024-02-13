@@ -96,7 +96,7 @@ def rxnorm_historical():
             con=engine,
             schema="datasource",
             if_exists="replace",
-            dtype={"ndcs": sqlalchemy.types.JSON},
+            dtype={"ndcs": sqlalchemy.dialects.postgresql.JSONB},
             index=False
         )
 

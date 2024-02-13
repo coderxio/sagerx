@@ -11,8 +11,8 @@ with rxnorm_historical_ndcs as
 
 , rxnorm_all_ndcs as
 (
-    select distinct ndc11 as ndc
-    from {{ ref('stg_rxnorm__all_ndcs') }}
+    select distinct ndc
+    from {{ ref('stg_rxnorm__ndcs') }}
 )
 
 , fda_ndc_ndcs as

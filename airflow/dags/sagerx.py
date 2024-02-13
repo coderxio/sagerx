@@ -27,6 +27,14 @@ def read_json_file(json_path:str):
         json_object = json.load(f)
     return json_object
 
+def unzip_folder(file_path):
+    import zipfile
+    with zipfile.ZipFile(file_path, "r") as zip_ref:
+            zip_ref.extractall(file_path.with_suffix(""))
+    Path.unlink(file_path)
+    file_path = file_path.with_suffix("")
+    return file_path
+
 # Web functions
 def download_dataset(url: str, dest: Path = Path.cwd(), file_name: str = None):
     """Downloads a data set file from provided Url via a requests steam
@@ -80,7 +88,6 @@ def download_dataset(url: str, dest: Path = Path.cwd(), file_name: str = None):
                 f.write(chunk)
     return dest_path
 
-
 # Airflow DAG Functions
 def get_dataset(ds_url, data_folder, ti=None, file_name=None):
     """retreives a dataset from the web and passes the filepath to airflow xcom
@@ -89,16 +96,12 @@ def get_dataset(ds_url, data_folder, ti=None, file_name=None):
     ds_url = url to download dataset file from
     data_folder = path to save dataset to
     ti = airflow parameter to store task instance for xcoms"""
-    import zipfile
     import logging
 
     file_path = download_dataset(url=ds_url, dest=data_folder)
     logging.info(f"requested url: {ds_url}")
     if file_path.suffix == ".zip":
-        with zipfile.ZipFile(file_path, "r") as zip_ref:
-            zip_ref.extractall(file_path.with_suffix(""))
-        Path.unlink(file_path)
-        file_path = file_path.with_suffix("")
+        file_path = unzip_folder(file_path)
 
     # change name of file if one is provided
     if file_name != None:

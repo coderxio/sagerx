@@ -1,6 +1,8 @@
 from pathlib import Path
 from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperator
 from airflow.models import Variable
+from tenacity import retry, stop_after_attempt, wait_exponential
+import requests
 
 # Filesystem functions
 def create_path(*args):
@@ -145,3 +147,42 @@ def alert_slack_channel(context):
             http_conn_id="slack",
             message=msg,
         ).execute(context=None)
+
+def load_df_to_pg(df,schema_name:str,table_name:str,if_exists:str, dtype_name:str="",index:bool=True) -> None:
+    from airflow.hooks.postgres_hook import PostgresHook
+    import sqlalchemy
+
+    pg_hook = PostgresHook(postgres_conn_id="postgres_default")
+    engine = pg_hook.get_sqlalchemy_engine()
+
+    if dtype_name:
+        dtype = {dtype_name:sqlalchemy.types.JSON}
+    else:
+        dtype = {}
+
+    df.to_sql(
+        table_name,
+        con=engine,
+        schema=schema_name,
+        if_exists=if_exists,
+        dtype=dtype,
+        index=index
+    )
+
+@retry(
+        stop=stop_after_attempt(20),
+        wait=wait_exponential(multiplier=1,max=10),
+)
+def retry_request(url)->dict:
+    response = requests.get(url, stream=True, allow_redirects=True)
+    response.raise_for_status()
+    return {"url":url,
+            "response":response.json()}
+
+def parallel_api_calls(api_calls:list) -> list:
+    from concurrent.futures import ThreadPoolExecutor
+
+    with ThreadPoolExecutor(max_workers=32) as executor:
+        output = list(executor.map(retry_request, api_calls))
+    
+    return output

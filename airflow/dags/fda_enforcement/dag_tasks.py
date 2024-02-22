@@ -1,6 +1,6 @@
 from airflow.decorators import task
 from common_dag_tasks import url_request
-from sagerx import read_json_file
+from sagerx import read_json_file, load_df_to_pg
 
 # Task to download data from web location
 @task(task_id='extract')
@@ -32,19 +32,4 @@ def load_json(data_path):
     df = pd.DataFrame(json_object["results"])
     df.set_index("recall_number")
     print(f"Dataframe loaded. Number of rows: {len(df)}")
-    load_df_to_pg(df)
-
-def load_df_to_pg(df):
-    from airflow.hooks.postgres_hook import PostgresHook
-    import sqlalchemy
-
-    pg_hook = PostgresHook(postgres_conn_id="postgres_default")
-    engine = pg_hook.get_sqlalchemy_engine()
-
-    df.to_sql(
-        "fda_enforcement",
-        con=engine,
-        schema="datasource",
-        if_exists="append",
-        dtype={"openfda": sqlalchemy.types.JSON},
-    )
+    load_df_to_pg(df,"datasource","fda_enforcement","append",dtype_name="openfda")

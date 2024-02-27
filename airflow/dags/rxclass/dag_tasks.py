@@ -39,15 +39,17 @@ def extract_atc(rxcui_list:list)->None:
     for atc in atcs_list:
         for druginfo in atc['response']["rxclassDrugInfoList"]["rxclassDrugInfo"]:
             rxcui = druginfo["minConcept"].get("rxcui")
-
-            atc_info = druginfo["rxclassMinConceptItem"]
+            atc_info = {}
+            atc_info['class_id'] = druginfo["rxclassMinConceptItem"].get("classId","")
+            atc_info['class_name'] = druginfo["rxclassMinConceptItem"].get("className","")
+            atc_info['class_type'] = druginfo["rxclassMinConceptItem"].get("classType","")
             atc_info["drug_name"] = druginfo["minConcept"].get("name","")
             atc_info["drug_tty"] = druginfo["minConcept"].get("tty","") #
             atc_info["rela"] = druginfo["minConcept"].get("rela","")
-            atc_info["relaSource"] = druginfo["minConcept"].get("relaSource","")            
+            atc_info["rela_source"] = druginfo["minConcept"].get("relaSource","")            
 
             atcs[rxcui] = atc_info
 
-    atc_df = pd.DataFrame.from_dict(atcs, orient='index').reset_index()
-
-    load_df_to_pg(atc_df,"datasource","rxclass_atc_to_product","replace",index=False)
+    atc_df = pd.DataFrame.from_dict(atcs, orient='index')
+    atc_df.index.names = ['rxcui']
+    load_df_to_pg(atc_df.reset_index(),"datasource","rxclass_atc_to_product","replace",index=False)

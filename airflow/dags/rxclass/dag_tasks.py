@@ -4,23 +4,12 @@ from sagerx import load_df_to_pg, parallel_api_calls
 
 
 def create_url_list(rxcui_list:list)-> list:
-    url = f"https://rxnav.nlm.nih.gov/REST/rxclass/class/byRxcui.json?rxcui={rxcui}&relaSource=ATCPROD"
     urls=[]
 
     for rxcui in rxcui_list:
-        urls.append(url)
+        urls.append(f"https://rxnav.nlm.nih.gov/REST/rxclass/class/byRxcui.json?rxcui={rxcui}&relaSource=ATCPROD")
     return urls
 
-def extract_rxcui_from_url(url:str)->str:
-    from urllib.parse import urlparse, parse_qs
-    parsed_url = urlparse(url)
-    query_params = parse_qs(parsed_url.query)
-
-    if 'rxcui' in query_params:
-        rxcui_value = query_params['rxcui'][0]
-    else:
-        raise f"Unable to extract RxCui from url: {url}"
-    return rxcui_value
 
 @task()
 def get_rxcuis() -> list:
@@ -30,24 +19,34 @@ def get_rxcuis() -> list:
     engine = pg_hook.get_sqlalchemy_engine()
 
     df = pd.read_sql(
-        "select distinct rxcui from datasource.rxnorm_rxnconso where tty in ('SCD','SBD','GPCK','BPCK') and sab = 'RXNORM'",
+        "select distinct rxcui from datasource.rxnorm_rxnconso where tty in ('IN', 'MIN') and sab = 'RXNORM'",
         con=engine
     )
-    
-    return list(df['rxcui'])
+    results = list(df['rxcui'])
+    print(f"Number of RxCUIs: {results}")
+    return results
 
 
 @task
 def extract_atc(rxcui_list:list)->None:
    # Get ATC for full list of RXCUI
     urls = create_url_list(rxcui_list)
+    print(f"URL List created of length: {len(urls)}")
     atcs_list = parallel_api_calls(urls)
-
+    print(atcs_list)
     atcs = {}
 
     for atc in atcs_list:
-        rxcui = extract_rxcui_from_url(atc['url'])
-        atcs[rxcui] = atc['response']["rxclassDrugInfoList"]["rxclassDrugInfo"][0]["rxclassMinConceptItem"]
+        for druginfo in atc['response']["rxclassDrugInfoList"]["rxclassDrugInfo"]:
+            rxcui = druginfo["minConcept"].get("rxcui")
+
+            atc_info = druginfo["rxclassMinConceptItem"]
+            atc_info["drug_name"] = druginfo["minConcept"].get("name","")
+            atc_info["drug_tty"] = druginfo["minConcept"].get("tty","") #
+            atc_info["rela"] = druginfo["minConcept"].get("rela","")
+            atc_info["relaSource"] = druginfo["minConcept"].get("relaSource","")            
+
+            atcs[rxcui] = atc_info
 
     atc_df = pd.DataFrame.from_dict(atcs, orient='index').reset_index()
 

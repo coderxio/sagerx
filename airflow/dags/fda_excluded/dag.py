@@ -1,3 +1,5 @@
+import pendulum
+
 from airflow_operator import create_dag
 from airflow.utils.helpers import chain
 
@@ -10,7 +12,9 @@ dag_id = "fda_excluded"
 
 dag = create_dag(
     dag_id=dag_id,
-    schedule= "30 4 * * *",  # run a 4:30am every day
+    schedule= "0 4 * * *",  # run at 4am every day
+    start_date=pendulum.yesterday(),
+    catchup=False,
     max_active_runs=1,
     concurrency=2,
 )

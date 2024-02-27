@@ -14,6 +14,7 @@ dag = create_dag(
     dag_id=dag_id,
     schedule= "0 4 * * *",  # run at 4am every day
     start_date=pendulum.yesterday(),
+    catchup=False,
     max_active_runs=1,
     concurrency=2,
 )

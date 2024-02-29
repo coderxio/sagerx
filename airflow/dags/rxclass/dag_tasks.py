@@ -33,7 +33,6 @@ def extract_atc(rxcui_list:list)->None:
     urls = create_url_list(rxcui_list)
     print(f"URL List created of length: {len(urls)}")
     atcs_list = parallel_api_calls(urls)
-    print(atcs_list)
     atcs = {}
 
     for atc in atcs_list:

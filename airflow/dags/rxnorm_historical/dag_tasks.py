@@ -9,17 +9,6 @@ def create_url_list(rxcui_list:list)-> list:
         urls.append(f'https://rxnav.nlm.nih.gov/REST/rxcui/{rxcui}/allhistoricalndcs.json')
     return urls
 
-def extract_rxcui_from_url(url:str)->str:
-    from urllib.parse import urlparse, parse_qs
-    parsed_url = urlparse(url)
-    query_params = parse_qs(parsed_url.query)
-
-    if 'rxcui' in query_params:
-        rxcui_value = query_params['rxcui'][0]
-    else:
-        raise f"Unable to extract RxCui from url: {url}"
-    return rxcui_value
-
 @task()
 def get_rxcuis() -> list:
     from airflow.hooks.postgres_hook import PostgresHook
@@ -43,13 +32,11 @@ def extract_ndc(ndc_list:list)->None:
 
     dfs = []
     for ndc_response in ndc_responses:
-        rxcui = extract_rxcui_from_url(ndc_response['url'])
         if ndc_response['response'].get('historicalNdcConcept') == None:
             print(ndc_response)
         df = pd.json_normalize(ndc_response['response']['historicalNdcConcept']['historicalNdcTime'], 'ndcTime', ['status', 'rxcui'], errors='ignore')
         df['ndc_list'] = df['ndc'].apply(lambda x: x if len(x) > 1 else None)
         df['ndc'] = df['ndc'].apply(lambda x: x[0] if len(x) == 1 else None)
-        df['root_rxcui'] = rxcui
         dfs.append(df)
 
     load_df_to_pg(pd.concat(dfs).reset_index(),"datasource","rxnorm_historical","replace",index=False)

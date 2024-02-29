@@ -91,11 +91,13 @@ def rxnorm_historical():
         pg_hook = PostgresHook(postgres_conn_id="postgres_default")
         engine = pg_hook.get_sqlalchemy_engine()
 
+        engine.execute('DROP TABLE IF EXISTS datasource.rxnorm_historical cascade')
+
         ndc_df.to_sql(
             "rxnorm_historical",
             con=engine,
             schema="datasource",
-            if_exists="replace",
+            if_exists="append",
             dtype={"ndcs": sqlalchemy.dialects.postgresql.JSONB},
             index=False
         )

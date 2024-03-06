@@ -9,7 +9,7 @@ with rxnorm_historical_ndcs as
     from {{ ref('stg_rxnorm_historical__ndcs') }}
 )
 
-, rxnorm_all_ndcs as
+, rxnorm_ndcs as
 (
     select distinct ndc
     from {{ ref('stg_rxnorm__ndcs') }}
@@ -37,7 +37,7 @@ with rxnorm_historical_ndcs as
 (
     select ndc from rxnorm_historical_ndcs
     union
-    select ndc from rxnorm_all_ndcs
+    select ndc from rxnorm_ndcs
     union
     select ndc from fda_ndc_ndcs
     union
@@ -46,36 +46,47 @@ with rxnorm_historical_ndcs as
     select ndc from fda_unfinished_ndcs
 )
 
-select
-    all_distinct_ndcs.ndc
-    , case when rxnorm_historical_ndcs.ndc is not null
-        then 1 
-        else 0
-        end as rxnorm_historical_ndcs
-    , case when rxnorm_all_ndcs.ndc is not null
-        then 1 
-        else 0
-        end as rxnorm_all_ndcs
-    , case when fda_ndc_ndcs.ndc is not null
-        then 1 
-        else 0
-        end as fda_ndc_ndcs
-    , case when fda_excluded_ndcs.ndc is not null
-        then 1 
-        else 0
-        end as fda_excluded_ndcs
-    , case when fda_unfinished_ndcs.ndc is not null
-        then 1 
-        else 0
-        end as fda_unfinished_ndcs
-from all_distinct_ndcs
-left join rxnorm_historical_ndcs
-    on rxnorm_historical_ndcs.ndc = all_distinct_ndcs.ndc
-left join rxnorm_all_ndcs
-    on rxnorm_all_ndcs.ndc = all_distinct_ndcs.ndc
-left join fda_ndc_ndcs
-    on fda_ndc_ndcs.ndc = all_distinct_ndcs.ndc
-left join fda_excluded_ndcs
-    on fda_excluded_ndcs.ndc = all_distinct_ndcs.ndc
-left join fda_unfinished_ndcs
-    on fda_unfinished_ndcs.ndc = all_distinct_ndcs.ndc
+, all_ndcs_to_sources as (
+    select
+        all_distinct_ndcs.ndc
+        , case when rxnorm_historical_ndcs.ndc is not null
+            then 1 
+            else 0
+            end as rxnorm_historical_ndcs
+        , case when rxnorm_ndcs.ndc is not null
+            then 1 
+            else 0
+            end as rxnorm_ndcs
+        , case when fda_ndc_ndcs.ndc is not null
+            then 1 
+            else 0
+            end as fda_ndc_ndcs
+        , case when fda_excluded_ndcs.ndc is not null
+            then 1 
+            else 0
+            end as fda_excluded_ndcs
+        , case when fda_unfinished_ndcs.ndc is not null
+            then 1 
+            else 0
+            end as fda_unfinished_ndcs
+    from all_distinct_ndcs
+    left join rxnorm_historical_ndcs
+        on rxnorm_historical_ndcs.ndc = all_distinct_ndcs.ndc
+    left join rxnorm_ndcs
+        on rxnorm_ndcs.ndc = all_distinct_ndcs.ndc
+    left join fda_ndc_ndcs
+        on fda_ndc_ndcs.ndc = all_distinct_ndcs.ndc
+    left join fda_excluded_ndcs
+        on fda_excluded_ndcs.ndc = all_distinct_ndcs.ndc
+    left join fda_unfinished_ndcs
+        on fda_unfinished_ndcs.ndc = all_distinct_ndcs.ndc
+)
+
+, all_not_null_ndcs_to_sources as (
+    select
+        *
+    from all_ndcs_to_sources
+    where ndc is not null
+)
+
+select * from all_not_null_ndcs_to_sources

@@ -149,7 +149,7 @@ def alert_slack_channel(context):
             message=msg,
         ).execute(context=None)
 
-def load_df_to_pg(df,schema_name:str,table_name:str,if_exists:str, dtype_name:str="",index:bool=True) -> None:
+def load_df_to_pg(df,schema_name:str,table_name:str,if_exists:str,dtype_name:str="",index:bool=True) -> None:
     from airflow.hooks.postgres_hook import PostgresHook
     import sqlalchemy
 
@@ -163,6 +163,11 @@ def load_df_to_pg(df,schema_name:str,table_name:str,if_exists:str, dtype_name:st
         dtype = {dtype_name:sqlalchemy.types.JSON}
     else:
         dtype = {}
+    
+    # trying it this way to prevent wiping tables that actually need to append
+    if if_exists == 'replace':
+        engine.execute(f'drop table if exists {schema_name}.{table_name} cascade')
+        if_exists = 'append'
 
     df.to_sql(
         table_name,

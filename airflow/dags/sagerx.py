@@ -156,6 +156,9 @@ def load_df_to_pg(df,schema_name:str,table_name:str,if_exists:str, dtype_name:st
     pg_hook = PostgresHook(postgres_conn_id="postgres_default")
     engine = pg_hook.get_sqlalchemy_engine()
 
+    if if_exists == "replace":
+        engine.execute(f'DROP TABLE IF EXISTS {schema_name}.{table_name} cascade')
+
     if dtype_name:
         dtype = {dtype_name:sqlalchemy.types.JSON}
     else:

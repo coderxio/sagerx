@@ -10,8 +10,8 @@ dag_id = "fda_enforcement"
 
 dag = create_dag(
     dag_id=dag_id,
-    schedule="0 4 * * *",
-    start_date=pendulum.datetime(2012, 1, 1),
+    schedule="0 4 * * 3",
+    start_date=pendulum.yesterday(),
     max_active_runs=1,
     concurrency=2,
 )

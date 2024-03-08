@@ -18,7 +18,7 @@ def get_rxcuis() -> list:
     engine = pg_hook.get_sqlalchemy_engine()
 
     df = pd.read_sql(
-            "select distinct rxcui from datasource.rxnorm_rxnconso where tty in ('SCD','SBD','GPCK','BPCK') and sab = 'RXNORM' limit 100",
+            "select distinct rxcui from datasource.rxnorm_rxnconso where tty in ('SCD','SBD','GPCK','BPCK') and sab = 'RXNORM'",
             con=engine
         )
     results = list(df['rxcui'])
@@ -39,11 +39,13 @@ def extract_ndc(ndc_list:list)->None:
             print(ndc_response)
         url = ndc_response['url']
         rxcui_match = re.search(rxcui_pattern, url)
-        print(rxcui_match.group('rxcui'))
-        # TODO: add rxcui as a column and think of what to name other rxcui (and maybe rename other columns to underscores)
+        rxcui = rxcui_match.group('rxcui')
+
         df = pd.json_normalize(ndc_response['response']['historicalNdcConcept']['historicalNdcTime'], 'ndcTime', ['status', 'rxcui'], errors='ignore')
         df['ndc_list'] = df['ndc'].apply(lambda x: x if len(x) > 1 else None)
         df['ndc'] = df['ndc'].apply(lambda x: x[0] if len(x) == 1 else None)
+        df.rename(columns={'startDate': 'start_date', 'endDate': 'end_date', 'rxcui': 'related_rxcui'}, inplace=True)
+        df['rxcui'] = rxcui
         dfs.append(df)
 
-    load_df_to_pg(pd.concat(dfs).reset_index(),"datasource","rxnorm_historical","replace",index=False)
+    load_df_to_pg(pd.concat(dfs),"datasource","rxnorm_historical","replace",index=False)

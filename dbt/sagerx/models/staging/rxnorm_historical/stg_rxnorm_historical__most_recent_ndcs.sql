@@ -2,6 +2,7 @@
 
 with
 
+-- NOTE: possibly want to prefer direct over indirect?
 rxnorm_historical as (
 
     select

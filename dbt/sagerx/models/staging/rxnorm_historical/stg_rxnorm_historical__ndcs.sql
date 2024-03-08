@@ -2,4 +2,4 @@
 
 select
     *
-from datasource.rxnorm_historical
+from {{ source('rxnorm_historical', 'rxnorm_historical') }}

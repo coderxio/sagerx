@@ -7,8 +7,5 @@ with atc_codes_to_rxnorm_product_rxcuis as (
 )
 
 select
-    index::varchar as rxcui
-    , "classId"::varchar as class_id
-    , "className"::varchar as class_name
-    , "classType"::varchar as class_type
+    *
 from atc_codes_to_rxnorm_product_rxcuis

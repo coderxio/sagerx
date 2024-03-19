@@ -32,7 +32,7 @@ services:
       POSTGRES_USER: sagerx
       PGUSER: sagerx
       POSTGRES_PASSWORD: sagerx
-      POSTGRES_DB: sagerx
+      POSTGRES_DB: sagerx  
     ports:
       - 5432:5432
     volumes:
@@ -40,7 +40,6 @@ services:
       - ./airflow/data:/opt/airflow/data
       - ./airflow/extracts:/opt/airflow/extracts
     build:
-      context: .
       shm_size: "4gb"
 
   pgadmin:
@@ -89,16 +88,17 @@ services:
     volumes:
       - ./airflow:/sources
     depends_on:
-      - postgres
+      postgres: #syntax change
+        condition: service_healthy
 
   airflow-webserver:
     <<: *airflow-common
     container_name: airflow-webserver
     command: webserver
-    #environment:
-      # AWS_ACCESS_KEY_ID: ${ACCESS_KEY}
-      # AWS_SECRET_ACCESS_KEY: ${SECRET_ACCESS_KEY}
-      # AWS_DEFAULT_REGION: ${DEFAULT_REGION}
+    environment:
+      AWS_ACCESS_KEY_ID: ${ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${SECRET_ACCESS_KEY}
+      AWS_DEFAULT_REGION: ${DEFAULT_REGION}
     ports:
       - 8001:8080
 

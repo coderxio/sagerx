@@ -12,7 +12,7 @@ from airflow.hooks.subprocess import SubprocessHook
 
 
 @dag(
-    schedule="0 0 10 * *",
+    schedule="0 0 10 * *", #10th of every month
     start_date=pendulum.datetime(2005, 1, 1),
     catchup=False,
 )

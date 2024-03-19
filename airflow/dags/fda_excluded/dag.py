@@ -13,9 +13,7 @@ dag_id = "fda_excluded"
 
 dag = create_dag(
     dag_id=dag_id,
-    schedule= "0 4 * * *",  # run at 4am every day
-    start_date=pendulum.yesterday(),
-    catchup=False,
+    schedule= "30 4 * * *",  # run at 4:30am every day
     max_active_runs=1,
     concurrency=2,
 )

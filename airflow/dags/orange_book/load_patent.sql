@@ -1,7 +1,7 @@
-/* datasource.orange_book_patent */
-DROP TABLE IF EXISTS datasource.orange_book_patent;
+/* sagerx_lake.orange_book_patent */
+DROP TABLE IF EXISTS sagerx_lake.orange_book_patent;
 
-CREATE TABLE datasource.orange_book_patent (
+CREATE TABLE sagerx_lake.orange_book_patent (
 appl_type                   TEXT,
 appl_no                     TEXT,
 product_no                  TEXT,
@@ -14,5 +14,5 @@ delist_flag                 TEXT,
 submission_date             TEXT
 );
 
-COPY datasource.orange_book_patent
+COPY sagerx_lake.orange_book_patent
 FROM '{data_path}/patent.txt' DELIMITER '~' CSV HEADER;

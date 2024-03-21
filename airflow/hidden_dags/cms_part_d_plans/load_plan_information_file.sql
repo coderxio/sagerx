@@ -1,7 +1,7 @@
-/* datasource.cms_plan_information */
-DROP TABLE IF EXISTS datasource.cms_plan_information CASCADE;
+/* sagerx_lake.cms_plan_information */
+DROP TABLE IF EXISTS sagerx_lake.cms_plan_information CASCADE;
 
-CREATE TABLE datasource.cms_plan_information (
+CREATE TABLE sagerx_lake.cms_plan_information (
 contract_id           VARCHAR(5) NOT NULL,
 plan_id         VARCHAR(3) NOT NULL,
 segment_id      VARCHAR(3),
@@ -19,5 +19,5 @@ snp       VARCHAR(1),
 plan_suppressed_yn       VARCHAR(1)
 );
 
-COPY datasource.cms_plan_information
+COPY sagerx_lake.cms_plan_information
 FROM '{{ ti.xcom_pull(task_ids='extract') }}/plan information  PPUF_{{params.year}}Q{{params.quarter}}.txt' DELIMITER '|' CSV HEADER ENCODING 'WIN1252';;

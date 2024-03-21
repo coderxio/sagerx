@@ -1,7 +1,7 @@
- /* staging.dailymed_main */
- DROP TABLE IF EXISTS staging.dailymed_main CASCADE;
+ /* sagerx.dailymed_main */
+ DROP TABLE IF EXISTS sagerx.dailymed_main CASCADE;
 
- CREATE TABLE IF NOT EXISTS staging.dailymed_main (
+ CREATE TABLE IF NOT EXISTS sagerx.dailymed_main (
 	spl 				TEXT NOT NULL,
 	document_id 		TEXT NOT NULL,
 	set_id			 	TEXT,
@@ -15,10 +15,10 @@
 with xml_table as
 (
 select spl, xml_content::xml as xml_column
-from datasource.dailymed_rx_full
+from sagerx_lake.dailymed_rx_full
 )
 
-INSERT INTO staging.dailymed_main
+INSERT INTO sagerx.dailymed_main
 SELECT spl, y.*, 'https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=' || y.set_id
     FROM   xml_table x,
             XMLTABLE('dailymed'

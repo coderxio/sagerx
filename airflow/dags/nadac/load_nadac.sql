@@ -1,5 +1,5 @@
-/* datasource.nadac */
-CREATE TABLE IF NOT EXISTS datasource.nadac (
+/* sagerx_lake.nadac */
+CREATE TABLE IF NOT EXISTS sagerx_lake.nadac (
 ndc_description		                            TEXT NOT NULL,
 ndc			                                    VARCHAR (11) NOT NULL,
 nadac_per_unit		                            NUMERIC (12,5),
@@ -14,7 +14,7 @@ corresponding_generic_drug_effective_date		DATE,
 as_of_date  			                        DATE
 );
 
-TRUNCATE datasource.nadac;
+TRUNCATE sagerx_lake.nadac;
 
-COPY datasource.nadac
+COPY sagerx_lake.nadac
 FROM '{{ ti.xcom_pull(task_ids='extract') }}' CSV HEADER;

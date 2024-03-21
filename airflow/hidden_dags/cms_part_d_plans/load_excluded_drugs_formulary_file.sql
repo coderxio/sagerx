@@ -1,7 +1,7 @@
-/* datasource.cms_excluded_drugs_formulary */
-DROP TABLE IF EXISTS datasource.cms_excluded_drugs_formulary CASCADE;
+/* sagerx_lake.cms_excluded_drugs_formulary */
+DROP TABLE IF EXISTS sagerx_lake.cms_excluded_drugs_formulary CASCADE;
 
-CREATE TABLE datasource.cms_excluded_drugs_formulary (
+CREATE TABLE sagerx_lake.cms_excluded_drugs_formulary (
 contract_id           VARCHAR(5) NOT NULL,
 plan_id         VARCHAR(3) NOT NULL,
 rxcui      VARCHAR(8),
@@ -15,5 +15,5 @@ capped_benefit_yn      VARCHAR(1),
 gap_cov      VARCHAR(1)
 );
 
-COPY datasource.cms_excluded_drugs_formulary
+COPY sagerx_lake.cms_excluded_drugs_formulary
 FROM '{{ ti.xcom_pull(task_ids='extract') }}/excluded drugs formulary file  PPUF_{{params.year}}Q{{params.quarter}}.txt' DELIMITER '|' CSV HEADER;;

@@ -1,7 +1,7 @@
-/* datasource.cms_geographic_locator */
-DROP TABLE IF EXISTS datasource.cms_geographic_locator CASCADE;
+/* sagerx_lake.cms_geographic_locator */
+DROP TABLE IF EXISTS sagerx_lake.cms_geographic_locator CASCADE;
 
-CREATE TABLE datasource.cms_geographic_locator (
+CREATE TABLE sagerx_lake.cms_geographic_locator (
 county_code           VARCHAR(5) NOT NULL,
 statename         VARCHAR(30) NOT NULL,
 county      VARCHAR(50),
@@ -11,5 +11,5 @@ pdp_region_code  VARCHAR(2),
 pdp_region    VARCHAR(150)
 );
 
-COPY datasource.cms_geographic_locator
+COPY sagerx_lake.cms_geographic_locator
 FROM '{{ ti.xcom_pull(task_ids='extract') }}/geographic locator file PPUF_{{params.year}}Q{{params.quarter}}.txt' DELIMITER '|' CSV HEADER;;

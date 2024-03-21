@@ -1,7 +1,7 @@
-/* datasource.rxnorm_rxnconso */
-DROP TABLE IF EXISTS datasource.rxnorm_rxnconso CASCADE;
+/* sagerx_lake.rxnorm_rxnconso */
+DROP TABLE IF EXISTS sagerx_lake.rxnorm_rxnconso CASCADE;
 
-CREATE TABLE datasource.rxnorm_rxnconso (
+CREATE TABLE sagerx_lake.rxnorm_rxnconso (
 rxcui		VARCHAR(8) NOT NULL,
 lat			VARCHAR (3) DEFAULT 'ENG' NOT NULL,
 ts			VARCHAR (1),
@@ -23,5 +23,5 @@ cvf			VARCHAR(50),
 blank       TEXT
 );
 
-COPY datasource.rxnorm_rxnconso FROM '{{ ti.xcom_pull(task_ids='extract') }}/rrf/RXNCONSO.RRF' CSV DELIMITER '|' ENCODING 'UTF8' ESCAPE E'\b' QUOTE E'\b';
+COPY sagerx_lake.rxnorm_rxnconso FROM '{{ ti.xcom_pull(task_ids='extract') }}/rrf/RXNCONSO.RRF' CSV DELIMITER '|' ENCODING 'UTF8' ESCAPE E'\b' QUOTE E'\b';
 --ESCAPE and QOUTE characters are dummy to remove default

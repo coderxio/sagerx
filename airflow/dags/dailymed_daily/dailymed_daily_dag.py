@@ -62,7 +62,7 @@ def process_dailymed(data_folder, xslt, ti):
                     )
                     df.to_sql(
                         "dailymed_daily",
-                        schema="datasource",
+                        schema="sagerx_lake",
                         con=db_conn,
                         if_exists="append",
                         index=False,

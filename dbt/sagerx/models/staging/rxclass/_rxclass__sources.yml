@@ -15,6 +15,6 @@ sources:
       The RxNorm product-level mapping for ATC was produced by the National Library of Medicine. While not all active RxNorm products are covered by the mapping, the mapping accounts for over 97% of the Medicare Part-D prescriptions from 2012-2020.
 
       The original ingredient-level mapping to ATC from the WHO Collaborating Centre for Drug Statistics Methodology remains available in RxClass (select ATC under Edit Drug Sources) and through the RxClass API (relaSource=ATC).
-    schema: datasource
+    schema: sagerx_lake
     tables:
       - name: rxclass_atc_to_product

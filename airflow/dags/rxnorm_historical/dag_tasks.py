@@ -18,7 +18,7 @@ def get_rxcuis() -> list:
     engine = pg_hook.get_sqlalchemy_engine()
 
     df = pd.read_sql(
-            "select distinct rxcui from datasource.rxnorm_rxnconso where tty in ('SCD','SBD','GPCK','BPCK') and sab = 'RXNORM'",
+            "select distinct rxcui from sagerx_lake.rxnorm_rxnconso where tty in ('SCD','SBD','GPCK','BPCK') and sab = 'RXNORM'",
             con=engine
         )
     results = list(df['rxcui'])
@@ -48,4 +48,4 @@ def extract_ndc(ndc_list:list)->None:
         df['rxcui'] = rxcui
         dfs.append(df)
 
-    load_df_to_pg(pd.concat(dfs),"datasource","rxnorm_historical","replace",index=False)
+    load_df_to_pg(pd.concat(dfs),"sagerx_lake","rxnorm_historical","replace",index=False)

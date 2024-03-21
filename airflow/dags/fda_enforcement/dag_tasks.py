@@ -32,23 +32,4 @@ def load_json(data_path):
     df = pd.DataFrame(json_object["results"])
     df.set_index("recall_number")
     print(f"Dataframe loaded. Number of rows: {len(df)}")
-<<<<<<< HEAD
-    load_df_to_pg(df,"datasource","fda_enforcement","replace",dtype_name="openfda")
-=======
-    load_df_to_pg(df)
-
-def load_df_to_pg(df):
-    from airflow.hooks.postgres_hook import PostgresHook
-    import sqlalchemy
-
-    pg_hook = PostgresHook(postgres_conn_id="postgres_default")
-    engine = pg_hook.get_sqlalchemy_engine()
-
-    df.to_sql(
-        "fda_enforcement",
-        con=engine,
-        schema="sagerx_lake",
-        if_exists="append",
-        dtype={"openfda": sqlalchemy.types.JSON},
-    )
->>>>>>> 5aee55f (Update DB Schemas)
+    load_df_to_pg(df,"sagerx_lake","fda_enforcement","replace",dtype_name="openfda")

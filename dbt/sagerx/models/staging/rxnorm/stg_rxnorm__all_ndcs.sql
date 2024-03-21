@@ -7,6 +7,6 @@ select
     , rxnsat.sab
 	, case when rxnsat.suppress = 'N' then true else false end as active
 	, case when rxnsat.cvf = '4096' then true else false end as prescribable
-from datasource.rxnorm_rxnsat rxnsat
+from sagerx_lake.rxnorm_rxnsat rxnsat
     where rxnsat.atn = 'NDC'
 	and rxnsat.sab in ('ATC', 'CVX', 'DRUGBANK', 'MSH', 'MTHCMSFRF', 'MTHSPL', 'RXNORM', 'USP', 'VANDF')

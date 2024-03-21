@@ -16,20 +16,20 @@ select
         then true
         else false
         end as prescribable
-from datasource.rxnorm_rxnconso ingredient_strength
-left join datasource.rxnorm_rxnsat numerator_value
+from sagerx_lake.rxnorm_rxnconso ingredient_strength
+left join sagerx_lake.rxnorm_rxnsat numerator_value
     on numerator_value.rxcui = ingredient_strength.rxcui
     and numerator_value.atn = 'RXN_BOSS_STRENGTH_NUM_VALUE'
-left join datasource.rxnorm_rxnsat numerator_unit
+left join sagerx_lake.rxnorm_rxnsat numerator_unit
     on numerator_unit.rxcui = ingredient_strength.rxcui
     and numerator_unit.atn = 'RXN_BOSS_STRENGTH_NUM_UNIT'
-left join datasource.rxnorm_rxnsat denominator_value
+left join sagerx_lake.rxnorm_rxnsat denominator_value
     on denominator_value.rxcui = ingredient_strength.rxcui
     and denominator_value.atn = 'RXN_BOSS_STRENGTH_DENOM_VALUE'
-left join datasource.rxnorm_rxnsat denominator_unit
+left join sagerx_lake.rxnorm_rxnsat denominator_unit
     on denominator_unit.rxcui = ingredient_strength.rxcui
     and denominator_unit.atn = 'RXN_BOSS_STRENGTH_DENOM_UNIT'
-left join datasource.rxnorm_rxnsat text
+left join sagerx_lake.rxnorm_rxnsat text
     on text.rxcui = ingredient_strength.rxcui
     and text.atn = 'RXN_STRENGTH'
 where ingredient_strength.tty = 'SCDC'

@@ -1,7 +1,7 @@
-/* datasource.cms_basic_drugs_formulary */
-DROP TABLE IF EXISTS datasource.cms_basic_drugs_formulary CASCADE;
+/* sagerx_lake.cms_basic_drugs_formulary */
+DROP TABLE IF EXISTS sagerx_lake.cms_basic_drugs_formulary CASCADE;
 
-CREATE TABLE datasource.cms_basic_drugs_formulary (
+CREATE TABLE sagerx_lake.cms_basic_drugs_formulary (
 formulary_id           VARCHAR(8) NOT NULL,
 formulary_version         VARCHAR(5) NOT NULL,
 contract_year      VARCHAR(4),
@@ -15,5 +15,5 @@ prior_authorization_yn      VARCHAR(1),
 step_therapy_yn      VARCHAR(1)
 );
 
-COPY datasource.cms_basic_drugs_formulary
+COPY sagerx_lake.cms_basic_drugs_formulary
 FROM '{{ ti.xcom_pull(task_ids='extract') }}/basic drugs formulary file  PPUF_{{params.year}}Q{{params.quarter}}.txt' DELIMITER '|' CSV HEADER;;

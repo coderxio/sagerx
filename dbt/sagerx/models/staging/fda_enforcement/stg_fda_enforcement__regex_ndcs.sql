@@ -7,7 +7,7 @@ z as (
 		recall_number
 		, ndc_to_11((regexp_matches(product_description, '(\m\d{1,5}-\d{1,4}-\d{1,2}\M|\m\d{11}\M)', 'g'))[1]) as ndc11
 		, left(ndc_to_11((regexp_matches(product_description, '(\m\d{1,5}-\d{1,4}-\d{1,2}\M|\m\d{11}\M)', 'g'))[1]), 9) as ndc9
-	from datasource.fda_enforcement
+	from sagerx_lake.fda_enforcement
 )
 
 select

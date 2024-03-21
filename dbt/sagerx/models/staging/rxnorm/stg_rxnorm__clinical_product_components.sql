@@ -12,9 +12,9 @@ with cte as (
 			, ingredient.rxcui as ingredient_rxcui
 			, ingredient.str as ingredient_name
 			, ingredient.tty as ingredient_tty
-		from datasource.rxnorm_rxnconso product_component
-		inner join datasource.rxnorm_rxnrel rxnrel on rxnrel.rxcui2 = product_component.rxcui and rxnrel.rela = 'has_ingredients'
-		inner join datasource.rxnorm_rxnconso ingredient
+		from sagerx_lake.rxnorm_rxnconso product_component
+		inner join sagerx_lake.rxnorm_rxnrel rxnrel on rxnrel.rxcui2 = product_component.rxcui and rxnrel.rela = 'has_ingredients'
+		inner join sagerx_lake.rxnorm_rxnconso ingredient
 			on rxnrel.rxcui1 = ingredient.rxcui
 			and ingredient.tty = 'MIN'
 			and ingredient.sab = 'RXNORM'
@@ -30,11 +30,11 @@ with cte as (
 			, ingredient.rxcui as ingredient_rxcui
 			, ingredient.str as ingredient_name
 			, ingredient.tty as ingredient_tty
-		from datasource.rxnorm_rxnconso product_component
-		inner join datasource.rxnorm_rxnrel scdc_rxnrel on scdc_rxnrel.rxcui2 = product_component.rxcui and scdc_rxnrel.rela = 'consists_of'
-		inner join datasource.rxnorm_rxnconso scdc on scdc_rxnrel.rxcui1 = scdc.rxcui
-		inner join datasource.rxnorm_rxnrel ingredient_rxnrel on ingredient_rxnrel.rxcui2 = scdc.rxcui and ingredient_rxnrel.rela = 'has_ingredient'
-		inner join datasource.rxnorm_rxnconso ingredient
+		from sagerx_lake.rxnorm_rxnconso product_component
+		inner join sagerx_lake.rxnorm_rxnrel scdc_rxnrel on scdc_rxnrel.rxcui2 = product_component.rxcui and scdc_rxnrel.rela = 'consists_of'
+		inner join sagerx_lake.rxnorm_rxnconso scdc on scdc_rxnrel.rxcui1 = scdc.rxcui
+		inner join sagerx_lake.rxnorm_rxnrel ingredient_rxnrel on ingredient_rxnrel.rxcui2 = scdc.rxcui and ingredient_rxnrel.rela = 'has_ingredient'
+		inner join sagerx_lake.rxnorm_rxnconso ingredient
 			on ingredient_rxnrel.rxcui1 = ingredient.rxcui
 			and ingredient.tty = 'IN'
 			and ingredient.sab = 'RXNORM'
@@ -53,16 +53,16 @@ select distinct
 		case when product_component.rxcui is null then product.cvf else product_component.cvf end = '4096' then true else false end as prescribable
 	, cte.ingredient_rxcui as ingredient_rxcui
 	, dose_form_rxnrel.rxcui1 as dose_form_rxcui
-from datasource.rxnorm_rxnconso product
-left join datasource.rxnorm_rxnrel rxnrel on rxnrel.rxcui2 = product.rxcui and rxnrel.rela = 'contains'
-left join datasource.rxnorm_rxnconso product_component
+from sagerx_lake.rxnorm_rxnconso product
+left join sagerx_lake.rxnorm_rxnrel rxnrel on rxnrel.rxcui2 = product.rxcui and rxnrel.rela = 'contains'
+left join sagerx_lake.rxnorm_rxnconso product_component
 	on rxnrel.rxcui1 = product_component.rxcui
     and product_component.tty = 'SCD'
     and product_component.sab = 'RXNORM'
 left join cte 
 	on cte.product_component_rxcui = case when product_component.rxcui is null then product.rxcui else product_component.rxcui end
 	and cte.rn < 2
-left join datasource.rxnorm_rxnrel dose_form_rxnrel
+left join sagerx_lake.rxnorm_rxnrel dose_form_rxnrel
 	on dose_form_rxnrel.rxcui2 = case when product_component.rxcui is null then product.rxcui else product_component.rxcui end
 	and dose_form_rxnrel.rela = 'has_dose_form'
 	and dose_form_rxnrel.sab = 'RXNORM'

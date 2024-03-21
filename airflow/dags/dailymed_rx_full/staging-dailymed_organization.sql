@@ -1,7 +1,7 @@
- /* staging.dailymed_organization */
- --DROP TABLE IF EXISTS staging.dailymed_organization CASCADE;
+ /* sagerx.dailymed_organization */
+ --DROP TABLE IF EXISTS sagerx.dailymed_organization CASCADE;
 
- CREATE TABLE IF NOT EXISTS staging.dailymed_organization (
+ CREATE TABLE IF NOT EXISTS sagerx.dailymed_organization (
 	spl 				TEXT NOT NULL,
 	document_id 		TEXT NOT NULL,
 	set_id			 	TEXT,
@@ -13,10 +13,10 @@
 with xml_table as
 (
 select spl, xml_content::xml as xml_column
-from datasource.dailymed_rx_full
+from sagerx_lake.dailymed_rx_full
 )
 
-INSERT INTO staging.dailymed_organization
+INSERT INTO sagerx.dailymed_organization
 SELECT spl, y.*
     FROM   xml_table x,
             XMLTABLE('/dailymed/Organizations/establishment'

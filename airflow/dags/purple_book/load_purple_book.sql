@@ -1,7 +1,7 @@
-/* datasource.purple_book */
-DROP TABLE IF EXISTS datasource.purple_book;
+/* sagerx_lake.purple_book */
+DROP TABLE IF EXISTS sagerx_lake.purple_book;
 
-CREATE TABLE datasource.purple_book (
+CREATE TABLE sagerx_lake.purple_book (
 nru											TEXT,
 applicant									TEXT,
 bla_number									TEXT,
@@ -29,5 +29,5 @@ ref_product_exclusivity_exp_date			TEXT,
 orphan_exclusivity_exp_date					TEXT
 );
 
-COPY datasource.purple_book
+COPY sagerx_lake.purple_book
 FROM '{data_path}' DELIMITER ',' CSV HEADER QUOTE '"';

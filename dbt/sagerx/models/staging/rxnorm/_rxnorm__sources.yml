@@ -2,7 +2,7 @@ version: 2
 
 sources:
   - name: rxnorm
-    schema: datasource
+    schema: sagerx_lake
     tables:
       - name: rxnorm_rxnatomarchive
       - name: rxnorm_rxnconso

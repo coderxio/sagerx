@@ -1,7 +1,7 @@
-/* datasource.cms_beneficiary_cost */
-DROP TABLE IF EXISTS datasource.cms_beneficiary_cost CASCADE;
+/* sagerx_lake.cms_beneficiary_cost */
+DROP TABLE IF EXISTS sagerx_lake.cms_beneficiary_cost CASCADE;
 
-CREATE TABLE datasource.cms_beneficiary_cost (
+CREATE TABLE sagerx_lake.cms_beneficiary_cost (
 contract_id           VARCHAR(5) NOT NULL,
 plan_id           VARCHAR(3) NOT NULL,
 segment_id         VARCHAR(3) NOT NULL,
@@ -34,5 +34,5 @@ ded_applies_yn   VARCHAR(1),
 gap_cov_tier   VARCHAR(1)
 );
 
-COPY datasource.cms_beneficiary_cost
+COPY sagerx_lake.cms_beneficiary_cost
 FROM '{{ ti.xcom_pull(task_ids='extract') }}/beneficiary cost file  PPUF_{{params.year}}Q{{params.quarter}}.txt' DELIMITER '|' CSV HEADER;;

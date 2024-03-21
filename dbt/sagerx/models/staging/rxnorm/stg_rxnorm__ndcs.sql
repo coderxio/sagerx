@@ -7,10 +7,10 @@ select rxnsat.atv as ndc
 		else null end as brand_product_rxcui
 	, case when rxnsat.suppress = 'N' then true else false end as active
 	, case when rxnsat.cvf = '4096' then true else false end as prescribable
-from datasource.rxnorm_rxnsat rxnsat
-	inner join datasource.rxnorm_rxnconso product on rxnsat.rxaui = product.rxaui
-	left join datasource.rxnorm_rxnrel rxnrel on rxnsat.rxcui = rxnrel.rxcui2 and rela = 'tradename_of' and product.tty in ('BPCK','SBD')
-	left join datasource.rxnorm_rxnconso clinical_product
+from sagerx_lake.rxnorm_rxnsat rxnsat
+	inner join sagerx_lake.rxnorm_rxnconso product on rxnsat.rxaui = product.rxaui
+	left join sagerx_lake.rxnorm_rxnrel rxnrel on rxnsat.rxcui = rxnrel.rxcui2 and rela = 'tradename_of' and product.tty in ('BPCK','SBD')
+	left join sagerx_lake.rxnorm_rxnconso clinical_product
 		on rxnrel.rxcui1 = clinical_product.rxcui
 		and clinical_product.tty in ('SCD','GPCK')
 		and clinical_product.sab = 'RXNORM'

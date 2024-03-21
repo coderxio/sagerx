@@ -26,7 +26,7 @@ select distinct
     , substance.tty as active_ingredient_tty	
     , product.active as active
     , product.prescribable as prescribable
-from datasource.rxnorm_rxnrel rxnrel
+from sagerx_lake.rxnorm_rxnrel rxnrel
 inner join substance
     on rxnrel.rxaui1 = substance.rxaui
 inner join product

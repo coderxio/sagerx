@@ -7,8 +7,8 @@ with cte as (
 		, ingredient_component.str as ingredient_component_name
 		, ingredient_component.tty as ingredient_component_tty
 	from
-		datasource.rxnorm_rxnrel rxnrel
-	inner join datasource.rxnorm_rxnconso ingredient_component
+		sagerx_lake.rxnorm_rxnrel rxnrel
+	inner join sagerx_lake.rxnorm_rxnconso ingredient_component
 		on rxnrel.rxcui1 = ingredient_component.rxcui
 	where rxnrel.rela = 'has_part'
 		and ingredient_component.tty = 'IN'
@@ -21,7 +21,7 @@ select distinct
         then ingredient.rxcui
         else cte.ingredient_component_rxcui
         end as ingredient_component_rxcui
-from datasource.rxnorm_rxnconso ingredient
+from sagerx_lake.rxnorm_rxnconso ingredient
 left join cte on ingredient.rxcui = cte.ingredient_rxcui
 where ingredient.tty in('IN', 'MIN')
 	and ingredient.sab = 'RXNORM'

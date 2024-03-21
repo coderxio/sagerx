@@ -1,7 +1,7 @@
-/* datasource.cms_pharmacy_networks */
-DROP TABLE IF EXISTS datasource.cms_pharmacy_networks CASCADE;
+/* sagerx_lake.cms_pharmacy_networks */
+DROP TABLE IF EXISTS sagerx_lake.cms_pharmacy_networks CASCADE;
 
-CREATE TABLE datasource.cms_pharmacy_networks (
+CREATE TABLE sagerx_lake.cms_pharmacy_networks (
 contract_id           VARCHAR(5) NOT NULL,
 plan_id         VARCHAR(3) NOT NULL,
 segment_id      VARCHAR(3),
@@ -21,20 +21,20 @@ generic_dispensing_fee_60       TEXT,
 generic_dispensing_fee_90       TEXT
 );
 
-COPY datasource.cms_pharmacy_networks
+COPY sagerx_lake.cms_pharmacy_networks
 FROM '{{ ti.xcom_pull(task_ids='extract') }}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 1.txt' DELIMITER '|' CSV HEADER;;
 
-COPY datasource.cms_pharmacy_networks
+COPY sagerx_lake.cms_pharmacy_networks
 FROM '{{ ti.xcom_pull(task_ids='extract') }}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 2.txt' DELIMITER '|' CSV HEADER;;
 
-COPY datasource.cms_pharmacy_networks
+COPY sagerx_lake.cms_pharmacy_networks
 FROM '{{ ti.xcom_pull(task_ids='extract') }}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 3.txt' DELIMITER '|' CSV HEADER;;
 
-COPY datasource.cms_pharmacy_networks
+COPY sagerx_lake.cms_pharmacy_networks
 FROM '{{ ti.xcom_pull(task_ids='extract') }}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 4.txt' DELIMITER '|' CSV HEADER;;
 
-COPY datasource.cms_pharmacy_networks
+COPY sagerx_lake.cms_pharmacy_networks
 FROM '{{ ti.xcom_pull(task_ids='extract') }}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 5.txt' DELIMITER '|' CSV HEADER;;
 
-COPY datasource.cms_pharmacy_networks
+COPY sagerx_lake.cms_pharmacy_networks
 FROM '{{ ti.xcom_pull(task_ids='extract') }}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 6.txt' DELIMITER '|' CSV HEADER;;

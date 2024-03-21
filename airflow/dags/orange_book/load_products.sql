@@ -1,7 +1,7 @@
-/* datasource.orange_book_products */
-DROP TABLE IF EXISTS datasource.orange_book_products;
+/* sagerx_lake.orange_book_products */
+DROP TABLE IF EXISTS sagerx_lake.orange_book_products;
 
-CREATE TABLE datasource.orange_book_products (
+CREATE TABLE sagerx_lake.orange_book_products (
 ingredient             TEXT,
 df_route               TEXT,
 trade_name             TEXT,
@@ -18,5 +18,5 @@ type                   TEXT,
 applicant_full_name    TEXT
 );
 
-COPY datasource.orange_book_products
+COPY sagerx_lake.orange_book_products
 FROM '{data_path}/products.txt' DELIMITER '~' CSV HEADER;

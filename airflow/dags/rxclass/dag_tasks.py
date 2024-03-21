@@ -20,7 +20,7 @@ def get_rxcuis() -> list:
     engine = pg_hook.get_sqlalchemy_engine()
 
     df = pd.read_sql(
-        "select distinct rxcui from datasource.rxnorm_rxnconso where tty in ('IN', 'MIN') and sab = 'RXNORM'",
+        "select distinct rxcui from sagerx_lake.rxnorm_rxnconso where tty in ('IN', 'MIN') and sab = 'RXNORM'",
         con=engine
     )
     results = list(df['rxcui'])
@@ -52,4 +52,4 @@ def extract_atc(rxcui_list:list)->None:
 
     atc_df = pd.DataFrame.from_dict(atcs, orient='index')
     atc_df.index.names = ['rxcui']
-    load_df_to_pg(atc_df.reset_index(),"datasource","rxclass_atc_to_product","replace",index=False)
+    load_df_to_pg(atc_df.reset_index(),"sagerx_lake","rxclass_atc_to_product","replace",index=False)

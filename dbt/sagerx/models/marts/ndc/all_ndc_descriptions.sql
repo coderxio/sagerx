@@ -2,6 +2,14 @@
 
 with 
 
+/*
+NOTE: this intermediate table is only NDCs that have
+SAB = RXNORM RXCUIs, which limits the total NDC count - 
+there are lots of NDCs that don't have RXNORM RXCUIs
+that might be good to include in the future, but a lot
+seem to be inactive or not prescribable
+MTHSPL = 174k+, VANDF = 309k+, CVX = 500+
+*/
 rxnorm_ndcs as (
 
     select
@@ -12,6 +20,10 @@ rxnorm_ndcs as (
 
 ) 
 
+/* 
+NOTE: maybe want to make a stg_rxnorm__products table
+to replace this weird one-off table
+*/
 , rxnorm_product_rxcuis as (
 
     select * from {{ ref('stg_rxnorm__product_rxcuis') }}
@@ -34,7 +46,6 @@ and somehow filter out any parts that are wrong?
         on rxnorm_product_rxcuis.rxcui = rxnorm_historical_most_recent_ndcs.rxcui::varchar
 
 )
-
 
 , fda_ndc_ndcs as (
 
@@ -193,5 +204,11 @@ and somehow filter out any parts that are wrong?
 
 )
 
+, all_not_null_ndc_descriptions as (
+
 select * from all_ndc_descriptions
 where ndc is not null
+
+)
+
+select * from all_not_null_ndc_descriptions

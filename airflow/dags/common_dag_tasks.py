@@ -5,6 +5,9 @@ from airflow.decorators import task
 def get_ds_folder(dag_id):
     return Path("/opt/airflow/dags") / dag_id
 
+def get_data_folder(dag_id):
+    return Path("/opt/airflow/data") / dag_id
+
 def generate_sql_list(dag_id, sql_prefix='load') -> list:
     ds_folder = get_ds_folder(dag_id)
     return get_sql_list(sql_prefix, ds_folder)
@@ -37,7 +40,7 @@ def url_request(url,param=None,headers=None):
 def extract(dag_id,url) -> str:
     # Task to download data from web location
 
-    data_folder = Path("/opt/airflow/data") / dag_id
+    data_folder = get_data_folder(dag_id)
     data_path = get_dataset(url, data_folder)
     print(f"Extraction Completed! Data saved in folder: {data_folder}")
     return data_path

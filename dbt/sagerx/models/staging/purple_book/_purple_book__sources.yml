@@ -8,7 +8,7 @@ sources:
       
       Currently, the database contains information about all FDA-licensed biological products regulated by the CDER, including any biosimilar and interchangeable biological products, licensed (approved) by the FDA and FDA-licensed allergenic, cellular and gene therapy, hematologic, and vaccine products regulated by CBER.
       The Purple Book database offers information about FDA- licensed biological products. It also includes information pertaining to exclusivity if the FDA has determined that a biological product is eligible for a relevant period of exclusivity.
-    schema: datasource
+    schema: sagerx_lake
     tables:
       - name: purple_book
         description: >

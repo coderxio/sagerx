@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: rxterms
     description: RxTerms is a drug interface terminology derived from RxNorm for prescription writing or medication history recording (e.g. in e-prescribing systems, PHRs).
-    schema: datasource
+    schema: sagerx_lake
     tables:
       - name: rxterms_ingredients
         description: Lists the ingredients and their RXCUIs for every drug in RxTerms that is not suppressible or retired.

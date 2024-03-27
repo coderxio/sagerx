@@ -2,6 +2,6 @@ version: 2
 
 sources:
   - name: fda_enforcement
-    schema: datasource
+    schema: sagerx_lake
     tables:
       - name: fda_enforcement

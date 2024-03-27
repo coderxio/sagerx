@@ -8,12 +8,12 @@ with atc as (
 		,a.tty
 	from (
 		select *
-		from datasource.rxnorm_rxnconso
+		from sagerx_lake.rxnorm_rxnconso
 		where sab = 'ATC'
 		and tty not like 'RXN%'
 		order by code
 	) a
-	left join datasource.rxnorm_rxnsat b
+	left join sagerx_lake.rxnorm_rxnsat b
 		on a.code= b.code
 	where atn = 'ATC_LEVEL'
 	order by code

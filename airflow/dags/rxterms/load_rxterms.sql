@@ -1,7 +1,7 @@
-/* datasource.rxterms */
-DROP TABLE IF EXISTS datasource.rxterms;
+/* sagerx_lake.rxterms */
+DROP TABLE IF EXISTS sagerx_lake.rxterms;
 
-CREATE TABLE datasource.rxterms (
+CREATE TABLE sagerx_lake.rxterms (
 rxcui                   TEXT,
 generic_rxcui           TEXT,
 tty                     TEXT,
@@ -22,5 +22,5 @@ sxdg_name               TEXT,
 psn                     TEXT
 );
 
-COPY datasource.rxterms
+COPY sagerx_lake.rxterms
 FROM '{data_path}/RxTerms{mnth}.txt' DELIMITER '|' QUOTE E'\b' CSV HEADER;

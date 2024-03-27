@@ -1,7 +1,7 @@
-/* datasource.rxnorm_rxnrel */
-DROP TABLE IF EXISTS datasource.rxnorm_rxnrel CASCADE;
+/* sagerx_lake.rxnorm_rxnrel */
+DROP TABLE IF EXISTS sagerx_lake.rxnorm_rxnrel CASCADE;
 
-CREATE TABLE datasource.rxnorm_rxnrel (
+CREATE TABLE sagerx_lake.rxnorm_rxnrel (
     rxcui1    varchar(8) ,
     rxaui1    varchar(8),
     stype1    varchar(50),
@@ -21,6 +21,6 @@ CREATE TABLE datasource.rxnorm_rxnrel (
     blank     TEXT
 );
 
-COPY datasource.rxnorm_rxnrel
+COPY sagerx_lake.rxnorm_rxnrel
 FROM '{{ ti.xcom_pull(task_ids='extract') }}/rrf/RXNREL.RRF' CSV DELIMITER '|' ENCODING 'UTF8' ESCAPE E'\b' QUOTE E'\b';
 --ESCAPE and QOUTE characters are dummy to remove default

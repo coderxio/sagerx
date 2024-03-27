@@ -8,16 +8,16 @@ sagerx:
       user: sagerx
       pass: sagerx
       dbname: sagerx
-      schema: dev
+      schema: sagerx_dev
 
     prod:
       type: postgres
-      threads: [1 or more]
-      host: [host]
-      port: [port]
-      user: [prod_username]
-      pass: [prod_password]
-      dbname: [dbname]
-      schema: [prod_schema]
+      threads: 1
+      host: postgres
+      port: 5432
+      user: sagerx
+      pass: sagerx
+      dbname: sagerx
+      schema: sagerx
 
   target: dev

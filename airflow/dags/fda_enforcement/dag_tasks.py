@@ -32,4 +32,4 @@ def load_json(data_path):
     df = pd.DataFrame(json_object["results"])
     df.set_index("recall_number")
     print(f"Dataframe loaded. Number of rows: {len(df)}")
-    load_df_to_pg(df,"datasource","fda_enforcement","replace",dtype_name="openfda")
+    load_df_to_pg(df,"sagerx_lake","fda_enforcement","replace",dtype_name="openfda")

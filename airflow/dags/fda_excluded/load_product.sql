@@ -1,7 +1,7 @@
-/* datasource.fda_excluded_package */
-DROP TABLE IF EXISTS datasource.fda_excluded_product CASCADE;
+/* sagerx_lake.fda_excluded_package */
+DROP TABLE IF EXISTS sagerx_lake.fda_excluded_product CASCADE;
 
-CREATE TABLE datasource.fda_excluded_product (
+CREATE TABLE sagerx_lake.fda_excluded_product (
 productid                           TEXT,
 productndc                          TEXT,
 producttypename                     TEXT,
@@ -25,5 +25,5 @@ listing_record_certified_through    TEXT,
 PRIMARY KEY (productid)
 );
 
-COPY datasource.fda_excluded_product
+COPY sagerx_lake.fda_excluded_product
 FROM '{data_path}/Products_excluded.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;

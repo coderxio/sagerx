@@ -7,7 +7,7 @@ sources:
       identifies drug products approved on the basis of safety and effectiveness by the Food and Drug Administration (FDA) 
       under the Federal Food, Drug, and Cosmetic Act (the Act) and related patent and exclusivity information. 
       For more information on the Orange Book including its history, see the Orange Book Preface.
-    schema: datasource
+    schema: sagerx_lake
     tables:
       - name: orange_book_exlusivity
         description: Related exclusivity information of  drug products approved on the basis of safety and effectiveness by the Food and Drug Administration (FDA) under the Federal Food, Drug, and Cosmetic Act (the Act).

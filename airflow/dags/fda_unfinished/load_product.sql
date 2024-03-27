@@ -1,7 +1,7 @@
-/* datasource.fda_unfinished_product*/
-DROP TABLE IF EXISTS datasource.fda_unfinished_product CASCADE;
+/* sagerx_lake.fda_unfinished_product*/
+DROP TABLE IF EXISTS sagerx_lake.fda_unfinished_product CASCADE;
 
-CREATE TABLE datasource.fda_unfinished_product (
+CREATE TABLE sagerx_lake.fda_unfinished_product (
 productid                           TEXT,
 productndc                          TEXT,
 producttypename                     TEXT,
@@ -19,6 +19,6 @@ listing_record_certified_through    TEXT,
 PRIMARY KEY (productid)
 );
 
-COPY datasource.fda_unfinished_product
+COPY sagerx_lake.fda_unfinished_product
 FROM '{data_path}/unfinished_product.txt'
 DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';

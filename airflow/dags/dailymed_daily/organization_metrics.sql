@@ -9,8 +9,8 @@ SELECT o.set_id
 			THEN 'Yes' ELSE '' END AS labeler_only
 	,COUNT(*)
 
-FROM staging.dailymed_organization o
-	INNER JOIN staging.dailymed_main ma ON o.set_id = ma.set_id
-	LEFT JOIN staging.dailymed_organization_text ot ON o.set_id = ot.set_id
+FROM sagerx.dailymed_organization o
+	INNER JOIN sagerx.dailymed_main ma ON o.set_id = ma.set_id
+	LEFT JOIN sagerx.dailymed_organization_text ot ON o.set_id = ot.set_id
 
 GROUP BY o.set_id, ma.market_status

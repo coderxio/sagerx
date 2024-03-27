@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: fda_excluded
     description: Products removed / excluded from the NDC Directory for failure to respond to FDA's requests for correction for various reasons.
-    schema: datasource
+    schema: sagerx_lake
     tables:
       - name: fda_excluded_package
         description: "Packages of product that have been removed/excluded from the NDC Directory for failure to respond to the FDA"

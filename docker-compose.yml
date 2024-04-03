@@ -7,6 +7,9 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__WEBSERVER__WEB_SERVER_MASTER_TIMEOUT: "300"
+    # WEB_SERVER_MASTER_TIMEOUT: "300"
+    # AIRFLOW_GUNICORN_OPTS: "--timeout 300"
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
     AIRFLOW_CONN_POSTGRES_DEFAULT: postgresql://sagerx:sagerx@postgres:5432/sagerx
     AIRFLOW_VAR_UMLS_API: ${UMLS_API}
@@ -28,8 +31,14 @@ services:
     container_name: postgres
     environment:
       POSTGRES_USER: sagerx
+      PGUSER: sagerx
       POSTGRES_PASSWORD: sagerx
       POSTGRES_DB: sagerx
+    healthcheck: #added health checks
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - 5432:5432
     volumes:
@@ -37,7 +46,6 @@ services:
       - ./airflow/data:/opt/airflow/data
       - ./airflow/extracts:/opt/airflow/extracts
     build:
-      context: .
       shm_size: "4gb"
 
   pgadmin:
@@ -82,18 +90,37 @@ services:
       _AIRFLOW_WWW_USER_CREATE: "true"
       _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
       _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+      # POSTGRES_USER: sagerx
+      # POSTGRES_PASSWORD: sagerx
+      # POSTGRES_DB: sagerx
+      # _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- psycopg2-binary==2.9.1}
     user: "0:0"
     volumes:
       - ./airflow:/sources
     depends_on:
-      - postgres
+      postgres: 
+      #syntax change
+        condition: service_healthy
 
   airflow-webserver:
     <<: *airflow-common
     container_name: airflow-webserver
     command: webserver
+    # environment:
+      # - "AIRFLOW_GUNICORN_OPTS=--timeout 300"
     ports:
       - 8001:8080
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully    
+    
+  
 
   airflow-scheduler:
     <<: *airflow-common

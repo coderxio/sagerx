@@ -1,0 +1,37 @@
+
+-- CREATE OR REPLACE FUNCTION ndc_convert(ndc CHAR(13),to_format CHAR(8))
+-- RETURNS CHAR(13)
+-- LANGUAGE 'plpgsql'
+-- AS
+-- $$
+
+-- DECLARE ndc11 char(11);
+-- DECLARE format_list char(8)[];
+-- DECLARE return_value CHAR(13);
+-- BEGIN
+-- 	format_list := array['10 Digit','11 Digit','4-4-2','5-3-2','5-4-1','5-4-2','5-5','4-6'];
+-- 	IF NOT (to_format = ANY (format_list))
+-- 		THEN RAISE 'format must be of viable type';
+-- 	END IF;
+--     ndc11 := ndc_to_11(ndc);
+-- 	RETURN CASE WHEN to_format = '10 Digit' THEN NULL
+-- 		 WHEN to_format = '11 Digit' THEN ndc11
+-- 		 WHEN to_format = '4-4-2' THEN 
+-- 		 			CASE WHEN SUBSTRING(ndc11,1,1) = '0' 
+-- 							THEN SUBSTRING(ndc11,2,4) ||'-'|| SUBSTRING(ndc11,6,4) ||'-'|| RIGHT(ndc11,2)
+-- 					ELSE NULL END
+-- 		 WHEN to_format = '5-3-2' THEN 
+-- 		 			CASE WHEN SUBSTRING(ndc11,6,1) = '0' 
+-- 						THEN LEFT(ndc11,5) ||'-'|| SUBSTRING(ndc11,7,3) ||'-'|| RIGHT(ndc11,2)
+-- 					ELSE NULL END
+-- 		 WHEN to_format = '5-4-1' THEN
+-- 		 			CASE WHEN SUBSTRING(ndc11,10,1) = '0' 
+-- 						THEN LEFT(ndc11,5) ||'-'|| SUBSTRING(ndc11,6,4) ||'-'|| RIGHT(ndc11,1)
+-- 					ELSE NULL END
+-- 		 WHEN to_format = '5-4-2' THEN LEFT(ndc11,5) ||'-'|| SUBSTRING(ndc11,6,4) ||'-'|| RIGHT(ndc11,2)
+-- 		 WHEN to_format = '5-5' THEN NULL
+-- 		 WHEN to_format = '4-6' THEN NULL
+-- 	ELSE NULL
+-- 	END;
+-- END;
+-- $$;

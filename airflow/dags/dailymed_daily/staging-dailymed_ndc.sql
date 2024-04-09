@@ -16,7 +16,7 @@ from sagerx_lake.dailymed_daily
 )
 
 INSERT INTO sagerx.dailymed_ndc
-SELECT spl, y.*, {{ndc_to_11('y.ndc') }}AS ndc11
+SELECT spl, y.*, ndc_to_11(y.ndc) AS ndc11
     FROM   xml_table x,
             XMLTABLE('dailymed/ndc_list/NDC'
               PASSING xml_column

@@ -32,11 +32,7 @@ with dag:
                     print(f'{mart} exists and will be exported')
                     df = pd.read_sql(f"SELECT * FROM flatfile.{mart};", con=connection)
                     mart_dfs.append(df)
-                    
-        # s3_resource = boto3.resource('s3',
-        #     aws_access_key_id = '',
-        #     aws_secret_access_key = '' 
-        # )    
+                      
         sts = boto3.client('sts')
         response = sts.assume_role( 
             RoleArn='aws:arn:iam::181615070735:role/miles_IAM_user',

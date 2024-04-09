@@ -22,7 +22,6 @@ x-airflow-common: &airflow-common
     - ./airflow/plugins:/opt/airflow/plugins
     - ./airflow/data:/opt/airflow/data
     - ./dbt:/dbt
-    - ~/.aws:/root/aws
 
 services:
   postgres:

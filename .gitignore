@@ -3,16 +3,12 @@
 # Python files
 __pycache__
 venv
-console.py
 
 # Airflow Volumes
 data
 logs
 extracts
 plugins
-
-# Extraneous files
-console.py
 
 # dbt
 .user.yml

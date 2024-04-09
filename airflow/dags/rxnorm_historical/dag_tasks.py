@@ -1,4 +1,5 @@
 from airflow.decorators import task
+from airflow.hooks.subprocess import SubprocessHook
 import pandas as pd
 import re
 from sagerx import load_df_to_pg, parallel_api_calls
@@ -32,11 +33,12 @@ def extract_ndc(ndc_list:list)->None:
     urls = create_url_list(ndc_list)
     print(f"URL List created of length: {len(urls)}")
     ndc_responses = parallel_api_calls(urls)
-
+    null_response_rxcuis = []
     dfs = []
     for ndc_response in ndc_responses:
         if ndc_response['response'].get('historicalNdcConcept') == None:
             print(ndc_response)
+            #cui_match = re.search(ndc_response['url']) add a line to make a list of the skipped records
         url = ndc_response['url']
         rxcui_match = re.search(rxcui_pattern, url)
         rxcui = rxcui_match.group('rxcui')

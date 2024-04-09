@@ -11,6 +11,9 @@ logs
 extracts
 plugins
 
+# Extraneous files
+console.py
+
 # dbt
 .user.yml
 

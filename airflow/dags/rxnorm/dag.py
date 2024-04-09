@@ -73,7 +73,7 @@ def rxnorm():
         )
 
     # Task to transform data using dbt
-    @task
+    @task(task_id="transform_task")
     def transform():
         subprocess = SubprocessHook()
         result = subprocess.run_command(['dbt', 'run', '--select', 'models/staging/rxnorm', 'models/intermediate/rxnorm'], cwd='/dbt/sagerx')

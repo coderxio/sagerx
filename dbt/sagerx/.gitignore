@@ -2,4 +2,3 @@
 target/
 dbt_packages/
 logs/
-console.py

@@ -4,65 +4,76 @@ import logging
 from airflow_operator import create_dag
 from common_dag_tasks import get_most_recent_dag_run
 from datetime import timedelta
-from airflow.exceptions import AirflowSkipException
 from airflow.sensors.external_task_sensor import ExternalTaskSensor
 from airflow.decorators import dag,task
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+from airflow.operators.python_operator import PythonOperator
 from airflow.hooks.subprocess import SubprocessHook
+from airflow.models import TaskInstance
 
 
 def run_dag_condition(dag_id):
     last_run = get_most_recent_dag_run(dag_id)
-    if not last_run is None or (pendulum.now() - last_run.execution_date).minutes > 120:
-        raise AirflowSkipException()
-        # logging.info(f"{dag_id} WILL be executed") 
-        # return True
-    # else:
-    #     logging.info(f"{dag_id} was last run at {last_run.execution_date} and WILL NOT be executed") 
-    #     return False
+    # if a DAG from the list of dependencies is more than 5 days stale
+    if last_run is None or (pendulum.now() - last_run.execution_date).days > 5:
+        return True
+    else:
+        print(f"{dag_id} not being run")
+        return False
+
+def get_dag_list():
+    list_of_dags = []
+    dag_dependencies = ["fda_ndc","fda_unfinished","fda_excluded","rxnorm","rxclass_atc_to_product","rxnorm_historical"]
+    for dag in dag_dependencies:
+        if run_dag_condition(dag):
+            list_of_dags.append(dag)
+    print(f'list of dags to run{list_of_dags}')
+    return list_of_dags
 
 dag = create_dag(
     dag_id="build_marts",
     catchup=False,
     concurrency=2
 )
-
 with dag:
 
-    list_of_dags = []
-    dag_dependencies = ["fda_ndc","fda_unfinished","fda_excluded","rxnorm","rxclass_atc_to_product","rxnorm_historical"]
-    for dag_id in dag_dependencies:
-        # if run_dag_condition(dag_id):
-        #     print(f'{dag_id} being run')
-        sub_dag = TriggerDagRunOperator(
-            task_id=f"{dag_id}_task",
-            trigger_dag_id=dag_id,
-            conf={"source_dag_id": "build_marts", 
-                "schedule":"None"},
-            wait_for_completion= True,
-            pre_execute=run_dag_condition(dag_id))
-        list_of_dags.append(sub_dag)
+    # PLEASE NOTE this block will execute each of the DAGs in turn;
+    # When all are being run, the process will take in excess of 60 minutes
+    
+    @task
+    def execute_external_dag_list(**kwargs): 
+        dags_list = get_dag_list()
+        for ex_dag in dags_list:
+            print(f'triggering {ex_dag}')
+            dag_task = TriggerDagRunOperator(
+                task_id=f"{ex_dag}_task",
+                trigger_dag_id=ex_dag,
+                conf={"source_dag_id": "build_marts"},
+                wait_for_completion=True)
+            dag_task.execute(context=kwargs)
 
-        # sub_dag_sensor =  ExternalTaskSensor(
-        #     task_id=f'wait_for_{dag_id}',
-        #     external_dag_id=dag_id,
-        #     external_task_id='transform_task',
-        #     execution_delta=timedelta(minutes=90),
-        #     pre_execute=run_dag_condition(dag_id)) 
-        # list_of_dags.append(sub_dag_sensor)
+    execute_external = execute_external_dag_list()
 
     @task
     def transform_tasks():
         ndc_subprocess = SubprocessHook()
-        result = ndc_subprocess.run_command(['dbt', 'run', '--select', 'models/marts/ndc'], cwd='/dbt/sagerx')
+        result = ndc_subprocess.run_command(['dbt', 'run', '--select', '+models/marts/ndc'], cwd='/dbt/sagerx')
         print("Result from dbt:", result)
         atc_subprocess = SubprocessHook()
-        result = atc_subprocess.run_command(['dbt', 'run', '--select', 'models/marts/classification'], cwd='/dbt/sagerx')
+        result = atc_subprocess.run_command(['dbt', 'run', '--select', '+models/marts/classification'], cwd='/dbt/sagerx')
         print("Result from dbt:", result)
     transform = transform_tasks()
 
-list_of_dags.append(transform)
+    # @task
+    # def rebuild_tables(**kwargs):
+    #     build_tables = TriggerDagRunOperator(
+    #         task_id = "rebuilding_tables",
+    #         trigger_dag_id = "build_marts",
+    #         conf = {"source_dag_id": "export_dag"},
+    #         wait_for_completion = True)
+    #     build_tables.execute(context=kwargs)
+    # refresh_tables = rebuild_tables()
 
-for i in range(len(list_of_dags) - 1):
-    list_of_dags[i].set_downstream(list_of_dags[i + 1])
+execute_external >> transform
+
 

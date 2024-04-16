@@ -1,5 +1,4 @@
 from airflow.decorators import task
-from airflow.hooks.subprocess import SubprocessHook
 import pandas as pd
 from sagerx import load_df_to_pg, parallel_api_calls
 

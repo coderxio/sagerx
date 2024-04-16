@@ -12,7 +12,7 @@ from airflow.hooks.subprocess import SubprocessHook
 
 
 @dag(
-    schedule="0 0 10 * *", #10th of every month
+    schedule="0 0 10 * *",
     start_date=pendulum.datetime(2005, 1, 1),
     catchup=False,
 )
@@ -73,7 +73,7 @@ def rxnorm():
         )
 
     # Task to transform data using dbt
-    @task(task_id="transform_task")
+    @task
     def transform():
         subprocess = SubprocessHook()
         result = subprocess.run_command(['dbt', 'run', '--select', 'models/staging/rxnorm', 'models/intermediate/rxnorm'], cwd='/dbt/sagerx')

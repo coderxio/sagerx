@@ -53,18 +53,11 @@ def extract(dag_id,url) -> str:
 
 
 @task
-def transform(dag_id, models_subdir='staging',task_id="transform_task",wait=False) -> None:
+def transform(dag_id, models_subdir='staging',task_id="",wait=False) -> None:
     # Task to transform data using dbt
     from airflow.hooks.subprocess import SubprocessHook
-    
+
     subprocess = SubprocessHook()
     result = subprocess.run_command(['dbt', 'run', '--select', f'models/{models_subdir}/{dag_id}'], cwd='/dbt/sagerx')
     print("Result from dbt:", result)
-
-@task
-def move_to_s3(target_filepath:str):
-    local_to_s3 = LocalFilesystemToS3Operator(
-        task_id = 'create_s3_job',
-        filename = target_filepath
-    )
 

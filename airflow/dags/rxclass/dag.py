@@ -18,7 +18,5 @@ dag = create_dag(
 with dag:
     ds_folder = get_ds_folder(dag_id)
     data_folder = get_data_folder(dag_id)
-    
     rxcuis = get_rxcuis()
     extract_atc(rxcuis) >> transform('rxclass')
-    

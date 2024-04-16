@@ -1,16 +1,10 @@
 import pendulum
-import logging
 
 from airflow_operator import create_dag
 from common_dag_tasks import get_most_recent_dag_run
-from datetime import timedelta
-from airflow.sensors.external_task_sensor import ExternalTaskSensor
 from airflow.decorators import dag,task
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
-from airflow.operators.python_operator import PythonOperator
 from airflow.hooks.subprocess import SubprocessHook
-from airflow.models import TaskInstance
-
 
 def run_dag_condition(dag_id):
     last_run = get_most_recent_dag_run(dag_id)
@@ -32,13 +26,14 @@ def get_dag_list():
 
 dag = create_dag(
     dag_id="build_marts",
+    schedule = "0 5 * * 2",
     catchup=False,
     concurrency=2
 )
 with dag:
 
     # PLEASE NOTE this block will execute each of the DAGs in turn;
-    # When all are being run, the process will take in excess of 60 minutes
+    # When all are being run consecutively, the process will take in excess of 60 minutes
     
     @task
     def execute_external_dag_list(**kwargs): 
@@ -54,6 +49,7 @@ with dag:
 
     execute_external = execute_external_dag_list()
 
+    # Once DBT freshness metrics are implemented, this task can be updated
     @task
     def transform_tasks():
         ndc_subprocess = SubprocessHook()
@@ -64,16 +60,4 @@ with dag:
         print("Result from dbt:", result)
     transform = transform_tasks()
 
-    # @task
-    # def rebuild_tables(**kwargs):
-    #     build_tables = TriggerDagRunOperator(
-    #         task_id = "rebuilding_tables",
-    #         trigger_dag_id = "build_marts",
-    #         conf = {"source_dag_id": "export_dag"},
-    #         wait_for_completion = True)
-    #     build_tables.execute(context=kwargs)
-    # refresh_tables = rebuild_tables()
-
 execute_external >> transform
-
-

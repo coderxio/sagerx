@@ -60,4 +60,3 @@ def transform(dag_id, models_subdir='staging',task_id="",wait=False) -> None:
     subprocess = SubprocessHook()
     result = subprocess.run_command(['dbt', 'run', '--select', f'models/{models_subdir}/{dag_id}'], cwd='/dbt/sagerx')
     print("Result from dbt:", result)
-

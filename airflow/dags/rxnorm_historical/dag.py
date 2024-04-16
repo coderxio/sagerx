@@ -37,5 +37,3 @@ with dag:
 
     rxcuis = get_rxcuis()
     extract_ndc(rxcuis) >> transform(dag_id)
-
-

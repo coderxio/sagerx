@@ -15,7 +15,7 @@ from airflow.models import Variable
 
 dag = create_dag(
     dag_id="export_dag",
-    schedule = "0 7 * * 2",
+    schedule = "0 7 * * 2", #every tuesday at 7:00am
     catchup=False,
     concurrency=2
 )

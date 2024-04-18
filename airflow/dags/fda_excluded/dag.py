@@ -18,17 +18,12 @@ dag = create_dag(
     concurrency=2,
 )
 
-@task(task_id="target_dag")
-def run_this_func(dag_run=None):
-    print(f"Remotely received value of {dag_run.conf.get('message')} for key=message")
-
 with dag:
     url = "https://www.accessdata.fda.gov/cder/ndc_excluded.zip"
     ds_folder = get_ds_folder(dag_id)
 
     extract_task = extract(dag_id,url)
     transform_task = transform(dag_id)
-    dag_message = run_this_func
 
     sql_tasks = []
     for sql in get_ordered_sql_tasks(dag_id):

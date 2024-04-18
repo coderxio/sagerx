@@ -53,7 +53,7 @@ def extract(dag_id,url) -> str:
 
 
 @task
-def transform(dag_id, models_subdir='staging',task_id="",wait=False) -> None:
+def transform(dag_id, models_subdir='staging',task_id="") -> None:
     # Task to transform data using dbt
     from airflow.hooks.subprocess import SubprocessHook
 

@@ -14,13 +14,11 @@ dag_id = "fda_excluded"
 dag = create_dag(
     dag_id=dag_id,
     schedule= "30 4 * * *",  # run at 4:30am every day
+    start_date=pendulum.yesterday(),
+    catchup=False,
     max_active_runs=1,
     concurrency=2,
 )
-
-@task(task_id="target_dag")
-def run_this_func(dag_run=None):
-    print(f"Remotely received value of {dag_run.conf.get('message')} for key=message")
 
 with dag:
     url = "https://www.accessdata.fda.gov/cder/ndc_excluded.zip"
@@ -28,7 +26,6 @@ with dag:
 
     extract_task = extract(dag_id,url)
     transform_task = transform(dag_id)
-    dag_message = run_this_func
 
     sql_tasks = []
     for sql in get_ordered_sql_tasks(dag_id):

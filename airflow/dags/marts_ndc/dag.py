@@ -30,7 +30,7 @@ def get_dag_list():
 
 dag = create_dag(
     dag_id="build_marts",
-    schedule = "0 5 * * 2",
+    schedule = "0 5 * * 2", #every tuesday at 5:00am
     catchup=False,
     concurrency=2
 )

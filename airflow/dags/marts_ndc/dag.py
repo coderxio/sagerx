@@ -10,9 +10,13 @@ def run_dag_condition(dag_id):
     last_run = get_most_recent_dag_run(dag_id)
     # if a DAG from the list of dependencies is more than 5 days stale
     if last_run is None or (pendulum.now() - last_run.execution_date).days > 5:
+        if last_run is not None:
+            print(f'{dag_id} was last run {last_run.execution_date}.')
+        else:
+            print(f'{dag_id} has never been run.')
         return True
     else:
-        print(f"{dag_id} not being run")
+        print(f"{dag_id} was last run {last_run.execution_date} and will now skipped.")
         return False
 
 def get_dag_list():

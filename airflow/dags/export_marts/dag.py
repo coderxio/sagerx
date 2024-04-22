@@ -14,7 +14,7 @@ from airflow.models import Variable
 
 
 dag = create_dag(
-    dag_id="export_dag",
+    dag_id="export_marts",
     schedule = "0 7 * * 2", #every tuesday at 7:00am
     catchup=False,
     concurrency=2
@@ -23,7 +23,7 @@ dag = create_dag(
 with dag:
 
     @task
-    def export_tables():
+    def export_marts():
         pg_hook = PostgresHook(postgres_conn_id="postgres_default")
         engine = pg_hook.get_sqlalchemy_engine()
         marts_list = ["all_ndc_descriptions","atc_codes_to_rxnorm_products"]
@@ -52,7 +52,4 @@ with dag:
 
             s3_resource.Object(dest_bucket, f'{k}.csv').put(Body=csv_buffer.getvalue())
 
-    export = export_tables()    
-
-export
-
+    export_marts()

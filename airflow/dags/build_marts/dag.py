@@ -51,8 +51,6 @@ with dag:
                 wait_for_completion=True)
             dag_task.execute(context=kwargs)
 
-    execute_external = execute_external_dag_list()
-
     # Once DBT freshness metrics are implemented, this task can be updated
     @task
     def transform_tasks():
@@ -62,6 +60,5 @@ with dag:
         atc_subprocess = SubprocessHook()
         result = atc_subprocess.run_command(['dbt', 'run', '--select', '+models/marts/classification'], cwd='/dbt/sagerx')
         print("Result from dbt:", result)
-    transform = transform_tasks()
 
-execute_external >> transform
+    execute_external_dag_list() >> transform_tasks()

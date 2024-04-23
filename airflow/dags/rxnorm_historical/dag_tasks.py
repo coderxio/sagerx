@@ -32,7 +32,6 @@ def extract_ndc(ndc_list:list)->None:
     urls = create_url_list(ndc_list)
     print(f"URL List created of length: {len(urls)}")
     ndc_responses = parallel_api_calls(urls)
-
     dfs = []
     for ndc_response in ndc_responses:
         if ndc_response['response'].get('historicalNdcConcept') == None:

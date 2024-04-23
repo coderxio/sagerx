@@ -7,6 +7,7 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    #AIRFLOW__WEBSERVER__WEB_SERVER_MASTER_TIMEOUT: "300" #un-comment if gunicorn timeout reached
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
     AIRFLOW_CONN_POSTGRES_DEFAULT: postgresql://sagerx:sagerx@postgres:5432/sagerx
     AIRFLOW_VAR_UMLS_API: ${UMLS_API}
@@ -28,6 +29,7 @@ services:
     container_name: postgres
     environment:
       POSTGRES_USER: sagerx
+      PGUSER: sagerx
       POSTGRES_PASSWORD: sagerx
       POSTGRES_DB: sagerx
     ports:
@@ -92,6 +94,11 @@ services:
     <<: *airflow-common
     container_name: airflow-webserver
     command: webserver
+    environment:
+      <<: *airflow-common-env
+      AWS_ACCESS_KEY_ID: ${ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${SECRET_ACCESS_KEY}
+      AWS_DEST_BUCKET: ${DEST_BUCKET}
     ports:
       - 8001:8080
 
@@ -99,3 +106,8 @@ services:
     <<: *airflow-common
     container_name: airflow-scheduler
     command: scheduler
+    environment:
+      <<: *airflow-common-env
+      AWS_ACCESS_KEY_ID: ${ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${SECRET_ACCESS_KEY}
+      AWS_DEST_BUCKET: ${DEST_BUCKET}

@@ -33,7 +33,7 @@ with dag:
                 if sqlalchemy.inspect(engine).has_table(mart, schema='sagerx_dev'):  
                     print(f'{mart} exists and will be exported')
                     df = pd.read_sql(f"SELECT * FROM sagerx_dev.{mart};", con=connection)
-                    mart_dfs[mart] = df.iloc[:,1:]
+                    mart_dfs[mart] = df
 
         access_key = environ.get("AWS_ACCESS_KEY_ID")
         secret_key = environ.get("AWS_SECRET_ACCESS_KEY")
@@ -48,7 +48,7 @@ with dag:
         for k in list(mart_dfs.keys()):
             print(f'putting {k}')
             csv_buffer = StringIO()
-            mart_dfs[k].to_csv(csv_buffer)
+            mart_dfs[k].to_csv(csv_buffer, index=False)
 
             s3_resource.Object(dest_bucket, f'{k}.csv').put(Body=csv_buffer.getvalue())
 

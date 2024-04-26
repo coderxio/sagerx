@@ -48,7 +48,7 @@ with dag:
         for k in list(mart_dfs.keys()):
             print(f'putting {k}')
             csv_buffer = StringIO()
-            mart_dfs[k].to_csv(csv_buffer)
+            mart_dfs[k].to_csv(csv_buffer, index=False)
 
             s3_resource.Object(dest_bucket, f'{k}.csv').put(Body=csv_buffer.getvalue())
 

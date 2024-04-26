@@ -33,7 +33,7 @@ with dag:
                 if sqlalchemy.inspect(engine).has_table(mart, schema='sagerx_dev'):  
                     print(f'{mart} exists and will be exported')
                     df = pd.read_sql(f"SELECT * FROM sagerx_dev.{mart};", con=connection)
-                    mart_dfs[mart] = df
+                    mart_dfs[mart] = df.iloc[:,1:]
 
         access_key = environ.get("AWS_ACCESS_KEY_ID")
         secret_key = environ.get("AWS_SECRET_ACCESS_KEY")

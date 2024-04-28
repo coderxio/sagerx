@@ -1,6 +1,22 @@
 -- stg_rxnorm__clinical_product_components.sql
 
-with cte as (
+with product AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+)
+
+, rxnrel AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnrel') }} 
+)
+
+, ingredient AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+)
+
+, product_component AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+)
+
+, cte as (
 	select
 	sq.*,
 	row_number() over(partition by product_component_rxcui order by ingredient_tty desc) as rn
@@ -12,10 +28,11 @@ with cte as (
 			, ingredient.rxcui as ingredient_rxcui
 			, ingredient.str as ingredient_name
 			, ingredient.tty as ingredient_tty
-		from sagerx_lake.rxnorm_rxnconso product_component
-		inner join sagerx_lake.rxnorm_rxnrel rxnrel
-			on rxnrel.rxcui2 = product_component.rxcui and rxnrel.rela = 'has_ingredients'
-		inner join sagerx_lake.rxnorm_rxnconso ingredient
+		from product_component
+		inner join rxnrel 
+			on rxnrel.rxcui2 = product_component.rxcui 
+			and rxnrel.rela = 'has_ingredients'
+		inner join ingredient
 			on rxnrel.rxcui1 = ingredient.rxcui
 			and ingredient.tty = 'MIN'
 			and ingredient.sab = 'RXNORM'
@@ -31,14 +48,16 @@ with cte as (
 			, ingredient.rxcui as ingredient_rxcui
 			, ingredient.str as ingredient_name
 			, ingredient.tty as ingredient_tty
-		from sagerx_lake.rxnorm_rxnconso product_component
-		inner join sagerx_lake.rxnorm_rxnrel scdc_rxnrel
-			on scdc_rxnrel.rxcui2 = product_component.rxcui and scdc_rxnrel.rela = 'consists_of'
-		inner join sagerx_lake.rxnorm_rxnconso scdc
+		from  product_component
+		inner join rxnrel as scdc_rxnrel
+			on scdc_rxnrel.rxcui2 = product_component.rxcui 
+			and scdc_rxnrel.rela = 'consists_of'
+		inner join product as scdc 
 			on scdc_rxnrel.rxcui1 = scdc.rxcui
-		inner join sagerx_lake.rxnorm_rxnrel ingredient_rxnrel
-			on ingredient_rxnrel.rxcui2 = scdc.rxcui and ingredient_rxnrel.rela = 'has_ingredient'
-		inner join sagerx_lake.rxnorm_rxnconso ingredient
+		inner join rxnrel as ingredient_rxnrel 
+			on ingredient_rxnrel.rxcui2 = scdc.rxcui 
+			and ingredient_rxnrel.rela = 'has_ingredient'
+		inner join ingredient
 			on ingredient_rxnrel.rxcui1 = ingredient.rxcui
 			and ingredient.tty = 'IN'
 			and ingredient.sab = 'RXNORM'
@@ -57,16 +76,18 @@ select distinct
 		case when product_component.rxcui is null then product.cvf else product_component.cvf end = '4096' then true else false end as prescribable
 	, cte.ingredient_rxcui as ingredient_rxcui
 	, dose_form_rxnrel.rxcui1 as dose_form_rxcui
-from sagerx_lake.rxnorm_rxnconso product
-left join sagerx_lake.rxnorm_rxnrel rxnrel on rxnrel.rxcui2 = product.rxcui and rxnrel.rela = 'contains'
-left join sagerx_lake.rxnorm_rxnconso product_component
+from  product
+left join rxnrel 
+	on rxnrel.rxcui2 = product.rxcui 
+	and rxnrel.rela = 'contains'
+left join product_component
 	on rxnrel.rxcui1 = product_component.rxcui
     and product_component.tty = 'SCD'
     and product_component.sab = 'RXNORM'
 left join cte 
 	on cte.product_component_rxcui = case when product_component.rxcui is null then product.rxcui else product_component.rxcui end
 	and cte.rn < 2
-left join sagerx_lake.rxnorm_rxnrel dose_form_rxnrel
+left join rxnrel as dose_form_rxnrel
 	on dose_form_rxnrel.rxcui2 = case when product_component.rxcui is null then product.rxcui else product_component.rxcui end
 	and dose_form_rxnrel.rela = 'has_dose_form'
 	and dose_form_rxnrel.sab = 'RXNORM'

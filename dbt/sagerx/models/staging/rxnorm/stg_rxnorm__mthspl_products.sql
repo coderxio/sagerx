@@ -8,6 +8,6 @@ select
 	, product.code as ndc
 	, case when product.suppress = 'N' then true else false end as active
 	, case when product.cvf = '4096' then true else false end as prescribable
-from sagerx_lake.rxnorm_rxnconso product
+from {{ source('rxnorm', 'rxnorm_rxnconso') }} as product
 where product.tty = 'DP'
 	and product.sab = 'MTHSPL'

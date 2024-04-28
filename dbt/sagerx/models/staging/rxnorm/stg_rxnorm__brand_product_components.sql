@@ -1,5 +1,17 @@
 -- stg_rxnorm__brand_product_components.sql
 
+WITH product AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+)
+
+, rxnrel AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnrel') }} 
+)
+
+, product_component AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+)
+
 select distinct
 	case when product.tty = 'SBD' then product.rxcui else product_component.rxcui end rxcui
 	, case when product.tty = 'SBD' then product.str else product_component.str end name
@@ -22,16 +34,17 @@ select distinct
         then true
         else false
         end as prescribable
-from sagerx_lake.rxnorm_rxnconso product
-left join sagerx_lake.rxnorm_rxnrel rxnrel on rxnrel.rxcui2 = product.rxcui and rxnrel.rela = 'contains'
-left join sagerx_lake.rxnorm_rxnconso product_component
+from product
+left join rxnrel 
+	on rxnrel.rxcui2 = product.rxcui and rxnrel.rela = 'contains'
+left join product_component
 	on rxnrel.rxcui1 = product_component.rxcui
 	and product_component.tty in ('SBD', 'SCD') -- NOTE: BPCKs can contain SBDs AND SCDs
 	and product_component.sab = 'RXNORM'
-left join sagerx_lake.rxnorm_rxnrel rxnrel_scd 
+left join rxnrel as rxnrel_scd 
 	on rxnrel_scd.rxcui2 = case when product_component.rxcui is null then product.rxcui else product_component.rxcui end 
 	and rxnrel_scd.rela = 'tradename_of' -- rxnrel_scd.rxcui1 = clinical_product_component_rxcui
-left join sagerx_lake.rxnorm_rxnrel rxnrel_bn 
+left join rxnrel as rxnrel_bn 
 	on rxnrel_bn.rxcui2 = case when product_component.rxcui is null then product.rxcui else product_component.rxcui end 
 	and rxnrel_bn.rela = 'has_ingredient' -- rxnrel_bn.rxcui1 = brand_rxcui
 where product.tty in ('SBD', 'BPCK')

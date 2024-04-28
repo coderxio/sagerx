@@ -1,11 +1,11 @@
 with all_ndcs as
 (
     select * from {{ ref('stg_rxnorm__all_ndcs') }}
-),
+)
 
-product_rxcuis as
+, product_rxcuis as
 (
-    select * from sagerx_lake.rxnorm_rxnconso
+    select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
     where sab = 'RXNORM'
         and tty in ('SCD', 'SBD', 'GPCK', 'BPCK')
 )

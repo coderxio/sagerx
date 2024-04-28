@@ -1,10 +1,18 @@
 -- stg_rxnorm__dose_form_group_links.sql
 
+WITH rxnrel AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnrel') }} 
+)
+
+, dose_form AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+)
+
 select distinct
 	dose_form.rxcui dose_form_rxcui
 	, rxnrel.rxcui1 dose_form_group_rxcui
-from sagerx_lake.rxnorm_rxnconso dose_form
-inner join sagerx_lake.rxnorm_rxnrel rxnrel
+from dose_form
+inner join rxnrel
 	on rxnrel.rxcui2 = dose_form.rxcui
 	and rxnrel.rela = 'isa'
 	and rxnrel.sab = 'RXNORM'

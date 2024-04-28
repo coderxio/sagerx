@@ -1,6 +1,18 @@
 -- stg_rxnorm__ingredient_components.sql
 
-with cte as (
+WITH ingredient AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+)
+
+, rxnrel AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnrel') }} 
+)
+
+, ingredient_component AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+)
+
+, cte as (
 	select
 		rxnrel.rxcui2 as ingredient_rxcui
 		, ingredient_component.rxcui as rxcui
@@ -8,9 +20,8 @@ with cte as (
 		, ingredient_component.tty as tty
 		, ingredient_component.suppress
 		, ingredient_component.cvf
-	from
-		sagerx_lake.rxnorm_rxnrel rxnrel
-	inner join sagerx_lake.rxnorm_rxnconso ingredient_component
+	from rxnrel
+	inner join ingredient_component
 		on rxnrel.rxcui1 = ingredient_component.rxcui
 	where rxnrel.rela = 'has_part'
 		and ingredient_component.tty = 'IN'
@@ -25,7 +36,8 @@ select distinct
 		case when cte.rxcui is null then ingredient.suppress else cte.suppress end = 'N' then true else false end as active
 	, case when 
 		case when cte.rxcui is null then ingredient.cvf else cte.cvf end = '4096' then true else false end as prescribable
-from sagerx_lake.rxnorm_rxnconso ingredient
-left join cte on ingredient.rxcui = cte.ingredient_rxcui
+from ingredient
+left join cte 
+	on ingredient.rxcui = cte.ingredient_rxcui
 where ingredient.tty in('IN', 'MIN')
 	and ingredient.sab = 'RXNORM'

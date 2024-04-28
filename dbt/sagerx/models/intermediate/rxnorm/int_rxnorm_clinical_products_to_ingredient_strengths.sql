@@ -1,71 +1,47 @@
 -- int_rxnorm_clinical_products_to_ingredient_strengths.sql
 
-with
-
-rcp as (
-
+with rcp as (
     select * from {{ ref('stg_rxnorm__clinical_products') }}
+)
 
-),
-
-rcpcl as (
-
+, rcpcl as (
     select * from {{ ref('stg_rxnorm__clinical_product_component_links') }}
+)
 
-),
-
-rcpc as (
-
+, rcpc as (
     select * from {{ ref('stg_rxnorm__clinical_product_components') }}
-
 ),
 
-rdf as (
-
+, rdf as (
     select * from {{ ref('stg_rxnorm__dose_forms') }}
+)
 
-),
-
-ri as (
-
+, ri as (
     select * from {{ ref('stg_rxnorm__ingredients') }}
+)
 
-),
-
-ricl as (
-
+, ricl as (
     select * from {{ ref('stg_rxnorm__ingredient_component_links') }}
+)
 
-),
-
-ric as (
-
+, ric as (
     select * from {{ ref('stg_rxnorm__ingredient_components') }}
+)
 
-),
-
-risl as (
-
+, risl as (
     select * from {{ ref('stg_rxnorm__ingredient_strength_links') }}
+)
 
-),
+, ris as (
+    select * from {{ ref('stg_rxnorm__ingredient_strengths') }}, 
+)
 
-ris as (
-
-    select * from {{ ref('stg_rxnorm__ingredient_strengths') }}
-
-),
-
-pinl as (
-
+, pinl as (
     select * from {{ ref('stg_rxnorm__precise_ingredient_links') }}
+)
 
-),
-
-pin as (
-
+, pin as (
     select * from {{ ref('stg_rxnorm__precise_ingredients') }}
-
 )
 
 select

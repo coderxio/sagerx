@@ -6,6 +6,6 @@ select
     , rxnsat.rxcui
 	, case when rxnsat.suppress = 'N' then true else false end as active
 	, case when rxnsat.cvf = '4096' then true else false end as prescribable
-from sagerx_lake.rxnorm_rxnsat rxnsat
+from {{ source('rxnorm', 'rxnorm_rxnsat') }} as rxnsat
     where rxnsat.atn = 'NDC'
         and rxnsat.sab = 'MTHSPL'

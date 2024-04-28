@@ -11,7 +11,7 @@ with rcp as (
 
 , rcpc as (
     select * from {{ ref('stg_rxnorm__clinical_product_components') }}
-),
+)
 
 , rdf as (
     select * from {{ ref('stg_rxnorm__dose_forms') }}

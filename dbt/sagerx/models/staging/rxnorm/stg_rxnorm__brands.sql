@@ -71,14 +71,14 @@ select distinct
 	, case when brand.suppress = 'N' then true else false end as active
 	, case when brand.cvf = '4096' then true else false end as prescribable
 	, cte.ingredient_rxcui as ingredient_rxcui
-from brand
+from brand as product
 inner join rxnrel
-	on rxnrel.rxcui2 = brand.rxcui 
+	on rxnrel.rxcui2 = product.rxcui 
 	and rxnrel.rela = 'has_ingredient'
 inner join brand
 	on rxnrel.rxcui1 = brand.rxcui
 	and brand.tty = 'BN'
 	and brand.sab = 'RXNORM'
 Left join cte on cte.rxcui = brand.rxcui and cte.rn < 2
-where brand.tty = 'SBD'
-	and brand.sab = 'RXNORM'
+where product.tty = 'SBD'
+	and product.sab = 'RXNORM'

@@ -21,6 +21,15 @@ CREATE TABLE sagerx_lake.rxnorm_rxnatomarchive (
    blank             TEXT
 );
 
+CREATE INDEX IF NOT EXISTS rxnrel_rxaui
+ON sagerx_lake.rxnorm_rxnatomarchive(rxaui);
+
+CREATE INDEX IF NOT EXISTS rxnrel_rxcui
+ON sagerx_lake.rxnorm_rxnatomarchive(rxcui);
+
+CREATE INDEX IF NOT EXISTS rxnrel_mergedcui
+ON sagerx_lake.rxnorm_rxnatomarchive(merged_to_rxcui);
+
 COPY sagerx_lake.rxnorm_rxnatomarchive
 FROM '{{ ti.xcom_pull(task_ids='extract') }}/rrf/RXNATOMARCHIVE.RRF' CSV DELIMITER '|' ENCODING 'UTF8' ESCAPE E'\b' QUOTE E'\b';
 --ESCAPE and QOUTE characters are dummy to remove default

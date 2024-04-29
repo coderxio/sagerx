@@ -21,6 +21,7 @@ x-airflow-common: &airflow-common
     - ./airflow/logs:/opt/airflow/logs
     - ./airflow/plugins:/opt/airflow/plugins
     - ./airflow/data:/opt/airflow/data
+    - ./airflow/config/airflow.cfg:/opt/airflow/airflow.cfg
     - ./dbt:/dbt
 
 services:

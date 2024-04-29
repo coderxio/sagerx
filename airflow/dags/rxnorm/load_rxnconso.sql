@@ -23,5 +23,21 @@ cvf			VARCHAR(50),
 blank       TEXT
 );
 
+CREATE INDEX IF NOT EXISTS rxnconso_str
+ON sagerx_lake.rxnorm_rxnconso(str);
+
+
+CREATE INDEX IF NOT EXISTS rxnconso_rxcui
+ON sagerx_lake.rxnorm_rxnconso(rxcui);
+
+
+CREATE INDEX IF NOT EXISTS rxnconso_tty
+ON sagerx_lake.rxnorm_rxnconso(tty);
+
+
+CREATE INDEX IF NOT EXISTS rxnconso_code
+ON sagerx_lake.rxnorm_rxnconso(code);
+--IF NOT EXISTS added if in future table is not always dropped first
+
 COPY sagerx_lake.rxnorm_rxnconso FROM '{{ ti.xcom_pull(task_ids='extract') }}/rrf/RXNCONSO.RRF' CSV DELIMITER '|' ENCODING 'UTF8' ESCAPE E'\b' QUOTE E'\b';
 --ESCAPE and QOUTE characters are dummy to remove default

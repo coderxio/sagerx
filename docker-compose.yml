@@ -29,14 +29,8 @@ services:
     container_name: postgres
     environment:
       POSTGRES_USER: sagerx
-      PGUSER: sagerx
       POSTGRES_PASSWORD: sagerx
       POSTGRES_DB: sagerx
-    healthcheck: #added health checks
-      test: [ "CMD", "pg_isready" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     ports:
       - 5432:5432
     volumes:
@@ -44,6 +38,7 @@ services:
       - ./airflow/data:/opt/airflow/data
       - ./airflow/extracts:/opt/airflow/extracts
     build:
+      context: .
       shm_size: "4gb"
 
   pgadmin:
@@ -88,40 +83,18 @@ services:
       _AIRFLOW_WWW_USER_CREATE: "true"
       _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
       _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
-      # POSTGRES_USER: sagerx
-      # POSTGRES_PASSWORD: sagerx
-      # POSTGRES_DB: sagerx
-      # _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- psycopg2-binary==2.9.1}
     user: "0:0"
     volumes:
       - ./airflow:/sources
     depends_on:
-      postgres: 
-      #syntax change
-        condition: service_healthy
+      - postgres
 
   airflow-webserver:
     <<: *airflow-common
     container_name: airflow-webserver
     command: webserver
-    environment:
-      <<: *airflow-common-env
-      AWS_ACCESS_KEY_ID: ${ACCESS_KEY}
-      AWS_SECRET_ACCESS_KEY: ${SECRET_ACCESS_KEY}
-      AWS_DEST_BUCKET: ${DEST_BUCKET}
     ports:
       - 8001:8080
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-    restart: always
-    depends_on:
-      airflow-init:
-        condition: service_completed_successfully    
-    
-  
 
   airflow-scheduler:
     <<: *airflow-common

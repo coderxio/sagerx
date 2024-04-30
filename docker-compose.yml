@@ -2,7 +2,7 @@ version: "3.8"
 x-airflow-common: &airflow-common
   build:
     context: ./airflow
-  image: sagerx_airflow
+  image: sagerx_airflow:v1 # Versioning allows a rebuild of docker image where necessary
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"

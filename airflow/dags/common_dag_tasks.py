@@ -1,6 +1,7 @@
 from pathlib import Path
 from sagerx import get_dataset, read_sql_file, get_sql_list
 from airflow.decorators import task
+from airflow.models import DagRun
 
 def get_ds_folder(dag_id):
     return Path("/opt/airflow/dags") / dag_id
@@ -35,6 +36,11 @@ def url_request(url,param=None,headers=None):
         print(f"Response Text: {response.text}")
         raise response
     return response
+
+def get_most_recent_dag_run(dag_id):
+    dag_runs = DagRun.find(dag_id=dag_id)
+    dag_runs.sort(key=lambda x: x.execution_date, reverse=True)
+    return dag_runs[0] if dag_runs else None
 
 @task
 def extract(dag_id,url) -> str:

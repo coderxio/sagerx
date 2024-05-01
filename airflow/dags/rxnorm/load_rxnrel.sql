@@ -24,3 +24,12 @@ CREATE TABLE sagerx_lake.rxnorm_rxnrel (
 COPY sagerx_lake.rxnorm_rxnrel
 FROM '{{ ti.xcom_pull(task_ids='extract') }}/rrf/RXNREL.RRF' CSV DELIMITER '|' ENCODING 'UTF8' ESCAPE E'\b' QUOTE E'\b';
 --ESCAPE and QOUTE characters are dummy to remove default
+
+CREATE INDEX IF NOT EXISTS rxnrel_rxcui1
+ON sagerx_lake.rxnorm_rxnrel(rxcui1);
+
+CREATE INDEX IF NOT EXISTS rxnrel_rxcui2
+ON sagerx_lake.rxnorm_rxnrel(rxcui2);
+
+CREATE INDEX IF NOT EXISTS rxnrel_rela
+ON sagerx_lake.rxnorm_rxnrel(rela);

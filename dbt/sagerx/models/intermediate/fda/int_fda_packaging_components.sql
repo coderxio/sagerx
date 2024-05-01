@@ -20,8 +20,8 @@ all_fda as (
 select
 	z.ndc11
     , z.packagedescription
-   	, z.ordinality as package_line
-	, trim(z.token) as package_text
+   	, z.ordinality as component_line
+	, trim(z.token) as component_text
 from (
     select distinct 
         all_fda.ndc11
@@ -40,4 +40,4 @@ from (
 				, '|')
 			) with ordinality as s(token, ordinality)
 ) z
-order by ndc11, package_line
+order by ndc11, component_line

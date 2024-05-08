@@ -21,6 +21,10 @@ with atc_codes_to_rxnorm_product_rxcuis as (
 select distinct
 	atc_codes_to_rxnorm_product_rxcuis.rxcui
 	, rxnorm_product_rxcuis.str as rxnorm_description
+	, atc_codes.atc_1_code
+	, atc_codes.atc_2_code
+	, atc_codes.atc_3_code
+	, atc_codes.atc_4_code
 	, atc_codes.atc_1_name
 	, atc_codes.atc_2_name
 	, atc_codes.atc_3_name

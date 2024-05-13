@@ -7,14 +7,17 @@ with rxnorm_products as (
 )
 
 select
-    product_rxcui
-    , product_name
-    , product_tty
+    prod.rxcui as product_rxcui
+    , prod.name as product_name
+    , prod.tty as product_tty
     , case
-        when product_tty in ('SBD', 'BPCK') then 'brand'
-        when product_tty in ('SCD', 'GPCK') then 'generic'
+        when prod.tty in ('SBD', 'BPCK') then 'brand'
+        when prod.tty in ('SCD', 'GPCK') then 'generic'
         end as brand_vs_generic
-    , substring(product_name from '\[(.*)\]') as brand_name
+    , substring(prod.name from '\[(.*)\]') as brand_name
+    , cping.clinical_product_rxcui
+    , cping.clinical_product_name
+    , cping.clinical_product_tty
     , cping.ingredient_name
     -- strength - couldn't easily get strength at this grain - can if needed
     , cping.dose_form_name

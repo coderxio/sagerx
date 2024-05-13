@@ -1,6 +1,5 @@
 with brand_products as (
-    select * from {{ ref('stg_rxnorm__products') }}
-    where product_tty in ('SBD', 'BPCK') -- brand products only
+    select * from {{ ref('stg_rxnorm__brand_products') }}
 )
 
 , fda_ndcs as (
@@ -13,9 +12,9 @@ with brand_products as (
 
 , map as (
     select
-        prod.product_tty
-        , prod.product_rxcui
-        , prod.product_name
+        prod.tty as product_tty
+        , prod.rxcui as product_rxcui
+        , prod.name as product_name
         , ndc.product_tty as ndc_product_tty
         , ndc.product_rxcui as ndc_product_rxcui
         , ndc.product_name as ndc_product_name
@@ -27,7 +26,7 @@ with brand_products as (
         on ndc.clinical_product_rxcui = prod.clinical_product_rxcui
     left join fda_ndcs fda
         on fda.ndc11 = ndc.ndc
-    order by prod.product_rxcui
+    order by prod.rxcui
 )
 
 select

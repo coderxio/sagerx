@@ -7,6 +7,12 @@ models:
 
       Data generally comes from RxNorm.
     columns:
+      - name: product_rxcui
+        description: >
+          Product-level RxNorm RXCUI.
+        tests:
+          - unique
+          - not_null    
       - name: brand_vs_generic
         description: |
           Simple (not comprehensive) brand vs generic flag.

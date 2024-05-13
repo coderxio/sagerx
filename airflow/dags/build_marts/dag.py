@@ -62,4 +62,3 @@ with dag:
         print("Result from dbt:", result)
 
     execute_external_dag_list() >> transform_tasks()
-    

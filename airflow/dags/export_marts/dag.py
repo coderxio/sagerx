@@ -53,4 +53,3 @@ with dag:
             s3_resource.Object(dest_bucket, f'{k}.csv').put(Body=csv_buffer.getvalue())
 
     export_marts()
-    

@@ -60,5 +60,8 @@ with dag:
         atc_subprocess = SubprocessHook()
         result = atc_subprocess.run_command(['dbt', 'run', '--select', '+models/marts/classification'], cwd='/dbt/sagerx')
         print("Result from dbt:", result)
+        products_subprocess = SubprocessHook()
+        result = products_subprocess.run_command(['dbt', 'run', '--select', '+models/marts/products'], cwd='/dbt/sagerx')
+        print("Result from dbt:", result)
 
     execute_external_dag_list() >> transform_tasks()

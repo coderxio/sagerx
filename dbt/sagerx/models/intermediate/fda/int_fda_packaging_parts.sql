@@ -4,6 +4,7 @@ with
 
 packaging_components as (
 	select * from {{ ref('int_fda_packaging_components') }}
+	where component_text like ('%*%')
 )
 
 select

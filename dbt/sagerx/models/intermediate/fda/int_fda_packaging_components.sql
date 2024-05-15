@@ -22,6 +22,10 @@ select
     , z.packagedescription
    	, z.ordinality as component_line
 	, trim(z.token) as component_text
+	, trim(substring(z.token from '(.*) in ')) as inner_text
+	, trim(substring(z.token from ' in (.*?)(?:\(|$)')) as outer_text
+	, trim(substring(z.token from '\((.+)\)')) as outer_ndc
+	, ndc_to_11(trim(substring(z.token from '\((.+)\)'))) as outer_ndc11
 from (
     select distinct 
         all_fda.ndc11

@@ -84,25 +84,28 @@ def process_dailymed(data_folder, xslt, ti):
 
     for zip_folder in data_folder.iterdir():
         logging.info(zip_folder)
-        with zipfile.ZipFile(zip_folder) as unzipped_folder:
-            folder_name = zip_folder.stem
-            for subfile in unzipped_folder.infolist():
-                if re.match(".*.xml", subfile.filename):
-                    new_file = unzipped_folder.extract(subfile, data_folder)
-                    # xslt transform
-                    xml_content = transform_xml(new_file, xslt)
-                    os.remove(new_file)
-                    df = pd.DataFrame(
-                        columns=["spl", "file_name", "xml_content"],
-                        data=[[folder_name, subfile.filename, xml_content]],
-                    )
-                    df.to_sql(
-                        "dailymed_rx_full",
-                        schema="sagerx_lake",
-                        con=db_conn,
-                        if_exists="append",
-                        index=False,
-                    )
+        try:
+            with zipfile.ZipFile(zip_folder) as unzipped_folder:
+                folder_name = zip_folder.stem
+                for subfile in unzipped_folder.infolist():
+                    if re.match(".*.xml", subfile.filename):
+                        new_file = unzipped_folder.extract(subfile, data_folder)
+                        # xslt transform
+                        xml_content = transform_xml(new_file, xslt)
+                        os.remove(new_file)
+                        df = pd.DataFrame(
+                            columns=["spl", "file_name", "xml_content"],
+                            data=[[folder_name, subfile.filename, xml_content]],
+                        )
+                        df.to_sql(
+                            "dailymed_rx_full",
+                            schema="sagerx_lake",
+                            con=db_conn,
+                            if_exists="append",
+                            index=False,
+                        )
+        except Exception as e:
+            logging.warning(e)
 
 
 ########################### DYNAMIC DAG DO NOT TOUCH BELOW HERE #################################

@@ -2,6 +2,7 @@ from airflow.decorators import task
 import pandas as pd
 from sagerx import load_df_to_pg, parallel_api_calls
 
+
 def create_url_list(rxcui_list:list)-> list:
     urls=[]
 
@@ -9,7 +10,8 @@ def create_url_list(rxcui_list:list)-> list:
         urls.append(f"https://rxnav.nlm.nih.gov/REST/rxclass/class/byRxcui.json?rxcui={rxcui}&relaSource=ATCPROD")
     return urls
 
-@task
+
+@task()
 def get_rxcuis() -> list:
     from airflow.hooks.postgres_hook import PostgresHook
 

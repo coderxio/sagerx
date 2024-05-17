@@ -35,7 +35,7 @@ models:
       +materialized: view
     intermediate:
       +schema: sagerx
-      +materialized: view
+      +materialized: table
     marts:
       +schema: sagerx
       +materialized: table

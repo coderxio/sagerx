@@ -25,7 +25,7 @@ def nadac():
     ds_folder = Path("/opt/airflow/dags") / dag_id
     data_folder = Path("/opt/airflow/data") / dag_id
 
-    @task()
+    @task
     def extract(data_interval_start=None):
         import requests
 

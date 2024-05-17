@@ -24,7 +24,7 @@ def fda_enf_extract(data_interval_start=None, data_interval_end=None):
 
     return df
 
-@task()
+@task
 def load_json(data_path):
     import pandas as pd
     print(f"JSON path: {data_path}")

@@ -10,7 +10,7 @@ def create_url_list(rxcui_list:list)-> list:
         urls.append(f'https://rxnav.nlm.nih.gov/REST/rxcui/{rxcui}/allhistoricalndcs.json')
     return urls
 
-@task()
+@task
 def get_rxcuis() -> list:
     from airflow.hooks.postgres_hook import PostgresHook
 

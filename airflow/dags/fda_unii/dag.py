@@ -20,7 +20,8 @@ with dag:
     url= "https://precision.fda.gov/uniisearch/archive/latest/unii_data.zip"
     ds_folder = get_ds_folder(dag_id)
 
-    extract_task = extract(dag_id,url)
+    # extract_task = extract(dag_id,url)
+    override_data_path = '/opt/airflow/data/fda_unii'
     transform_task = transform(dag_id)
 
     sql_tasks = []
@@ -30,9 +31,10 @@ with dag:
         sql_task = PostgresOperator(
             task_id=task_id,
             postgres_conn_id="postgres_default",
-            sql=read_sql_file(sql_path).format(data_path=extract_task),
+            sql=read_sql_file(sql_path).format(data_path=override_data_path),
             dag=dag
         )
         sql_tasks.append(sql_task)
         
-    extract_task >> sql_tasks >> transform_task
+    # extract_task >> sql_tasks >> transform_task
+    sql_tasks >> transform_task

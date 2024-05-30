@@ -27,5 +27,5 @@ CREATE TABLE sagerx_lake.fda_unii (
     dailymed              TEXT
 );
 
-COPY sagerx_lake.fda_ndc_package
-FROM '{data_path}/UNII_Records_27Jan2024.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;
+COPY sagerx_lake.fda_unii
+FROM '{data_path}/UNII_Records_16May2024.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;

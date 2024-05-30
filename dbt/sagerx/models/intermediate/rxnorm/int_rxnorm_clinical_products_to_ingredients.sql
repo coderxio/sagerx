@@ -36,15 +36,15 @@ select
     rcp.rxcui as clinical_product_rxcui
     , rcp.name as clinical_product_name
     , rcp.tty as clinical_product_tty
-    , rcpc.rxcui as clinical_product_component_rxcui
-    , rcpc.name as clinical_product_compnent_name
-    , rcpc.tty as clinical_product_component_tty
-    , rdf.rxcui as dose_form_rxcui
-    , rdf.name as dose_form_name
-    , rdf.tty as dose_form_tty
-    , ri.rxcui as ingredient_rxcui
-    , ri.name as ingredient_name
-    , ri.tty as ingredient_tty
+    , string_agg(rcpc.rxcui, ' | ') as clinical_product_component_rxcui
+    , string_agg(rcpc.name, ' | ') as clinical_product_compnent_name
+    , string_agg(rcpc.tty, ' | ') as clinical_product_component_tty
+    , string_agg(rdf.rxcui, ' | ') as dose_form_rxcui
+    , string_agg(rdf.name, ' | ') as dose_form_name
+    , string_agg(rdf.tty, ' | ') as dose_form_tty
+    , string_agg(ri.rxcui, ' | ') as ingredient_rxcui
+    , string_agg(ri.name, ' | ') as ingredient_name
+    , string_agg(ri.tty, ' | ') as ingredient_tty
     , rcp.active
     , rcp.prescribable        
 from rcp 
@@ -56,3 +56,10 @@ left join rdf
     on rcpc.dose_form_rxcui = rdf.rxcui 
 left join ri 
     on rcpc.ingredient_rxcui = ri.rxcui 
+group by
+    rcp.rxcui
+    , rcp.name
+    , rcp.tty
+    , rcp.active
+    , rcp.prescribable        
+

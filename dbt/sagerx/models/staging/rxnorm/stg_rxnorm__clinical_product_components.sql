@@ -13,7 +13,8 @@ with cte as (
 			, ingredient.str as ingredient_name
 			, ingredient.tty as ingredient_tty
 		from sagerx_lake.rxnorm_rxnconso product_component
-		inner join sagerx_lake.rxnorm_rxnrel rxnrel on rxnrel.rxcui2 = product_component.rxcui and rxnrel.rela = 'has_ingredients'
+		inner join sagerx_lake.rxnorm_rxnrel rxnrel
+			on rxnrel.rxcui2 = product_component.rxcui and rxnrel.rela = 'has_ingredients'
 		inner join sagerx_lake.rxnorm_rxnconso ingredient
 			on rxnrel.rxcui1 = ingredient.rxcui
 			and ingredient.tty = 'MIN'
@@ -31,9 +32,12 @@ with cte as (
 			, ingredient.str as ingredient_name
 			, ingredient.tty as ingredient_tty
 		from sagerx_lake.rxnorm_rxnconso product_component
-		inner join sagerx_lake.rxnorm_rxnrel scdc_rxnrel on scdc_rxnrel.rxcui2 = product_component.rxcui and scdc_rxnrel.rela = 'consists_of'
-		inner join sagerx_lake.rxnorm_rxnconso scdc on scdc_rxnrel.rxcui1 = scdc.rxcui
-		inner join sagerx_lake.rxnorm_rxnrel ingredient_rxnrel on ingredient_rxnrel.rxcui2 = scdc.rxcui and ingredient_rxnrel.rela = 'has_ingredient'
+		inner join sagerx_lake.rxnorm_rxnrel scdc_rxnrel
+			on scdc_rxnrel.rxcui2 = product_component.rxcui and scdc_rxnrel.rela = 'consists_of'
+		inner join sagerx_lake.rxnorm_rxnconso scdc
+			on scdc_rxnrel.rxcui1 = scdc.rxcui
+		inner join sagerx_lake.rxnorm_rxnrel ingredient_rxnrel
+			on ingredient_rxnrel.rxcui2 = scdc.rxcui and ingredient_rxnrel.rela = 'has_ingredient'
 		inner join sagerx_lake.rxnorm_rxnconso ingredient
 			on ingredient_rxnrel.rxcui1 = ingredient.rxcui
 			and ingredient.tty = 'IN'

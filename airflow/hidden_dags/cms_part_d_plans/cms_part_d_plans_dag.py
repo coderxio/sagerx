@@ -2,7 +2,7 @@ from pathlib import Path
 import os
 import pendulum
 # zipfile_deflate64 is needed likely because of how CMS zips these files
-import zipfile_deflate64 as zipfile
+import zipfile_deflate64 as zipfile # this package is not easily accessible in this context - consider an alternative
 
 from sagerx import create_path, get_dataset, read_sql_file, get_sql_list, alert_slack_channel
 

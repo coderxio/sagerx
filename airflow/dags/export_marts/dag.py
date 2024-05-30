@@ -26,7 +26,7 @@ with dag:
     def export_marts():
         pg_hook = PostgresHook(postgres_conn_id="postgres_default")
         engine = pg_hook.get_sqlalchemy_engine()
-        marts_list = ["all_ndc_descriptions","atc_codes_to_rxnorm_products"]
+        marts_list = ["all_ndc_descriptions","atc_codes_to_rxnorm_products","all_ndcs_to_sources","products_to_inactive_ingredients","products","brand_products_with_related_ndcs"]
         mart_dfs={}
         with engine.connect() as connection:
             for mart in marts_list:
@@ -48,7 +48,7 @@ with dag:
         for k in list(mart_dfs.keys()):
             print(f'putting {k}')
             csv_buffer = StringIO()
-            mart_dfs[k].to_csv(csv_buffer)
+            mart_dfs[k].to_csv(csv_buffer, index=False)
 
             s3_resource.Object(dest_bucket, f'{k}.csv').put(Body=csv_buffer.getvalue())
 

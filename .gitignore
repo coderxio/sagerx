@@ -1,4 +1,5 @@
 .env
+notebooks
 
 # Python files
 __pycache__

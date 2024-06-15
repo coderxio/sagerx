@@ -112,7 +112,6 @@ with dag:
 
 
 """
-
 Notes:
 - Scaling issue if each table contains multiple tasks, can quickly grow since it grows exponentially 
 - Single dbt run is the preferred method since the complexity of dependencies is handled once 

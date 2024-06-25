@@ -5,7 +5,7 @@ ENV DBT_PROFILES_DIR=/dbt
 RUN apt-get -y update
 RUN apt-get -y install git
 
-RUN pip install dbt-postgres==1.5.1
+RUN pip install dbt-core dbt-postgres
 
 WORKDIR /dbt
 

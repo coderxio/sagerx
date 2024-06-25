@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "sagerx-420700",
+  "private_key_id": "6bf9848ab8176d0d1ba164047563fc833c82e13e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCtqq0wO3XXsHSa\nKG0SEinf11jgL1N0QNpgXN74rg0ZdQ1+zTlMrKMpZ1TthAQpBGZgaSZWChh8B4k4\nKvbnMsuDW196bwujhCFptJiDcdhEHenbVV1RpGgxO8z7Eo0q0WikjlLtx5UM2BoK\nYOz02SjSw88rj34vOB5aQl7uFsVZ0cCg8ZwBKBC5BOSWxgJN6d3zr8AzVBy6tLFV\n1xQfiaGbuvUCuDzda79PgGBZKCkQDdiSzG955tdugEM51URFescmV9Y6afEaCB1k\nM36pPqSpiO4MWytDRwqvp599Mpv/u8ybwp4lqdw+eNVVBJtZWp9m8ye6nNUJlgF5\nXvee7ONJAgMBAAECggEADDmvHm2ZIpln4/BDmVmQ/BJ3TbTXLaBhHxZ6lcv+3RNp\n40rEJVsj00bUajH4bwDByjisu7LTPWv0Y3FW1ziyrekRRBesHJMxHPVbJSmu/UCT\n1V5hht1JfmnEyMnqCSEbujXQra92lSRjVOa015mv74JcQ6dCzUUokdcJQr50nxlw\nwU6SzK1gvpN9H/rWgNDFp9rzlumFkp1dOvrEbdGn2OsVmzHP6y+5JARlFV+gCRYc\njNzVHsSHfN30e50f+1z/8li77bTA7UumQXVdJ9xWuCkKXpuWg8KOY7i7vczsS52T\nb66qPL7K2VOz1XfbelfnRl+Sc08VV37m7EP82BPR7wKBgQDYSuPh+4QWq7r1E8Zg\n7Hn2UZdxPRq3Lt6qhCgT8sowgLfXV1A0uPSXxGyvYkt4iFsI7nPTpaE514zmqRT4\na4ILoLRRd3A0nc8eappkFs8D2GwAhwhi0V9YIeMMqDwiS3QRtQJCTsjWHPTs+5bu\nLPMpR2oWZEJd7tWdCbzHqVwVhwKBgQDNjH+Hg0lIp7PhnQZtxFv8WfPwMZBZagvq\nVX+lR0t1vBn55CYTksU1tRutF8iNT3OvNbwTA8MzlULp8st42pxac7SmR86O5eXX\np6I5t4DTT+tfyvb/MY+u4EYPWRn7tqxihTIPkwOPkkRHudu2++KkIt+Ov/KbzmmV\nc5siVT90rwKBgQCqq0Vv7uhGf1Gxyt3RYyfFrpIiX4XyH8DBqjB5tS3H4fmuqQ33\n3C3ch7j/Fz/YJzg2LvokemBi5OwgojCS6TofdLp0Qhu+2Psy1Alpivnk3eQy8loy\np2VlhK/FMAbrRMCcrEjRC5u8H/NAADITVFK3MsvKSWh4+FmEZceZgNDRhwKBgHm5\n2ZBL7GtNfVZ/4l3A6mSgdLjq8TwydAn7RhOADC0WDyAQv4fZ5FYxAcnZCti8k5rQ\nLKfqE4CJxU28jkjs1akvWm0amzW+6gVzbbvWc0Ew1Agvr2RjWl7KzFKshpmtjZru\nnD3i5znv+eWsKHTN6GMhj9j+zVL9w0NRai7D40dbAoGAdUxA6or4sFQcqajPIwuG\n2Mi/h1h7vvfpIU7+EXYKldKM251H//cREAbVCifLYgOKrFsVHmw/e09WjELo/OzF\ny1o5iv13kOntp42pE6t8zYtITyfV/yWlEqLUpima7cC+l/hA6aosfv6HjbWDEg6H\njxA6HVX3j/dLNU3ktyj/KS8=\n-----END PRIVATE KEY-----\n",
+  "client_email": "lukasz-mac-book@sagerx-420700.iam.gserviceaccount.com",
+  "client_id": "117356098211646277767",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/lukasz-mac-book%40sagerx-420700.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

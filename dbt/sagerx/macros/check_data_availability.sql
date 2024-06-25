@@ -17,17 +17,8 @@ create table sagerx.data_availability(
     schema_name text,
     table_name text,
     has_data boolean,
-<<<<<<< HEAD
-<<<<<<< HEAD
     materialized text,
     columns_info jsonb
-=======
-    materialized text
->>>>>>> fdd900a (init2)
-=======
-    materialized text,
-    columns_info jsonb
->>>>>>> 7b9283b (finalize logic to push and create datasets)
 );
 {% endset %}
 
@@ -73,21 +64,9 @@ create table sagerx.data_availability(
       {% set row_count_result = run_query(row_count_query) %}
 
       {% set insert_query %}
-<<<<<<< HEAD
-<<<<<<< HEAD
           insert into sagerx.data_availability
           (schema_name, table_name, has_data, materialized, columns_info)
           values ('{{ schema_name }}','{{ table_name }}', {{ row_count_result[0]['row_count'] > 0 }}, '{{ mat_config }}', '{{ columns_info | tojson }}');
-=======
-          insert into {{ target.schema }}.data_availability
-          (schema_name, table_name, has_data, materialized)
-          values ('{{ schema_name }}','{{ table_name }}', {{ row_count_result[0]['row_count'] > 0 }}, '{{ mat_config }}');
->>>>>>> fdd900a (init2)
-=======
-          insert into sagerx.data_availability
-          (schema_name, table_name, has_data, materialized, columns_info)
-          values ('{{ schema_name }}','{{ table_name }}', {{ row_count_result[0]['row_count'] > 0 }}, '{{ mat_config }}', '{{ columns_info | tojson }}');
->>>>>>> 7b9283b (finalize logic to push and create datasets)
       {% endset %}
       {{ run_query(insert_query) }}
     {% else %}

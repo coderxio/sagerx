@@ -28,4 +28,4 @@ CREATE TABLE sagerx_lake.fda_unii (
 );
 
 COPY sagerx_lake.fda_unii
-FROM '{data_path}/UNII_Records_16May2024.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;
+FROM '{data_path}/{file_name}' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;

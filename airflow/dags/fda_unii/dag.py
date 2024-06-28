@@ -17,21 +17,10 @@ dag = create_dag(
 )
 
 with dag:
-    '''
-    don't need this url because we are overriding the extract_task below
-    
-    this is required due to this issue: https://github.com/coderxio/sagerx/issues/276
-    '''
-    # url= "https://precision.fda.gov/uniisearch/archive/latest/unii_data.zip"
+    url= "https://precision.fda.gov/uniisearch/archive/latest/UNII_Data.zip"
     ds_folder = get_ds_folder(dag_id)
 
-    '''
-    override result of extract_task, which is a data path
-
-    NOTE: if you need to update the file name, do so in load_unii.sql
-    '''
-    # extract_task = extract(dag_id,url)
-    extract_task = '/opt/airflow/data/fda_unii'
+    extract_task = extract(dag_id,url)
     transform_task = transform(dag_id)
 
     sql_tasks = []
@@ -49,5 +38,4 @@ with dag:
     '''
     don't need the extract_task for now
     '''
-    # extract_task >> sql_tasks >> transform_task
-    sql_tasks >> transform_task
+    extract_task >> sql_tasks >> transform_task

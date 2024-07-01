@@ -11,6 +11,7 @@ select
     , display_name
     , rxcui
     , pubchem
+    , rn
     , ncit
     , ncbi
     , dailymed

@@ -8,12 +8,21 @@ with products_to_inactive_ingredients as (
     select * from {{ ref('stg_fda_unii__unii_codes') }}
 )
 
+, fda_unii_preservatives as (
+    select * from {{ ref('fda_unii_preservatives') }}
+)
+
 /*TODO: Move string_agg stuff here */
 select
     ndc9
     , ndc
+    , unii_codes.unii as fda_unii_code
     , unii_codes.display_name as fda_unii_display_name
     , unii_codes.pubchem as pubchem_id
+    , max(case
+        when preservative.unii is not null
+            then 1
+        end) as preservative
     , product_rxcui
     , string_agg(product_name, ' | ') as product_name
     , product_tty
@@ -49,9 +58,12 @@ left join unii_codes
         ) then inactive_ingredient_unii
         else rxcui_to_unii.unii
         end
+left join fda_unii_preservatives preservative
+    on preservative.unii = unii_codes.unii
 group by
     ndc9
     , ndc
+    , unii_codes.unii
     , unii_codes.display_name
     , unii_codes.pubchem
     , product_rxcui

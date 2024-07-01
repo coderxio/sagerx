@@ -10,6 +10,7 @@ select
     unii
     , display_name
     , rxcui
+    , pubchem
     , ncit
     , ncbi
     , dailymed

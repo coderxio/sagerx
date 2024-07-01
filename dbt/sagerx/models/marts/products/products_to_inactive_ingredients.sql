@@ -13,6 +13,7 @@ select
     ndc9
     , ndc
     , unii_codes.display_name as fda_unii_display_name
+    , unii_codes.pubchem as pubchem_id
     , product_rxcui
     , string_agg(product_name, ' | ') as product_name
     , product_tty
@@ -51,7 +52,8 @@ left join unii_codes
 group by
     ndc9
     , ndc
-    , unii_codes.display_name 
+    , unii_codes.display_name
+    , unii_codes.pubchem
     , product_rxcui
     , product_tty
     , inactive_ingredient_unii

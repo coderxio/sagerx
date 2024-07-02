@@ -9,11 +9,11 @@ from airflow.decorators import dag, task
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.hooks.subprocess import SubprocessHook
 
-starting_date = pendulum.parse("2013-12-01")
-
+now = pendulum.now()
+previous_thursday = now.previous(pendulum.THURSDAY)
 
 @dag(
-    start_date=starting_date,
+    start_date=previous_thursday,
     schedule_interval="0 6 * * 4",  # run at 6am every thur
     description="DAG for downloading NADAC weekly",
     on_failure_callback=alert_slack_channel,
@@ -32,6 +32,7 @@ def nadac():
         class nadac:
             def __init__(self):
                 self.dataset_dict = self._build_dataset()
+                print(f"Length of JSON: len(self.dataset_dict)")
 
             def _build_dataset(self):
                 url = "https://data.medicaid.gov/api/1/search/?sort=modified&sort-order=desc&theme=National%20Average%20Drug%20Acquisition%20Cost"
@@ -40,9 +41,10 @@ def nadac():
                 result_json = response.json()["results"]
                 dataset_dict = {}
                 for key, value in result_json.items():
-                    dataset_dict[value["title"]] = value["distribution"][0][
-                        "downloadURL"
-                    ]
+                    if "NADAC (National Average Drug Acquisition Cost)" in value["title"]:
+                        dataset_dict[value["title"]] = value["distribution"][0][
+                            "downloadURL"
+                        ]
                 return dataset_dict
 
             def get_download_url(self, year):

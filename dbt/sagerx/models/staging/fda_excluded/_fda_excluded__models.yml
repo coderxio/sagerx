@@ -6,7 +6,7 @@ models:
     columns:
       - name: ndc11
         description: "The ndcpackagecode field, normalized to a NDC11 format."
-        tests:
+        data_tests:
           - unique
           - not_null
       - name: productid

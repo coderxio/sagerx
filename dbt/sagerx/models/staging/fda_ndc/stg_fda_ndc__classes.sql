@@ -2,18 +2,24 @@
 
 with
 
-product as (
-    
+product as (    
     select * from {{ source('fda_ndc', 'fda_ndc_product') }}
+)
 
+, pharm_classes_array as (
+	select 
+		product.productid
+		, token
+		, row_number() over (partition by product.productid order by token desc) as class_line
+	from product, unnest(string_to_array(product.pharm_classes, ',')) as token
 )
 
 select
-	z.productid
-	, row_number() over (partition by z.productid order by z.token desc) as class_line
-	, trim(left(z.token, position('[' in z.token) -1 )) as class_name
-    , substring(z.token, '\[(.+)\]') as class_type
-from (select distinct product.productid
-	, product.pharm_classes
-	, s.token
-	from product, unnest(string_to_array(product.pharm_classes, ',')) s(token)) z
+	classes.productid
+	, classes.class_line
+	, trim(left(classes.token, position('[' in classes.token) -1 )) as class_name
+	, substring(classes.token, '\[(.+)\]') as class_type
+from pharm_classes_array classes
+order by
+	productid
+	, class_line

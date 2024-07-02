@@ -4,6 +4,7 @@ from airflow.models import Variable
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import requests
 from time import sleep
+import pandas as pd
 
 # Filesystem functions
 def create_path(*args):
@@ -177,6 +178,15 @@ def load_df_to_pg(df,schema_name:str,table_name:str,if_exists:str,dtype_name:str
         dtype=dtype,
         index=index
     )
+
+def run_query_to_df(query:str) -> pd.DataFrame:
+    from airflow.hooks.postgres_hook import PostgresHook
+
+    pg_hook = PostgresHook(postgres_conn_id="postgres_default")
+    engine = pg_hook.get_sqlalchemy_engine()
+    df = pd.read_sql(query, con=engine)
+    
+    return df
 
 @retry(
         stop=stop_after_attempt(20),

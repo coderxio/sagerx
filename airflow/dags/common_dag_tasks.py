@@ -93,6 +93,18 @@ def upload_csv_to_gcs(dag_id):
             gcp_tasks.append(gcp_task)
     return gcp_tasks
 
+def run_subprocess_command(command:list, cwd:str, success_code:int = 0) -> None:
+    from airflow.hooks.subprocess import SubprocessHook
+    from airflow.exceptions import AirflowException
+
+    subprocess = SubprocessHook()
+    run_results = subprocess.run_command(command, cwd=cwd)
+    if run_results.exit_code in [0,success_code]: #dbt default success code is 0
+        print(f"Command succeeded with output: {run_results.output}")
+    else:
+        raise AirflowException(f"Command failed with return code {run_results.exit_code}: {run_results.output}")
+    
+
 @task
 def extract(dag_id,url) -> str:
     # Task to download data from web location
@@ -106,11 +118,8 @@ def extract(dag_id,url) -> str:
 @task
 def transform(dag_id, models_subdir='staging',task_id="") -> None:
     # Task to transform data using dbt
-    from airflow.hooks.subprocess import SubprocessHook
-    from airflow.exceptions import AirflowException
 
-    subprocess = SubprocessHook()
-    result = subprocess.run_command(['docker', 'exec', 'dbt','dbt', 'run', '--select', f'models/{models_subdir}/{dag_id}'], cwd='/dbt/sagerx')
-    if result.exit_code != 0:
-            raise AirflowException(f"Command failed with return code {result.exit_code}: {result.output}")
-    print("Result from dbt:", result)
+    run_subprocess_command(
+        command=['docker', 'exec', 'dbt','dbt', 'run', '--select', f'models/{models_subdir}/{dag_id}'],
+        cwd='/dbt/sagerx'
+    )

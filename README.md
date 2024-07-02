@@ -90,11 +90,24 @@ The access and secret-access keys can be found in 2 ways:
 
 ### Integration with Google Cloud Platform (GCP)
 
-.env variables
+Currently we are utilizing 2 GCP products: Google Cloud Storage (GCS) and BigQuery (BQ).
+
+The current workflow has all of the dbt tables are created locally with only the final products being pushed to GCP. This reduces computational expenses especially as we test out new data sources and need to run dbt more frequently.
+
+To accomplish this yourself, you need to follow these steps:
+
+1. Set up a GCP account (including billing)
+2. Made a new storage bucket under GCS
+3. Enable IAM API
+4. Create a new [service account](https://cloud.google.com/iam/docs/service-account-overview?hl=en) with permissions to add and delete content for both GCS and BQ, [dbt example](https://docs.getdbt.com/guides/bigquery?step=4)
+5. Created new key for service account and download it as JSON, this gets added to the root directory of the project as gcp.json
+6. Add the necessary environment variables to .env
 
 - GCS_BUCKET
 - GCP_PROJECT
 - GCP_DATASET
+
+7. Rebuild docker containers
 
 ### Troubleshooting
 

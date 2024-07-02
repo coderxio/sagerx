@@ -4,8 +4,11 @@ from airflow_operator import create_dag
 
 from airflow.providers.google.cloud.transfers.postgres_to_gcs import PostgresToGCSOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
-
 from airflow.operators.python_operator import PythonOperator
+
+from common_dag_tasks import run_subprocess_command
+
+from os import environ
 
 dag_id = "dbt_gcp"
 
@@ -19,26 +22,8 @@ dag = create_dag(
 
 with dag:
     def run_dbt():
-        from airflow.hooks.subprocess import SubprocessHook
-        from airflow.exceptions import AirflowException
-
-        subprocess = SubprocessHook()
-
-        run_results = subprocess.run_command(['docker','exec','dbt','dbt', 'run'], cwd='/dbt/sagerx')
-        if run_results.exit_code != 1:
-            raise AirflowException(f"Command failed with return code {run_results.exit_code}: {run_results.output}")
-        print(f"Command succeeded with output: {run_results.output}")
-
-        docs_results = subprocess.run_command(['docker','exec','dbt','dbt', "docs", "generate"], cwd='/dbt/sagerx')
-        if docs_results.exit_code != 0:
-            raise AirflowException(f"Command failed with return code {docs_results.exit_code}: {docs_results.output}")
-        print(f"Command succeeded with output: {docs_results.output}")
-
-        check_results = subprocess.run_command(['docker','exec','dbt','dbt', 'run-operation', 'check_data_availability'], cwd='/dbt/sagerx')
-        if check_results.exit_code != 0:
-            raise AirflowException(f"Command failed with return code {check_results.exit_code}: {check_results.output}")
-        print(f"Command succeeded with output: {check_results.output}")
-            
+        run_subprocess_command(command=['docker','exec','dbt','dbt', 'run'], cwd='/dbt/sagerx', success_code=1)
+        run_subprocess_command(command=['docker','exec','dbt','dbt', 'run-operation', 'check_data_availability'], cwd='/dbt/sagerx')
 
     def get_dbt_models():
         from sagerx import run_query_to_df
@@ -70,7 +55,7 @@ with dag:
                 task_id=f'postgres_to_gcs_{schema_name}.{table_name}',
                 postgres_conn_id='postgres_default',  
                 sql=f"SELECT * FROM {schema_name}.{table_name}",
-                bucket="sagerx_bucket", 
+                bucket=environ.get("GCS_BUCKET"), 
                 filename=f'{table_name}', 
                 export_format='csv', 
                 gzip=False,  
@@ -80,15 +65,14 @@ with dag:
             # Populate BigQuery tables with data from Cloud Storage Bucket
             cs2bq_task = GCSToBigQueryOperator(
                 task_id=f"bq_load_{schema_name}.{table_name}",
-                bucket="sagerx_bucket",
+                bucket=environ.get("GCS_BUCKET"),
                 source_objects=[f"{table_name}"],
-                destination_project_dataset_table=f"sagerx-420700.sagerx_lake.{table_name}",
+                destination_project_dataset_table=f"{environ.get('GCP_PROJECT')}.{environ.get('GCP_DATASET')}.{table_name}",
                 autodetect = True,
                 external_table=False,
                 create_disposition= "CREATE_IF_NEEDED", 
                 write_disposition= "WRITE_TRUNCATE", 
-                gcp_conn_id = 'google_cloud_default', 
-                location='us-east5',
+                gcp_conn_id = 'google_cloud_default',
                 dag = dag,
             )
 

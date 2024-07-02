@@ -1,0 +1,8 @@
+version: 2
+
+seeds:
+  - name: usp_preservatives
+    description: |
+      A list of CAS RN identifiers and USP product names obtained manually from
+      searching the [USP catalog](https://store.usp.org/preservatives/category/USP-1213)
+      for products in the "Preservatives" category.      

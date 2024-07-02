@@ -45,3 +45,25 @@ models:
         description: The start marketing date of the **product**. Can be different from that of the package.
       - name: package_startmarketingdate
         description: The start marketing date of the **package**. Can be different from that of the product.
+
+  - name: products_to_inactive_ingredients
+    description: |
+      DailyMed (MTHSPL) products (along with 9-digit NDCs), mapped to DailyMed
+      substances, which are mapped to normalized FDA UNII display names.
+    columns:
+      - name: product_name
+        description: |
+          NOTE: this field is aggregated and pipe-delimited (' | '). It appears
+          as though the MTHSPL data in RxNorm can have multiple
+          product names for a given RXCUI. Since we are mostly concerned
+          with NDC to UNII code, the names of the products as they
+          exist in the MTHSPL SAB of RxNorm should be for quick reference
+          and validation only.
+      - name: inactive_ingredient_name
+        description: |
+          NOTE: this field is aggregated and pipe-delimited (' | '). It appears
+          as though the MTHSPL data in RxNorm can have multiple
+          substance names for a given RXCUI. Since we are mostly concerned
+          with NDC to UNII code, the names of the substances as they
+          exist in the MTHSPL SAB of RxNorm should be for quick reference
+          and validation only.

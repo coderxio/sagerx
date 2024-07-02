@@ -6,6 +6,6 @@ select
 	, ingredient.tty tty
 	, case when ingredient.suppress = 'N' then true else false end as active
 	, case when ingredient.cvf = '4096' then true else false end as prescribable
-from sagerx_lake.rxnorm_rxnconso ingredient
+from {{ source('rxnorm', 'rxnorm_rxnconso') }} as ingredient
 where ingredient.tty in('IN', 'MIN')
 	and ingredient.sab = 'RXNORM'

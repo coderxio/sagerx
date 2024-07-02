@@ -1,29 +1,19 @@
 -- int_rxnorm_clinical_products_to_clinical_product_components.sql
 
-with
-
-ndc as (
-
+with ndc as (
     select * from {{ ref('stg_rxnorm__ndcs') }}
+)
 
-),
-
-rcp as (
-
+, rcp as (
     select * from {{ ref('stg_rxnorm__clinical_products') }}
+)
 
-),
-
-rcpcl as (
-
+, rcpcl as (
     select * from {{ ref('stg_rxnorm__clinical_product_component_links') }}
+)
 
-),
-
-rcpc as (
-
+, rcpc as (
     select * from {{ ref('stg_rxnorm__clinical_product_components') }}
-
 )
 
 select

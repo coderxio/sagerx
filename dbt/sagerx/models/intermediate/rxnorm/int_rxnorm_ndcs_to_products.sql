@@ -1,23 +1,15 @@
 -- int_rxnorm_ndcs_to_products.sql
 
-with
-
-ndc as (
-
+with ndc as (
     select * from {{ ref('stg_rxnorm__ndcs') }}
+)
 
-),
-
-rcp as (
-
+, rcp as (
     select * from {{ ref('stg_rxnorm__clinical_products') }}
+)
 
-),
-
-rbp as (
-
+, rbp as (
     select * from {{ ref('stg_rxnorm__brand_products') }}
-
 )
 
 select distinct

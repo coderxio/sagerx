@@ -1,17 +1,15 @@
 -- int_mthspl_products_to_active_ingredients.sql
 
-with
+with substance as (
+    SELECT * FROM {{ ref('stg_rxnorm__mthspl_substances') }}
+)
 
-substance as (
+, product as (
+    SELECT * FROM {{ ref('stg_rxnorm__mthspl_products') }}
+)
 
-    select * from {{ ref('stg_rxnorm__mthspl_substances') }}
-
-),
-
-product as (
-
-    select * from {{ ref('stg_rxnorm__mthspl_products') }}
-
+, rxnrel AS (
+    SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnrel') }} 
 )
 
 select distinct
@@ -26,7 +24,7 @@ select distinct
     , substance.tty as active_ingredient_tty	
     , product.active as active
     , product.prescribable as prescribable
-from sagerx_lake.rxnorm_rxnrel rxnrel
+from rxnrel
 inner join substance
     on rxnrel.rxaui1 = substance.rxaui
 inner join product

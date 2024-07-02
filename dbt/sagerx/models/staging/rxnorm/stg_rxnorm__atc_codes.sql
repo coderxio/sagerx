@@ -8,12 +8,12 @@ with atc as (
 		,a.tty
 	from (
 		select *
-		from sagerx_lake.rxnorm_rxnconso
+		from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 		where sab = 'ATC'
 		and tty not like 'RXN%'
 		order by code
 	) a
-	left join sagerx_lake.rxnorm_rxnsat b
+	left join {{ source('rxnorm', 'rxnorm_rxnsat') }} as b
 		on a.code= b.code
 	where atn = 'ATC_LEVEL'
 	order by code

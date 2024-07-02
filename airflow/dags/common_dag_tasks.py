@@ -107,7 +107,13 @@ def extract(dag_id,url) -> str:
 def transform(dag_id, models_subdir='staging',task_id="") -> None:
     # Task to transform data using dbt
     from airflow.hooks.subprocess import SubprocessHook
+    from airflow.exceptions import AirflowException
 
     subprocess = SubprocessHook()
     result = subprocess.run_command(['docker', 'exec', 'dbt','dbt', 'run', '--select', f'models/{models_subdir}/{dag_id}'], cwd='/dbt/sagerx')
+<<<<<<< HEAD
+=======
+    if result.exit_code != 0:
+            raise AirflowException(f"Command failed with return code {result.exit_code}: {result.output}")
+>>>>>>> d972c97 (init fba cleanup)
     print("Result from dbt:", result)

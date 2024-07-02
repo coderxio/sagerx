@@ -35,7 +35,10 @@ models:
       +materialized: view
     intermediate:
       +schema: sagerx
-      +materialized: view
+      +materialized: table
     marts:
       +schema: sagerx
       +materialized: table
+    +persist_docs:
+      relation: true
+      columns: true

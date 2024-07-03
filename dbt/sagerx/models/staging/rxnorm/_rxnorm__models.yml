@@ -169,6 +169,8 @@ models:
       - name: name
       - name: tty
       - name: rxaui
+        tests:
+          - unique
       - name: ndc
       - name: active
       - name: prescribable

@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: fda_unii
+    description: FDA UNII codes.
+    schema: sagerx_lake
+    tables:
+      - name: fda_unii
+        desciption: FDA UNII codes.

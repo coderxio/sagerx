@@ -17,5 +17,5 @@ plugins
 # Desktop Services Store
 .DS_Store
 
-#GCP
+# GCP
 gcp.json

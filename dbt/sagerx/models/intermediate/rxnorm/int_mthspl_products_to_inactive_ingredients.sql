@@ -1,5 +1,4 @@
 -- int_mthspl_products_to_inactive_ingredients.sql
-{{ config(materialized='table') }}
 
 with
 

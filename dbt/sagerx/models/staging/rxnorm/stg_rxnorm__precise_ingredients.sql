@@ -1,7 +1,7 @@
 -- stg_rxnorm__precise_ingredients.sql
 
-WITH ingredient AS (
-	SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }}
+with ingredient as (
+	select * from {{ source('rxnorm', 'rxnorm_rxnconso') }}
 )
 
 select

@@ -1,11 +1,11 @@
 -- stg_rxnorm__dose_form_group_links.sql
 
-WITH rxnrel AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnrel') }} 
+with rxnrel as (
+	select * from {{ source('rxnorm', 'rxnorm_rxnrel') }} 
 )
 
-, dose_form AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+, dose_form as (
+	select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
 select distinct

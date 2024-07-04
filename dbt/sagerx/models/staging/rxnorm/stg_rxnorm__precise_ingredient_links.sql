@@ -1,15 +1,15 @@
 -- stg_rxnorm__precise_ingredient_links.sql
 
-WITH precise_ingredient AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+with precise_ingredient as (
+	select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
-, precise_ingredient_of AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnrel') }} 
+, precise_ingredient_of as (
+	select * from {{ source('rxnorm', 'rxnorm_rxnrel') }} 
 )
 
-, ingredient_strength AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+, ingredient_strength as (
+	select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
 select distinct

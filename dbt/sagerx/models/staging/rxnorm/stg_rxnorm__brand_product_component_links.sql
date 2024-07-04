@@ -1,15 +1,15 @@
 -- stg_rxnorm__brand_product_component_links.sql
 
-WITH product AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+with product as (
+	select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
-, rxnrel AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnrel') }} 
+, rxnrel as (
+	select * from {{ source('rxnorm', 'rxnorm_rxnrel') }} 
 )
 
-, product_component AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+, product_component as (
+	select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
 select distinct

@@ -1,7 +1,7 @@
 -- stg_rxnorm__all_ndcs.sql
 
-WITH rxnsat AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnsat') }} 
+with rxnsat as (
+    select * from {{ source('rxnorm', 'rxnorm_rxnsat') }} 
 )
 
 select

@@ -1,15 +1,15 @@
 -- stg_rxnorm__brands.sql
 
-with brand AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+with brand as (
+	select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
-, rxnrel AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnrel') }} 
+, rxnrel as (
+	select * from {{ source('rxnorm', 'rxnorm_rxnrel') }} 
 )
 
-, ingredient AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+, ingredient as (
+	select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
 , cte as (

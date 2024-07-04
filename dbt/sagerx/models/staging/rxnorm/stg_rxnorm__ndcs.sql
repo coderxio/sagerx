@@ -1,18 +1,18 @@
 -- stg_rxnorm__ndcs.sql
-WITH rxnsat AS (
-	SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnsat') }} 
+with rxnsat as (
+	select * from {{ source('rxnorm', 'rxnorm_rxnsat') }} 
 )
 
-, product AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+, product as (
+select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
-, rxnrel AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnrel') }} 
+, rxnrel as (
+select * from {{ source('rxnorm', 'rxnorm_rxnrel') }} 
 )
 
-, clinical_product AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+, clinical_product as (
+select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
 select rxnsat.atv as ndc

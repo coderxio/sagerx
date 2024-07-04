@@ -1,7 +1,7 @@
 -- stg_rxnorm__clinical_products.sql
 
-WITH product AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+with product as (
+	select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
 select

@@ -4,10 +4,10 @@ from airflow_operator import create_dag
 from airflow.utils.helpers import chain
 
 from airflow.decorators import task
-from airflow.providers.postgres.operators.postgres import PostgresOperator
 import pandas as pd
-import xmltodict
-import re
+
+from dailymed_images.dag_tasks import *
+from sagerx import load_df_to_pg
 
 dag_id = "dailymed_images"
 
@@ -20,74 +20,55 @@ dag = create_dag(
     concurrency=2,
 )
 
+"""
+Process
+
+1. get xml data from dailymed_daily
+2. read xml data 
+3. find ndc and image data in xml
+4. map ndc and image data 
+5. map ndc and image ids toghether
+5.a. check to see if NDC is in the image name, if so map together
+5.b. check to see if NDC is under the same 51945-4 component, if so then map together
+5.c. Run image PCR to pull NDC fr
+6. upload to postgres
+
+
+"""
+
+
 @task
 def get_dailymed_data():
     from airflow.hooks.postgres_hook import PostgresHook
-    query = "SELECT * FROM sagerx_lake.dailymed_daily limit 1"
+
+    query = "SELECT * FROM sagerx_lake.dailymed_daily"
     pg_hook = PostgresHook(postgres_conn_id="postgres_default")
     engine = pg_hook.get_sqlalchemy_engine()
     df = pd.read_sql(query, con=engine)
+    print(f"DF length of {len(df)} with columns: {df.columns}")
 
-    return df
+    df['raw_xml_content'] = df.apply(parse_xml_content, axis=1)
+    df['set_id'] = df.apply(lambda x: extract_set_id(x['raw_xml_content']), axis=1)
+    df['ndc_ids'] = df.apply(lambda x: find_ndc_numbers(x['raw_xml_content']), axis=1)
+    df['image_ids'] = df.apply(lambda x: find_image_ids(x['raw_xml_content']), axis=1)
+    df['ndc_image_mapping'] = df.apply(map_ndcs_parent_function, axis=1)
 
-def isolate_ndc(input_string):
-    pattern = r"\b\d{5}-\d{3}-\d{2}\b"
-    match = re.search(pattern, input_string)
+    load_df_to_pg(df[['spl','file_name','set_id','ndc_ids','image_ids','ndc_image_mapping']],"sagerx_lake","dailymed_images","replace",dtype_name="ndc_image_mapping")
+
+    #df['med_dict'] = df.apply(extract_data, axis=1)
+
+    # dfs = []
+    # for md in df['med_dict']:
+    #     df_temp = pd.DataFrame.from_dict(md,orient='index')
+    #     df_temp.index.name = 'ndc'
+    #     dfs.append(df_temp)
+
+    # df_final = pd.concat(dfs)
+    # df_final = df_final.reset_index()
+
+    #print(df_final)
+    # return df
+     
     
-    if match:
-        return match.group(0)
-    else:
-        return None
-
-def clean_string(input_string):
-    cleaned_string = input_string.strip()
-    cleaned_string = ' '.join(cleaned_string.split())
-    return cleaned_string
-
-def extract_data(xml_string):
-    xml_data = xmltodict.parse(xml_string)
-
-    med_dict = {}
-    set_id = xml_data['document']['setId']['@root']
-
-    for component in xml_data['document']['component']['structuredBody']['component']:
-        if component['section']['code']['@code'] == '51945-4':
-            component_dict = {}
-
-            additional_info = []
-            for para in component['section']['text']['paragraph']:
-                if isinstance(para, str):
-                    if 'NDC' in para:
-                        ndc = isolate_ndc(para)
-                    else: 
-                        additional_info.append(clean_string(para))
-                elif isinstance(para,dict):
-                    if 'content' in para.keys():
-                        additional_info.append(clean_string(para['content']['#text']))
-                    elif '#text' in para.keys():
-                        if 'NDC' in para['#text']:
-                            ndc = isolate_ndc(clean_string(para['#text']))
-                        else:
-                            additional_info.append(clean_string(para['#text']))
-            
-            component_dict['set_id'] = set_id
-            component_dict['effective_time'] = component['section']['effectiveTime']['@value']
-
-            if component['section']['component']['observationMedia']['value']['@mediaType'] == 'image/jpeg':
-                image_id = component['section']['component']['observationMedia']['value']['reference']['@value']
-                component_dict['image_id'] = image_id
-
-            component_dict['image_url'] = f"https://dailymed.nlm.nih.gov/dailymed/image.cfm?name={image_id}&setid={set_id}&type=img"
-            component_dict['additional_info'] = additional_info
-            med_dict[ndc] = component_dict
-
-    df = pd.DataFrame.from_dict(med_dict,orient='index')
-    df.index.name = 'ndc'
-    df = df.reset_index()
-
-    return df
-
 with dag:
-    dm_data = get_dailymed_data() 
-
-    print(dm_data['xml_content'])
+    get_dailymed_data()

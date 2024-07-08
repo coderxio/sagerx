@@ -53,12 +53,13 @@ def process_dailymed(data_folder, xslt, ti):
             for subfile in unzipped_folder.infolist():
                 if re.match(".*.xml", subfile.filename):
                     new_file = unzipped_folder.extract(subfile, data_folder)
+                    raw_xml_data = etree.tostring(etree.parse(new_file) , encoding='unicode')
                     # xslt transform
                     xml_content = transform_xml(new_file, xslt)
-                    os.remove(new_file)
+                    #os.remove(new_file)
                     df = pd.DataFrame(
-                        columns=["spl", "file_name", "xml_content"],
-                        data=[[folder_name, subfile.filename, xml_content]],
+                        columns=["spl", "file_name", "xml_content", "raw_xml_content"],
+                        data=[[folder_name, subfile.filename, xml_content,raw_xml_data]],
                     )
                     df.to_sql(
                         "dailymed_daily",

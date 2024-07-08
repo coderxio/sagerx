@@ -4,3 +4,4 @@
 dbt-core
 dbt-postgres
 apache-airflow[google]
+xmltodict==0.13.0

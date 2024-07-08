@@ -1,15 +1,15 @@
 -- stg_rxnorm__brand_product_components.sql
 
-with product as (
-	select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+WITH product AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
-, rxnrel as (
-	select * from {{ source('rxnorm', 'rxnorm_rxnrel') }} 
+, rxnrel AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnrel') }} 
 )
 
-, product_component as (
-	select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+, product_component AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
 select distinct
@@ -31,7 +31,7 @@ select distinct
             then product.cvf
             else product_component.cvf 
             end = '4096' 
-        then true	
+        then true
         else false
         end as prescribable
 from product

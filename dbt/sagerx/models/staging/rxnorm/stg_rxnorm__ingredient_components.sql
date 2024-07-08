@@ -1,25 +1,43 @@
 -- stg_rxnorm__ingredient_components.sql
 
-with cte as (
-	select * from {{ ref('stg_rxnorm__common_ingredient_component') }}
+WITH ingredient AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+)
+
+, rxnrel AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnrel') }} 
+)
+
+, ingredient_component AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+)
+
+, cte as (
+	select
+		rxnrel.rxcui2 as ingredient_rxcui
+		, ingredient_component.rxcui as rxcui
+		, ingredient_component.str as name
+		, ingredient_component.tty as tty
+		, ingredient_component.suppress
+		, ingredient_component.cvf
+	from rxnrel
+	inner join ingredient_component
+		on rxnrel.rxcui1 = ingredient_component.rxcui
+	where rxnrel.rela = 'has_part'
+		and ingredient_component.tty = 'IN'
+		and ingredient_component.sab = 'RXNORM'
 )
 
 select distinct
-	case when cte.ingredient_component_rxcui is null then cte.rxcui 
-		else cte.ingredient_component_rxcui 
-		end rxcui
-	, case when cte.ingredient_component_name is null then cte.str 
-		else cte.ingredient_component_name 
-		end name
-	, case when cte.ingredient_component_tty is null then cte.tty 
-		else cte.ingredient_component_tty 
-		end tty
+	case when cte.rxcui is null then ingredient.rxcui else cte.rxcui end rxcui
+	, case when cte.name is null then ingredient.str else cte.name end name
+	, case when cte.tty is null then ingredient.tty else cte.tty end tty
 	, case when 
-		case when cte.ingredient_component_rxcui is null then cte.suppress 
-			else cte.ingredient_component_suppress end = 'N' then true else false 
-			end as active
+		case when cte.rxcui is null then ingredient.suppress else cte.suppress end = 'N' then true else false end as active
 	, case when 
-		case when cte.ingredient_component_rxcui is null then cte.cvf 
-		else cte.ingredient_component_cvf end = '4096' then true else false 
-		end as prescribable
-from cte 
+		case when cte.rxcui is null then ingredient.cvf else cte.cvf end = '4096' then true else false end as prescribable
+from ingredient
+left join cte 
+	on ingredient.rxcui = cte.ingredient_rxcui
+where ingredient.tty in('IN', 'MIN')
+	and ingredient.sab = 'RXNORM'

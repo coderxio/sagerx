@@ -1,19 +1,19 @@
 -- stg_rxnorm__clinical_product_components.sql
 
-with product as (
-	select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+with product AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
-, rxnrel as (
-	select * from {{ source('rxnorm', 'rxnorm_rxnrel') }} 
+, rxnrel AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnrel') }} 
 )
 
-, ingredient as (
-	select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+, ingredient AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
-, product_component as (
-	select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+, product_component AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
 , cte as (

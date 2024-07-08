@@ -1,11 +1,10 @@
 -- stg_rxnorm__ingredient_strength_links.sql
-
-with rxnrel as (
-	select * from {{ source('rxnorm', 'rxnorm_rxnrel') }} 
+WITH rxnrel AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnrel') }} 
 )
 
-, ingredient as (
-select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+, ingredient AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
 select distinct

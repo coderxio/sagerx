@@ -1,10 +1,10 @@
 -- stg_rxnorm__ingredient_strengths.sql
-with ingredient_strength as (
-    select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+WITH ingredient_strength AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
-, rxnsat as (
-    select * from {{ source('rxnorm', 'rxnorm_rxnsat') }}
+, rxnsat AS (
+    SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnsat') }}
 )
 
 select

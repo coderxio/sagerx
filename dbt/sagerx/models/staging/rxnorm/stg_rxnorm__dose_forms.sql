@@ -1,7 +1,7 @@
 -- stg_rxnorm__dose_forms.sql
 
-with dose_form as (
-	select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+WITH dose_form AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
 select

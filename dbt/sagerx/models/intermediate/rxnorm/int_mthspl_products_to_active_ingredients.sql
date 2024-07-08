@@ -1,15 +1,15 @@
 -- int_mthspl_products_to_active_ingredients.sql
 
 with substance as (
-    select * from {{ ref('stg_rxnorm__mthspl_substances') }}
+    SELECT * FROM {{ ref('stg_rxnorm__mthspl_substances') }}
 )
 
 , product as (
-    select * from {{ ref('stg_rxnorm__mthspl_products') }}
+    SELECT * FROM {{ ref('stg_rxnorm__mthspl_products') }}
 )
 
-, rxnrel as (
-    select * from {{ source('rxnorm', 'rxnorm_rxnrel') }} 
+, rxnrel AS (
+    SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnrel') }} 
 )
 
 select distinct

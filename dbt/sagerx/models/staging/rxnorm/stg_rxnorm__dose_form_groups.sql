@@ -1,7 +1,7 @@
 -- stg_rxnorm__dose_form_groups.sql
 
-with dose_form_group as (
-	select * from {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+WITH dose_form_group AS (
+SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
 )
 
 select

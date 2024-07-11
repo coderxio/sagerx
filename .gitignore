@@ -12,3 +12,6 @@ plugins
 
 # dbt
 .user.yml
+
+# GCP
+gcp.json

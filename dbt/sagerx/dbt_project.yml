@@ -32,11 +32,11 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   sagerx:
     staging:
-      +schema: staging
-      +materialized: table
+      +schema: sagerx_dev
+      +materialized: view
     intermediate:
       +schema: intermediate
       +materialized: table
     marts:
-      +schema: marts
-      +materialized: view
+      +schema: sagerx_dev
+      +materialized: table

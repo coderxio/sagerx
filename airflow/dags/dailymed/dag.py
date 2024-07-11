@@ -18,7 +18,8 @@ def dailymed():
 
     ds_folder = Path("/opt/airflow/dags") / dag_id
     data_folder = Path("/opt/airflow/data") / dag_id
-    file_set = "dm_spl_release_human_rx_part"
+    #file_set = "dm_spl_release_human_rx_part"
+    file_set = "dm_spl_daily_update_07092024"
 
     def connect_to_ftp_dir(ftp_str: str, dir: str):
         import ftplib
@@ -106,7 +107,7 @@ def dailymed():
                         )
                         df.to_sql(
                             "dailymed",
-                            schema="datasource",
+                            schema="sagerx_lake",
                             con=db_conn,
                             if_exists="append",
                             index=False,

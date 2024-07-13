@@ -13,6 +13,10 @@
     <dailymed>
         <xsl:apply-templates select="v3:document"/>
 
+        <Media>
+            <xsl:apply-templates select="v3:document/v3:component/v3:structuredBody/v3:component"/>
+        </Media>
+
         <NDCList>
             <xsl:apply-templates select="v3:document/v3:component"/>
         </NDCList>
@@ -65,6 +69,18 @@
     <EffectiveDate><xsl:value-of select="/v3:document/v3:effectiveTime/@value"/></EffectiveDate>
     <MarketStatus><xsl:value-of select="//v3:subjectOf/v3:approval/v3:code/@displayName"/></MarketStatus>
     <ApplicationNumber><xsl:value-of select="//v3:subjectOf/v3:approval/v3:id/@extension"/></ApplicationNumber>
+</xsl:template>
+
+<!-- Media -->
+<xsl:template match="v3:document/v3:component/v3:structuredBody/v3:component">
+    <Media>
+    	<Image>
+            <xsl:for-each select="v3:section/v3:component/v3:observationMedia/v3:value">
+                <xsl:value-of select="v3:reference/@value"/>
+            </xsl:for-each>
+    	</Image>
+    	<Text><xsl:value-of select="."/></Text>
+    </Media>
 </xsl:template>
 
 <!-- NDCList -->

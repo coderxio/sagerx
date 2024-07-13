@@ -6,7 +6,7 @@ from airflow.hooks.subprocess import SubprocessHook
 
 from lxml import etree
 
-from sagerx import create_path
+from sagerx import create_path, load_df_to_pg
 
 @dag(
     schedule="0 0 10 * *",
@@ -91,6 +91,7 @@ def dailymed():
             / "prescription"
         )
 
+        data = []
         for zip_folder in prescription_data_folder.iterdir():
             # logging.info(zip_folder)
             with zipfile.ZipFile(zip_folder) as unzipped_folder:
@@ -101,17 +102,21 @@ def dailymed():
                         # xslt transform
                         xml_content = transform_xml(new_file, xslt)
                         os.remove(new_file)
-                        df = pd.DataFrame(
-                            columns=["spl", "file_name", "xml_content"],
-                            data=[[folder_name, subfile.filename, xml_content]],
-                        )
-                        df.to_sql(
-                            "dailymed",
-                            schema="sagerx_lake",
-                            con=db_conn,
-                            if_exists="append",
-                            index=False,
-                        )
+                        # append row to the data list
+                        data.append({"spl": folder_name, "file_name": subfile.filename, "xml_content": xml_content})
+        
+        df = pd.DataFrame(
+            data,
+            columns=["spl", "file_name", "xml_content"],
+        )
+
+        load_df_to_pg(
+            df,
+            schema_name="sagerx_lake",
+            table_name="dailymed",
+            if_exists="replace",
+            index=False,
+        )
 
     # Task to transform data using dbt
     @task

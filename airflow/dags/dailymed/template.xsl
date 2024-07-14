@@ -13,9 +13,9 @@
     <dailymed>
         <xsl:apply-templates select="v3:document"/>
 
-        <Media>
-            <xsl:apply-templates select="v3:document/v3:component/v3:structuredBody/v3:component"/>
-        </Media>
+        <PackageLabels>
+            <xsl:apply-templates select="//v3:section[v3:code[@code='51945-4']]"/>
+        </PackageLabels>
 
         <NDCList>
             <xsl:apply-templates select="v3:document/v3:component"/>
@@ -71,16 +71,23 @@
     <ApplicationNumber><xsl:value-of select="//v3:subjectOf/v3:approval/v3:id/@extension"/></ApplicationNumber>
 </xsl:template>
 
-<!-- Media -->
-<xsl:template match="v3:document/v3:component/v3:structuredBody/v3:component">
-    <Media>
-    	<Image>
-            <xsl:for-each select="v3:section/v3:component/v3:observationMedia/v3:value">
-                <xsl:value-of select="v3:reference/@value"/>
+<!-- PackageLabels -->
+<xsl:template match="//v3:section[v3:code[@code='51945-4']]">
+    <PackageLabel> <!-- there can be multiple PRINCIPAL DISPLAY PANEL sections in a SPL -->
+        <MediaList> <!-- there can be multiple images within a PRINCIPAL DISPLAY PANEL section -->
+            <xsl:for-each select=".//v3:observationMedia">
+                <Media>
+                    <ID>
+                        <xsl:value-of select="./@ID"/>
+                    </ID>
+                    <Image>
+                        <xsl:value-of select="v3:value/v3:reference/@value"/>
+                    </Image>
+                </Media>
             </xsl:for-each>
-    	</Image>
-    	<Text><xsl:value-of select="."/></Text>
-    </Media>
+        </MediaList>
+        <Text><xsl:value-of select="."/></Text>
+    </PackageLabel>
 </xsl:template>
 
 <!-- NDCList -->

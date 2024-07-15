@@ -86,6 +86,7 @@
                 </Media>
             </xsl:for-each>
         </MediaList>
+        <ID><xsl:value-of select=".//@root"/></ID>
         <Text><xsl:value-of select="."/></Text>
     </PackageLabel>
 </xsl:template>

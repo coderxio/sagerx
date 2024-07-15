@@ -1,13 +1,23 @@
 -- stg_rxnorm__mthspl_substances.sql
-
-select
-	substance.rxcui rxcui
-	, substance.str name
-	, substance.tty tty
-	, substance.rxaui rxaui
-	, substance.code unii
-	, case when substance.suppress = 'N' then true else false end as active
-	, case when substance.cvf = '4096' then true else false end as prescribable
-from {{ source('rxnorm', 'rxnorm_rxnconso') }} as substance
-where substance.tty = 'SU'
-	and substance.sab = 'MTHSPL'
+SELECT
+    substance.rxcui rxcui,
+    substance.str NAME,
+    substance.tty tty,
+    substance.rxaui rxaui,
+    substance.code unii,
+    CASE
+        WHEN substance.suppress = 'N' THEN TRUE
+        ELSE FALSE
+    END AS active,
+    CASE
+        WHEN substance.cvf = '4096' THEN TRUE
+        ELSE FALSE
+    END AS prescribable
+FROM
+    {{ source(
+        'rxnorm',
+        'rxnorm_rxnconso'
+    ) }} AS substance
+WHERE
+    substance.tty = 'SU'
+    AND substance.sab = 'MTHSPL'

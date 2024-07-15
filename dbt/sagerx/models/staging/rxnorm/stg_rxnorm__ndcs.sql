@@ -1,39 +1,97 @@
 -- stg_rxnorm__ndcs.sql
 WITH rxnsat AS (
-	SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnsat') }} 
+    SELECT
+        *
+    FROM
+        {{ source(
+            'rxnorm',
+            'rxnorm_rxnsat'
+        ) }}
+),
+product AS (
+    SELECT
+        *
+    FROM
+        {{ source(
+            'rxnorm',
+            'rxnorm_rxnconso'
+        ) }}
+),
+rxnrel AS (
+    SELECT
+        *
+    FROM
+        {{ source(
+            'rxnorm',
+            'rxnorm_rxnrel'
+        ) }}
+),
+clinical_product AS (
+    SELECT
+        *
+    FROM
+        {{ source(
+            'rxnorm',
+            'rxnorm_rxnconso'
+        ) }}
 )
-
-, product AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
-)
-
-, rxnrel AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnrel') }} 
-)
-
-, clinical_product AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
-)
-
-select rxnsat.atv as ndc
-	,case when product.tty in ('BPCK','SBD') then clinical_product.rxcui
-		else rxnsat.rxcui end as clinical_product_rxcui		
-	,case when product.tty in ('BPCK','SBD') then rxnsat.rxcui
-		else null end as brand_product_rxcui
-	, case when rxnsat.suppress = 'N' then true else false end as active
-	, case when rxnsat.cvf = '4096' then true else false end as prescribable
-from rxnsat
-inner join product 
-	on rxnsat.rxaui = product.rxaui
-left join rxnrel 
-	on rxnsat.rxcui = rxnrel.rxcui2 
-	and rela = 'tradename_of' 
-	and product.tty in ('BPCK','SBD')
-left join clinical_product
-	on rxnrel.rxcui1 = clinical_product.rxcui
-	and clinical_product.tty in ('SCD','GPCK')
-	and clinical_product.sab = 'RXNORM'
-where rxnsat.atn = 'NDC'
-	and rxnsat.sab in ('ATC', 'CVX', 'DRUGBANK', 'MSH', 'MTHCMSFRF', 'MTHSPL', 'RXNORM', 'USP', 'VANDF')
-	and product.tty in ('SCD','SBD','GPCK','BPCK')
-	and product.sab = 'RXNORM'
+SELECT
+    rxnsat.atv AS ndc,CASE
+        WHEN product.tty IN (
+            'BPCK',
+            'SBD'
+        ) THEN clinical_product.rxcui
+        ELSE rxnsat.rxcui
+    END AS clinical_product_rxcui,CASE
+        WHEN product.tty IN (
+            'BPCK',
+            'SBD'
+        ) THEN rxnsat.rxcui
+        ELSE NULL
+    END AS brand_product_rxcui,
+    CASE
+        WHEN rxnsat.suppress = 'N' THEN TRUE
+        ELSE FALSE
+    END AS active,
+    CASE
+        WHEN rxnsat.cvf = '4096' THEN TRUE
+        ELSE FALSE
+    END AS prescribable
+FROM
+    rxnsat
+    INNER JOIN product
+    ON rxnsat.rxaui = product.rxaui
+    LEFT JOIN rxnrel
+    ON rxnsat.rxcui = rxnrel.rxcui2
+    AND rela = 'tradename_of'
+    AND product.tty IN (
+        'BPCK',
+        'SBD'
+    )
+    LEFT JOIN clinical_product
+    ON rxnrel.rxcui1 = clinical_product.rxcui
+    AND clinical_product.tty IN (
+        'SCD',
+        'GPCK'
+    )
+    AND clinical_product.sab = 'RXNORM'
+WHERE
+    rxnsat.atn = 'NDC'
+    AND rxnsat.sab IN (
+        'ATC',
+        'CVX',
+        'DRUGBANK',
+        'MSH',
+        'MTHCMSFRF',
+        'MTHSPL',
+        'RXNORM',
+        'USP',
+        'VANDF'
+    )
+    AND product.tty IN (
+        'SCD',
+        'SBD',
+        'GPCK',
+        'BPCK'
+    )
+    AND product.sab = 'RXNORM'

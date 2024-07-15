@@ -1,15 +1,27 @@
 -- stg_rxnorm__dose_forms.sql
-
 WITH dose_form AS (
-SELECT * FROM {{ source('rxnorm', 'rxnorm_rxnconso') }} 
+    SELECT
+        *
+    FROM
+        {{ source(
+            'rxnorm',
+            'rxnorm_rxnconso'
+        ) }}
 )
-
-select
-	dose_form.rxcui rxcui
-	, dose_form.str name
-	, dose_form.tty tty
-	, case when dose_form.suppress = 'N' then true else false end as active
-	, case when dose_form.cvf = '4096' then true else false end as prescribable
-from dose_form
-where dose_form.tty = 'DF'
-	and dose_form.sab = 'RXNORM'
+SELECT
+    dose_form.rxcui rxcui,
+    dose_form.str NAME,
+    dose_form.tty tty,
+    CASE
+        WHEN dose_form.suppress = 'N' THEN TRUE
+        ELSE FALSE
+    END AS active,
+    CASE
+        WHEN dose_form.cvf = '4096' THEN TRUE
+        ELSE FALSE
+    END AS prescribable
+FROM
+    dose_form
+WHERE
+    dose_form.tty = 'DF'
+    AND dose_form.sab = 'RXNORM'

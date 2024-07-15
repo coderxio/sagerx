@@ -1,5 +1,16 @@
 -- stg_rxnorm__product_rxcuis
-
-select * from {{ source('rxnorm', 'rxnorm_rxnconso') }}
-where sab = 'RXNORM'
-    and tty in ('SCD', 'SBD', 'GPCK', 'BPCK')
+SELECT
+    *
+FROM
+    {{ source(
+        'rxnorm',
+        'rxnorm_rxnconso'
+    ) }}
+WHERE
+    sab = 'RXNORM'
+    AND tty IN (
+        'SCD',
+        'SBD',
+        'GPCK',
+        'BPCK'
+    )

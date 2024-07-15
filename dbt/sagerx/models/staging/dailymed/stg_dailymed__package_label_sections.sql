@@ -1,4 +1,4 @@
- /* staging.stg_dailymed__media */
+ /* staging.stg_dailymed__package_label_sections */
 
 with xml_table as
 (
@@ -8,10 +8,6 @@ with xml_table as
 
 select
 	spl
-	, p_label.document_id
-	, p_label.set_id
-	, p_label.version_number
-	, p_label.text
 	, y.*
 from xml_table x,
 	xmltable(
@@ -20,12 +16,7 @@ from xml_table x,
 			document_id 	text  path '../../documentId',
 			set_id  		text  path '../../SetId',
 			version_number	text  path '../../VersionNumber',
+			id				text  path 'ID',
 			text			text  path 'Text',
 			media_list		xml   path 'MediaList'
-	) as p_label,
-	xmltable(
-		'MediaList/Media' passing p_label.media_list
-		columns
-			image			text  path 'Image',
-			image_id		text  path 'ID'
-	) as y
+	) y

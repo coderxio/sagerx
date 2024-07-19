@@ -1,30 +1,30 @@
 -- stg_rxnorm__clinical_products.sql
-WITH product AS (
-    SELECT
+with product as (
+    select
         *
-    FROM
+    from
         {{ source(
             'rxnorm',
             'rxnorm_rxnconso'
         ) }}
 )
-SELECT
-    product.rxcui AS rxcui,
-    product.str AS NAME,
-    product.tty AS tty,
-    CASE
-        WHEN product.suppress = 'N' THEN TRUE
-        ELSE FALSE
-    END AS active,
-    CASE
-        WHEN product.cvf = '4096' THEN TRUE
-        ELSE FALSE
-    END AS prescribable
-FROM
+select
+    product.rxcui as rxcui,
+    product.str as name,
+    product.tty as tty,
+    case
+        when product.suppress = 'N' then true
+        else false
+    end as active,
+    case
+        when product.cvf = '4096' then true
+        else false
+    end as prescribable
+from
     product
-WHERE
-    product.tty IN(
+where
+    product.tty in(
         'SCD',
         'GPCK'
     )
-    AND product.sab = 'RXNORM'
+    and product.sab = 'RXNORM'

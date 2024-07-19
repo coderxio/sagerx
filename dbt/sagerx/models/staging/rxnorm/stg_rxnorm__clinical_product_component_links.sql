@@ -1,49 +1,59 @@
 -- stg_rxnorm__clinical_product_component_links.sql
-WITH product AS (
-    SELECT
-        *
-    FROM
+with clinical_products as (
+
+    select
+        rxcui
+
+    from
+        {{ ref(
+            'stg_rxnorm__clinical_products'
+        ) }}
+
+),
+
+clinical_product_components as (
+
+    select
+        rxcui
+
+    from
         {{ source(
             'rxnorm',
             'rxnorm_rxnconso'
         ) }}
+
+        where tty = 'SCD' and
+            sab = 'RXNORM'
+
 ),
-rxnrel AS (
-    SELECT
-        *
-    FROM
+
+clinical_product_component_links as (
+
+    select distinct 
+        clinical_products.rxcui as clinical_product_rxcui,
+        case
+            when clinical_product_components.rxcui is null
+                then clinical_products.rxcui
+            else clinical_product_components.rxcui
+        end as clinical_product_component_rxcui
+
+    from
         {{ source(
             'rxnorm',
             'rxnorm_rxnrel'
-        ) }}
-),
-product_component AS (
-    SELECT
-        *
-    FROM
-        {{ source(
-            'rxnorm',
-            'rxnorm_rxnconso'
-        ) }}
+        ) }} rxnrel
+    
+    left join clinical_products
+        on clinical_products.rxcui = rxnrel.rxcui2
+    left join clinical_product_components
+        on clinical_product_components.rxcui = rxnrel.rxcui1
+
+    where rxnrel.rela = 'contains'
+
+    group by
+        1,
+        2
+
 )
-SELECT
-    DISTINCT product.rxcui AS clinical_product_rxcui,
-    CASE
-        WHEN product_component.rxcui IS NULL THEN product.rxcui
-        ELSE product_component.rxcui
-    END AS clinical_product_component_rxcui
-FROM
-    product
-    LEFT JOIN rxnrel
-    ON rxnrel.rxcui2 = product.rxcui
-    AND rxnrel.rela = 'contains'
-    LEFT JOIN product_component
-    ON rxnrel.rxcui1 = product_component.rxcui
-    AND product_component.tty = 'SCD'
-    AND product_component.sab = 'RXNORM'
-WHERE
-    product.tty IN(
-        'SCD',
-        'GPCK'
-    )
-    AND product.sab = 'RXNORM'
+
+select * from clinical_product_component_links

@@ -1,150 +1,152 @@
 -- stg_rxnorm__clinical_product_components.sql
-WITH product AS (
-    SELECT
-        *
-    FROM
+with
+
+clinical_product_components as (
+
+    select
+        rxcui,
+        str as name,
+        tty
+
+    from
         {{ source(
             'rxnorm',
             'rxnorm_rxnconso'
         ) }}
+
+        where sab = 'RXNORM' and
+            tty = 'SCD' 
+
 ),
-rxnrel AS (
-    SELECT
+
+rxnrel as (
+
+    select
         *
-    FROM
+
+    from
         {{ source(
             'rxnorm',
             'rxnorm_rxnrel'
         ) }}
-),
-ingredient AS (
-    SELECT
-        *
-    FROM
-        {{ source(
-            'rxnorm',
-            'rxnorm_rxnconso'
-        ) }}
-),
-product_component AS (
-    SELECT
-        *
-    FROM
-        {{ source(
-            'rxnorm',
-            'rxnorm_rxnconso'
-        ) }}
-),
-cte AS (
-    SELECT
-        sq.*,
-        ROW_NUMBER() over(
-            PARTITION BY product_component_rxcui
-            ORDER BY
-                ingredient_tty DESC
-        ) AS rn
-    FROM
-        (
-            SELECT
-                product_component.rxcui AS product_component_rxcui,
-                product_component.str AS product_component_name,
-                product_component.tty AS product_component_tty,
-                ingredient.rxcui AS ingredient_rxcui,
-                ingredient.str AS ingredient_name,
-                ingredient.tty AS ingredient_tty
-            FROM
-                product_component
-                INNER JOIN rxnrel
-                ON rxnrel.rxcui2 = product_component.rxcui
-                AND rxnrel.rela = 'has_ingredients'
-                INNER JOIN ingredient
-                ON rxnrel.rxcui1 = ingredient.rxcui
-                AND ingredient.tty = 'MIN'
-                AND ingredient.sab = 'RXNORM'
-            WHERE
-                product_component.tty = 'SCD'
-                AND product_component.sab = 'RXNORM'
-            UNION ALL
-            SELECT
-                product_component.rxcui AS product_component_rxcui,
-                product_component.str AS product_component_name,
-                product_component.tty AS product_component_tty,
-                ingredient.rxcui AS ingredient_rxcui,
-                ingredient.str AS ingredient_name,
-                ingredient.tty AS ingredient_tty
-            FROM
-                product_component
-                INNER JOIN rxnrel AS scdc_rxnrel
-                ON scdc_rxnrel.rxcui2 = product_component.rxcui
-                AND scdc_rxnrel.rela = 'consists_of'
-                INNER JOIN product AS scdc
-                ON scdc_rxnrel.rxcui1 = scdc.rxcui
-                INNER JOIN rxnrel AS ingredient_rxnrel
-                ON ingredient_rxnrel.rxcui2 = scdc.rxcui
-                AND ingredient_rxnrel.rela = 'has_ingredient'
-                INNER JOIN ingredient
-                ON ingredient_rxnrel.rxcui1 = ingredient.rxcui
-                AND ingredient.tty = 'IN'
-                AND ingredient.sab = 'RXNORM'
-            WHERE
-                product_component.tty = 'SCD'
-                AND product_component.sab = 'RXNORM'
-        ) sq
-)
-SELECT
-    DISTINCT CASE
-        WHEN product_component.rxcui IS NULL THEN product.rxcui
-        ELSE product_component.rxcui
-    END rxcui,
-    CASE
-        WHEN product_component.str IS NULL THEN product.str
-        ELSE product_component.str
-    END NAME,
-    CASE
-        WHEN product_component.tty IS NULL THEN product.tty
-        ELSE product_component.tty
-    END tty,
-    CASE
-        WHEN CASE
-            WHEN product_component.rxcui IS NULL THEN product.suppress
-            ELSE product_component.suppress
-        END = 'N' THEN TRUE
-        ELSE FALSE
-    END AS active,
-    CASE
-        WHEN CASE
-            WHEN product_component.rxcui IS NULL THEN product.cvf
-            ELSE product_component.cvf
-        END = '4096' THEN TRUE
-        ELSE FALSE
-    END AS prescribable,
-    cte.ingredient_rxcui AS ingredient_rxcui,
-    dose_form_rxnrel.rxcui1 AS dose_form_rxcui
-FROM
-    product
-    LEFT JOIN rxnrel
-    ON rxnrel.rxcui2 = product.rxcui
-    AND rxnrel.rela = 'contains'
-    LEFT JOIN product_component
-    ON rxnrel.rxcui1 = product_component.rxcui
-    AND product_component.tty = 'SCD'
-    AND product_component.sab = 'RXNORM'
-    LEFT JOIN cte
-    ON cte.product_component_rxcui = CASE
-        WHEN product_component.rxcui IS NULL THEN product.rxcui
-        ELSE product_component.rxcui
-    END
-    AND cte.rn < 2
-    LEFT JOIN rxnrel AS dose_form_rxnrel
-    ON dose_form_rxnrel.rxcui2 = CASE
-        WHEN product_component.rxcui IS NULL THEN product.rxcui
-        ELSE product_component.rxcui
-    END
-    AND dose_form_rxnrel.rela = 'has_dose_form'
-    AND dose_form_rxnrel.sab = 'RXNORM'
-WHERE
-    product.tty IN(
-        'SCD',
-        'GPCK'
+
+    where rela in (
+        'consists_of',
+        'has_ingredients',
+        'has_ingredient'
     )
-    AND product.sab = 'RXNORM'
+
+),
+
+ingredients AS (
+
+    select
+        rxcui,
+        str as name,
+        tty
+
+    from
+        {{ source(
+            'rxnorm',
+            'rxnorm_rxnconso'
+        ) }}
+
+    where sab = 'RXNORM' and
+        tty in (
+            'IN',
+            'MIN' 
+        )
+
+),
+
+cpc_to_multiple_ingredients as (
+
+    select
+        cpc.rxcui as clinical_product_component_rxcui,
+        rxnrel.rxcui1 as ingredient_rxcui,
+
+    from
+        clinical_product_components cpc
+        
+    inner join rxnrel
+        on rxnrel.rxcui2 = cpc.rxcui and
+            rxnrel.rela = 'has_ingredients'
+
+),
+
+cpc_to_single_ingredients as (
+
+    select
+        cpc.rxcui
+            as clinical_product_component_rxcui,
+        ingredient_rxnrel.rxcui1 as ingredient_rxcui,
+
+    from
+        clinical_product_components cpc
+        
+    inner join rxnrel as scdc_rxnrel
+        on scdc_rxnrel.rxcui2 = cpc.rxcui and
+            scdc_rxnrel.rela = 'consists_of'
+    inner join rxnrel as ingredient_rxnrel
+        on ingredient_rxnrel.rxcui2 = scdc_rxnrel.rxcui1 and
+            ingredient_rxnrel.rela = 'has_ingredient'
+
+),
+
+cpc_to_all_ingredients as (
+
+    select
+        *
+    from clinical_products_to_multiple_ingredients
+
+    union all
+
+    select
+        *
+    from clinical_products_to_single_ingredients
+
+)
+
+
+ranked_clinical_product_component_ingredients as (
+
+    select
+        *,
+        row_number() over(
+            partition by clinical_product_component_rxcui
+            order by
+                ingredient_tty desc
+        ) as rn
+    from cpc_to_all_ingredients
+
+)
+select
+    rxcui,
+    name,
+    tty,
+    {{ active_and_prescribable() }},
+    cte.ingredient_rxcui AS ingredient_rxcui,
+    dose_form_rxnrel.rxcui1 as dose_form_rxcui
+from
+    clinical_product_components
+    /*
+    left join ingredients
+        on ingredients.clinical_product_component_rxcui = 
+            clinical_product_components.rxcui
+    left join dose_forms
+        on dose_forms.clinical_product_component_rxcui = 
+            clinical_product_components.rxcui
+    */
+    left join cte
+    on cte.product_component_rxcui = case
+        when product_component.rxcui is null then product.rxcui
+        else product_component.rxcui
+    end
+    and cte.rn < 2
+    left join rxnrel as dose_form_rxnrel
+    on dose_form_rxnrel.rxcui2 = case
+        when product_component.rxcui is null then product.rxcui
+        else product_component.rxcui
+    end
+    and dose_form_rxnrel.rela = 'has_dose_form'
+    and dose_form_rxnrel.sab = 'RXNORM'

@@ -9,7 +9,7 @@ from airflow.operators.python import get_current_context
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.hooks.postgres_hook import PostgresHook
 
-from common_dag_tasks import run_subprocess_command
+from common_dag_tasks import transform
 
 
 @dag(
@@ -73,11 +73,8 @@ def rxnorm():
             )
         )
 
-    # Task to transform data using dbt
-    @task
-    def transform():
-        run_subprocess_command(['dbt', 'run', '--select', 'models/staging/rxnorm', 'models/intermediate/rxnorm'], cwd='/dbt/sagerx')
+    transform_task = transform(dag_id, models_subdir=['staging', 'intermediate'])
 
-    extract(get_st(get_tgt())) >> load >> transform()
+    extract(get_st(get_tgt())) >> load >> transform_task
 
 rxnorm()

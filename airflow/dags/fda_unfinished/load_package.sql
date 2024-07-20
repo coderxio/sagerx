@@ -12,3 +12,6 @@ endmarketingdate    TEXT
 
 COPY sagerx_lake.fda_unfinished_package
 FROM '{data_path}/unfinished_package.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';
+
+CREATE INDEX IF NOT EXISTS x_productid
+ON sagerx_lake.fda_unfinished_package(productid);

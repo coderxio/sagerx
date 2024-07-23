@@ -31,6 +31,8 @@ with dag:
     url= "https://www.ashp.org/drug-shortages/current-shortages/drug-shortages-list?page=CurrentShortages"
     ds_folder = get_ds_folder(dag_id)
 
+    transform_task = transform(dag_id)
+
     @task
     def extract_load_shortage_list():
         logging.basicConfig(level=logging.INFO, format='%(asctime)s : %(levelname)s : %(message)s')
@@ -52,8 +54,8 @@ with dag:
         
         if len(ashp_drugs) > 0:
             df = pd.DataFrame(ashp_drugs)
-            load_df_to_pg(df, "sagerx_lake", "ashp", "replace", index=False)
+            load_df_to_pg(df, "sagerx_lake", "ashp_shortage_list", "replace", index=False)
         else:
             logging.error('Drug shortage list not found')
-
-    extract_load_shortage_list()
+        
+    extract_load_shortage_list() >> transform_task

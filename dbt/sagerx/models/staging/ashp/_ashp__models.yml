@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: current_drug_shortages
+    description: Current ASHP drug shortages.
+    columns:
+      - name: id
+        description: The ID of the shortage as defined by the detail page URL ID.
+        data_tests:
+          - unique
+          - not_null
+      - name: name
+        description: The name of the shortage as described by ASHP.
+      - name: url
+        description: |
+          The full URL link to the shortage detail page, completely
+          lower case because it bugs me that part of the URL is
+          camel case on the ASHP website.

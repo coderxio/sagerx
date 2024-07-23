@@ -4,6 +4,7 @@ from datetime import date
 
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
 
 import pendulum
 
@@ -11,7 +12,7 @@ from airflow_operator import create_dag
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 
 from common_dag_tasks import  extract, transform, generate_sql_list, get_ds_folder
-from sagerx import read_sql_file
+from sagerx import read_sql_file, load_df_to_pg
 
 from airflow.decorators import task
 
@@ -31,7 +32,7 @@ with dag:
     ds_folder = get_ds_folder(dag_id)
 
     @task
-    def get_shortage_list():
+    def extract_load_shortage_list():
         logging.basicConfig(level=logging.INFO, format='%(asctime)s : %(levelname)s : %(message)s')
 
         logging.info('Checking ASHP website for updates')
@@ -49,8 +50,10 @@ with dag:
                 'detail_url': link.get('href')
             })
         
-        print(ashp_drugs)
+        if len(ashp_drugs) > 0:
+            df = pd.DataFrame(ashp_drugs)
+            load_df_to_pg(df, "sagerx_lake", "ashp", "replace", index=False)
+        else:
+            logging.error('Drug shortage list not found')
 
-    extract_task = get_shortage_list()
-        
-    extract_task
+    extract_load_shortage_list()

@@ -103,7 +103,32 @@ def run_subprocess_command(command:list, cwd:str, success_code:int = 0) -> None:
         print(f"Command succeeded with output: {run_results.output}")
     else:
         raise AirflowException(f"Command failed with return code {run_results.exit_code}: {run_results.output}")
-    
+
+def get_umls_ticket_granting_ticket():
+    import requests
+    from airflow.models import Variable
+    api_key = Variable.get("umls_api")
+    params = { "apikey": api_key }
+    headers = { "Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain", "User-Agent":"python" }
+    url = "https://utslogin.nlm.nih.gov/cas/v1/api-key"
+    response = requests.post(url, headers=headers, data=params)
+    response.raise_for_status()
+    return response.url.split('/')[-1]
+
+def get_umls_service_ticket(tgt: str):
+    import requests
+    service = "https://uts-ws.nlm.nih.gov"
+    params = { "service": service }
+    headers = { "Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain", "User-Agent":"python" }
+    url = f"https://utslogin.nlm.nih.gov/cas/v1/tickets/{tgt}"
+    response = requests.post(url, headers=headers, data=params)
+    response.raise_for_status()
+    return response.text
+
+def get_umls_ticket():
+    tgt = get_umls_ticket_granting_ticket()
+    st = get_umls_service_ticket(tgt)
+    return st
 
 @task
 def extract(dag_id,url) -> str:

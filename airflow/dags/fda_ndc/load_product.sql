@@ -27,3 +27,6 @@ PRIMARY KEY (productid)
 
 COPY sagerx_lake.fda_ndc_product
 FROM '{data_path}/product.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;
+
+CREATE INDEX IF NOT EXISTS x_productid
+ON sagerx_lake.fda_ndc_product(productid);

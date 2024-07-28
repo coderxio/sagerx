@@ -150,7 +150,8 @@ def alert_slack_channel(context):
             message=msg,
         ).execute(context=None)
 
-def load_df_to_pg(df,schema_name:str,table_name:str,if_exists:str,dtype_name:str="",index:bool=True) -> None:
+def load_df_to_pg(df,schema_name:str,table_name:str,if_exists:str,dtype_name:str="",index:bool=True, 
+                  create_index: bool = False, index_columns: list = None) -> None:
     from airflow.hooks.postgres_hook import PostgresHook
     import sqlalchemy
 
@@ -159,6 +160,15 @@ def load_df_to_pg(df,schema_name:str,table_name:str,if_exists:str,dtype_name:str
 
     if if_exists == "replace":
         engine.execute(f'DROP TABLE IF EXISTS {schema_name}.{table_name} cascade')
+    
+    # Create index before loading data if specified
+    if create_index and index_columns:
+        if len(index_columns) == 1:
+            engine.execute(f'CREATE INDEX IF NOT EXISTS idx_{table_name}_{index_columns[0]} ON {schema_name}.{table_name} ({index_columns[0]})')
+        else:
+            columns_str = ', '.join(index_columns)
+            engine.execute(f'CREATE INDEX IF NOT EXISTS idx_{table_name}_{"_".join(index_columns)} ON {schema_name}.{table_name} ({columns_str})')
+
 
     if dtype_name:
         dtype = {dtype_name:sqlalchemy.types.JSON}

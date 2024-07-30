@@ -21,7 +21,7 @@ def process_concept(class_base_url, concept):
         return []
 
 
-base_url = "https://rxnav.nlm.nih.gov/REST/allconcepts.json?tty=SBD+SCD+GPCK+BPCK"
+base_url = "https://rxnav.nlm.nih.gov/REST/allconcepts.json?tty=IN+PIN+MIN+SCDC+SCDF+SCDFP+SCDG+SCDGP+SCD+GPCK+BN+SBDC+SBDF+SBDFP+SBDG+SBD+BPCK"
 class_base_url = "https://rxnav.nlm.nih.gov/REST/rxclass/class/byRxcui.json?rxcui="
 
 cui_json = fetch_json(base_url)

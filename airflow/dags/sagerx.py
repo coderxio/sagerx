@@ -178,8 +178,8 @@ def load_df_to_pg(df,schema_name:str,table_name:str,if_exists:str,dtype_name:str
     )
 
     if create_index and index_columns:
-            columns_str = ', '.join(index_columns)
-            engine.execute(f'CREATE INDEX IF NOT EXISTS idx_{table_name}_{"_".join(index_columns)} ON {schema_name}.{table_name} ({columns_str})')
+        columns_str = ', '.join(index_columns)
+        engine.execute(f'CREATE INDEX IF NOT EXISTS idx_{table_name}_{"_".join(index_columns)} ON {schema_name}.{table_name} ({columns_str})')
 
 def run_query_to_df(query:str) -> pd.DataFrame:
     from airflow.hooks.postgres_hook import PostgresHook

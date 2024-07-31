@@ -98,7 +98,7 @@ if failed_concepts:
 print(f"Processing complete. Total concepts: {total_concepts}, Processed: {processed_concepts}, Failed: {failed_count}")
 if failed_concepts:
     print("Failed concepts:")
-    for concept in failed_concepts[:25]:
+    for concept in failed_concepts[:10]:
         print(f"  - RxCUI: {concept['rxcui']}, Name: {concept['name']}")
     if len(failed_concepts) > 10:
         print(f"  ... and {len(failed_concepts) - 10} more. See log file for complete list.")

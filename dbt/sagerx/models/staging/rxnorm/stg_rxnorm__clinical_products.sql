@@ -1,4 +1,5 @@
 -- stg_rxnorm__clinical_products.sql
+
 with
 
 clinical_products as (

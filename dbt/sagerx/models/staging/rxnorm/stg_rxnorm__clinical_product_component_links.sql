@@ -1,58 +1,43 @@
 -- stg_rxnorm__clinical_product_component_links.sql
-with clinical_products as (
+
+with 
+
+clinical_products as (
+    select
+        *
+    from {{ ref('stg_rxnorm__clinical_products') }}
+),
+
+rxnrel as (
 
     select
-        rxcui
+        rxcui2 as clinical_product_rxcui,
+        rxcui1 as clinical_product_component_rxcui
 
     from
         {{ ref(
-            'stg_rxnorm__clinical_products'
+            'stg_rxnorm__rxnrel_ttys'
         ) }}
-
-),
-
-clinical_product_components as (
-
-    select
-        rxcui
-
-    from
-        {{ source(
-            'rxnorm',
-            'rxnorm_rxnconso'
-        ) }}
-
-        where tty = 'SCD' and
-            sab = 'RXNORM'
+    
+    where tty2 = 'GPCK'
+        and rela = 'contains'
+        and tty1 = 'SCD'
 
 ),
 
 clinical_product_component_links as (
 
-    select distinct 
+    select
         clinical_products.rxcui as clinical_product_rxcui,
         case
-            when clinical_product_components.rxcui is null
-                then clinical_products.rxcui
-            else clinical_product_components.rxcui
-        end as clinical_product_component_rxcui
-
-    from
-        {{ source(
-            'rxnorm',
-            'rxnorm_rxnrel'
-        ) }} rxnrel
-    
-    left join clinical_products
-        on clinical_products.rxcui = rxnrel.rxcui2
-    left join clinical_product_components
-        on clinical_product_components.rxcui = rxnrel.rxcui1
-
-    where rxnrel.rela = 'contains'
-
-    group by
-        1,
-        2
+            when clinical_product_component_rxcui is not null
+                then clinical_product_component_rxcui
+            else clinical_products.rxcui
+            end as clinical_product_component_rxcui
+    from clinical_products
+    left join rxnrel
+        on clinical_product_rxcui 
+            = clinical_products.rxcui
 
 )
 

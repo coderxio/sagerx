@@ -15,7 +15,9 @@ current_drug_shortages as (
         name,
         concat(
             'https://www.ashp.org/drug-shortages/current-shortages/',
-            lower(detail_url)) as url
+            lower(detail_url)) as url,
+        created_date,
+        update_date
     from ashp_shortage_list
 
 )

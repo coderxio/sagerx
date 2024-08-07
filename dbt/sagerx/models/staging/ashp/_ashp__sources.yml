@@ -18,3 +18,7 @@ sources:
               Also, this field is weirdly camel-case for some reason
               (Drug-Shortage-Detail.aspx?id=123) even though the actual
               link it takes you to is all lower case.
+          - name: created_date
+            description: The date the shortage record was created by ASHP.
+          - name: updated_date
+            description: The date the shortage record was last updated by ASHP.

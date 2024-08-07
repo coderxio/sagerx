@@ -16,3 +16,7 @@ models:
           The full URL link to the shortage detail page, completely
           lower case because it bugs me that part of the URL is
           camel case on the ASHP website.
+      - name: created_date
+        description: The date the shortage record was created by ASHP.
+      - name: updated_date
+        description: The date the shortage record was last updated by ASHP.

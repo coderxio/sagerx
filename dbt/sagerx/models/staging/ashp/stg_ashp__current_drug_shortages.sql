@@ -17,7 +17,7 @@ current_drug_shortages as (
             'https://www.ashp.org/drug-shortages/current-shortages/',
             lower(detail_url)) as url,
         created_date::date,
-        update_date::date
+        updated_date::date
     from ashp_shortage_list
 
 )

@@ -22,3 +22,17 @@ sources:
             description: The date the shortage record was created by ASHP.
           - name: updated_date
             description: The date the shortage record was last updated by ASHP.
+
+      - name: ashp_shortage_list_ndcs
+        desciption: Affected and available NDCs for each ASHP drug shortage.
+        columns:
+          - name: detail_url
+            description: |
+              The partial URL for the detail about the shortage.
+              Contains an ID parameter which can be used as an index.
+          - name: ndc
+            description: The NDC relevant to the shortage.
+          - name: ndc_type
+            description: |
+              The relationship between the NDC and the shortage. Can
+              either be 'affected' or 'available'.

@@ -32,6 +32,7 @@ dag = create_dag(
 with dag:
     landing_url = "https://www.ashp.org/drug-shortages/current-shortages/drug-shortages-list?page=CurrentShortages"
     base_url = "https://www.ashp.org/drug-shortages/current-shortages/"
+    ndc_regex = re.compile(r"\d{5}\-\d{4}\-\d{2}")  # ASHP shortage pages always have 5-4-2 format NDCs
     created_regex = re.compile(r"Created (\w+ \d+, \d+)")
     updated_regex = re.compile(r"Updated (\w+ \d+, \d+)")
 
@@ -62,9 +63,28 @@ with dag:
             shortage_detail_data = requests.get(base_url + shortage['detail_url'])
             soup = BeautifulSoup(shortage_detail_data.content, 'html.parser')
 
-            stamp = soup.find(id='1_lblUpdated').find('p').get_text()
+            # Get affected NDCs
+            affected_ndcs = []
+            try:
+                for ndc_description in soup.find(id='1_lblProducts').find_all('li'):
+                    ndc = re.search(ndc_regex, ndc_description.get_text())[0]
+                    affected_ndcs.append(ndc)
+                    shortage['affected_ndcs'] = affected_ndcs
+            except TypeError:
+                logging.info(f'No affected NDCs for {shortage.get("name")}')
+
+            # Get currently available NDCs
+            available_ndcs = []
+            try:
+                for ndc_description in soup.find(id='1_lblAvailable').find_all('li'):
+                    ndc = ndc_regex.search(ndc_description.get_text())[0]
+                    available_ndcs.append(ndc)
+                shortage['available_ndcs'] = available_ndcs
+            except TypeError:
+                logging.info(f'No available NDCs for {shortage.get("name")}')
 
             # Get created date
+            stamp = soup.find(id='1_lblUpdated').find('p').get_text()
             try:
                 created_date = created_regex.search(stamp).group(1)
                 created_date = datetime.strptime(created_date, '%B %d, %Y')
@@ -80,19 +100,35 @@ with dag:
             try:
                 updated_date = updated_regex.search(stamp).group(1)
                 updated_date = datetime.strptime(updated_date, '%B %d, %Y')
-                shortage['update_date'] = updated_date
+                shortage['updated_date'] = updated_date
             except AttributeError:
                 logging.info(f'Missing ASHP update date for {shortage.get("name")}')
-                shortage['update_date'] = None
+                shortage['updated_date'] = None
             except ValueError:
                 logging.error(f'Could not parse update date for {shortage.get("name")}')
-                shortage['update_date'] = None
+                shortage['updated_date'] = None
 
             sleep(0.2)
         
         if len(ashp_drugs) > 0:
-            df = pd.DataFrame(ashp_drugs)
-            load_df_to_pg(df, "sagerx_lake", "ashp_shortage_list", "replace", index=False)
+            # Load the main shortage table
+            shortage_columns = ['name', 'detail_url', 'created_date', 'updated_date']
+            shortages = pd.DataFrame(ashp_drugs, columns=shortage_columns)
+            load_df_to_pg(shortages, "sagerx_lake", "ashp_shortage_list", "replace", index=False)
+
+            # Load the table of affected and available NDCs
+            affected_ndcs = pd.DataFrame(ashp_drugs, columns=['detail_url', 'affected_ndcs']).explode('affected_ndcs')
+            affected_ndcs['ndc_type'] = 'affected'
+            affected_ndcs = affected_ndcs.rename(columns={'affected_ndcs': 'ndc'})
+
+            available_ndcs = pd.DataFrame(ashp_drugs, columns=['detail_url', 'available_ndcs']).explode(
+                'available_ndcs')
+            available_ndcs['ndc_type'] = 'available'
+            available_ndcs = available_ndcs.rename(columns={'available_ndcs': 'ndc'})
+
+            ndcs = pd.concat([affected_ndcs, available_ndcs])
+            ndcs = ndcs[~ndcs['ndc'].isnull()]  # Remove shortages that have no associated NDCs
+            load_df_to_pg(ndcs, "sagerx_lake", "ashp_shortage_list_ndcs", "replace", index=False)
         else:
             logging.error('Drug shortage list not found')
         

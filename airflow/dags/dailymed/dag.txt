@@ -6,7 +6,7 @@ from airflow.utils.helpers import chain
 from airflow.decorators import task
 import pandas as pd
 
-from dailymed_images.dag_tasks import *
+from airflow.dags.dailymed_images.dailymed_images import *
 from sagerx import load_df_to_pg
 
 dag_id = "dailymed_images"

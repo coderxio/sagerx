@@ -1,7 +1,9 @@
 # Any change made here should accompany an increment 
 # to the image version on line 5 of docker-compose.yml
 
+apache-airflow[google]
 dbt-core
 dbt-postgres
-apache-airflow[google]
+pillow==9.5.0
+pyzbar==0.1.9
 xmltodict==0.13.0

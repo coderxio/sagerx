@@ -1,9 +1,10 @@
 from airflow_operator import create_dag
 
-from rxclass.dag_tasks import get_rxcuis, extract_atc
+from sagerx import get_rxcuis
+from rxclass.dag_tasks import extract_rxclass
 from common_dag_tasks import  get_ds_folder, get_data_folder, transform
 
-dag_id = 'rxclass_atc_to_product'
+dag_id = 'rxclass'
 
 dag = create_dag(
     dag_id=dag_id,
@@ -16,5 +17,6 @@ dag = create_dag(
 with dag:
     ds_folder = get_ds_folder(dag_id)
     data_folder = get_data_folder(dag_id)
-    rxcuis = get_rxcuis()
-    rxcuis >> extract_atc(rxcuis) >> transform('rxclass')
+    all_ttys = ['IN','PIN','MIN','SCDC','SCDF','SCDFP','SCDG','SCDGP','SCD','GPCK','BN','SBDC','SBDF','SBDFP','SBDG','SBD','BPCK']
+    rxcuis = get_rxcuis(ttys=all_ttys)
+    rxcuis >> extract_rxclass(rxcuis)

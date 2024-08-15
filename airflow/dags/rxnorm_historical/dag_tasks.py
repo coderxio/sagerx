@@ -10,21 +10,6 @@ def create_url_list(rxcui_list:list)-> list:
         urls.append(f'https://rxnav.nlm.nih.gov/REST/rxcui/{rxcui}/allhistoricalndcs.json')
     return urls
 
-@task
-def get_rxcuis() -> list:
-    from airflow.hooks.postgres_hook import PostgresHook
-
-    pg_hook = PostgresHook(postgres_conn_id="postgres_default")
-    engine = pg_hook.get_sqlalchemy_engine()
-
-    df = pd.read_sql(
-            "select distinct rxcui from sagerx_lake.rxnorm_rxnconso where tty in ('SCD','SBD','GPCK','BPCK') and sab = 'RXNORM'",
-            con=engine
-        )
-    results = list(df['rxcui'])
-    print(f"Number of RxCUIs: {results}")
-    return results
-
 rxcui_pattern = re.compile(r'rxcui\/(?P<rxcui>\d+)\/')
 
 @task

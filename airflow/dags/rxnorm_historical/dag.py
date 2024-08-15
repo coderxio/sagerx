@@ -20,7 +20,8 @@ from airflow.hooks.subprocess import SubprocessHook
 
 from airflow_operator import create_dag
 from common_dag_tasks import  get_ds_folder, get_data_folder, transform
-from rxnorm_historical.dag_tasks import get_rxcuis, extract_ndc
+from sagerx import get_rxcuis
+from rxnorm_historical.dag_tasks import extract_ndc
 
 dag_id = "rxnorm_historical"
 
@@ -35,5 +36,5 @@ with dag:
     ds_folder = get_ds_folder(dag_id)
     data_folder = get_data_folder(dag_id)
 
-    rxcuis = get_rxcuis()
+    rxcuis = get_rxcuis(ttys=['SCD', 'SBD', 'GPCK', 'BPCK'])
     rxcuis >> extract_ndc(rxcuis) >> transform(dag_id)

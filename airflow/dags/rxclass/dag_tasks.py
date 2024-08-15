@@ -1,52 +1,75 @@
 from airflow.decorators import task
 import pandas as pd
-from sagerx import load_df_to_pg, parallel_api_calls
+import json
+from sagerx import load_df_to_pg, parallel_api_calls, rate_limited_api_calls
+import hashlib
 
-def create_url_list(rxcui_list:list)-> list:
+def create_url_list(rxcui_list:list) -> list:
     urls=[]
 
     for rxcui in rxcui_list:
-        urls.append(f"https://rxnav.nlm.nih.gov/REST/rxclass/class/byRxcui.json?rxcui={rxcui}&relaSource=ATCPROD")
+        urls.append(f"https://rxnav.nlm.nih.gov/REST/rxclass/class/byRxcui.json?rxcui={rxcui}")
+
     return urls
 
-@task
-def get_rxcuis() -> list:
-    from airflow.hooks.postgres_hook import PostgresHook
-
-    pg_hook = PostgresHook(postgres_conn_id="postgres_default")
-    engine = pg_hook.get_sqlalchemy_engine()
-
-    df = pd.read_sql(
-        "select distinct rxcui from sagerx_lake.rxnorm_rxnconso where tty in ('IN', 'MIN') and sab = 'RXNORM'",
-        con=engine
-    )
-    results = list(df['rxcui'])
-    print(f"Number of RxCUIs: {results}")
-    return results
-
+# function to generate a hash for a row
+def generate_hash(row):
+    return hashlib.md5(str(tuple(row.values())).encode()).hexdigest()
 
 @task
-def extract_atc(rxcui_list:list)->None:
-   # Get ATC for full list of RXCUI
-    urls = create_url_list(rxcui_list)
-    print(f"URL List created of length: {len(urls)}")
-    atcs_list = parallel_api_calls(urls)
-    atcs = {}
+def extract_rxclass(rxcui_list:list) -> None:
+    url_list = create_url_list(rxcui_list)
+    print(f"URL List created of length: {len(url_list)}")
+    response_list = rate_limited_api_calls(url_list)
+    
+    # initialize an empty DataFrame
+    rxclass_df = pd.DataFrame(columns=[
+            "rxcui", 
+            "name",
+            "tty",
+            "class_id",
+            "class_name",
+            "class_type",
+            "rela",
+            "rela_source"
+        ])
+    
+    # initialize a set to store hashes of existing rows
+    existing_hashes = set()
 
-    for atc in atcs_list:
-        for druginfo in atc['response']["rxclassDrugInfoList"]["rxclassDrugInfo"]:
-            rxcui = druginfo["minConcept"].get("rxcui")
-            atc_info = {}
-            atc_info['class_id'] = druginfo["rxclassMinConceptItem"].get("classId","")
-            atc_info['class_name'] = druginfo["rxclassMinConceptItem"].get("className","")
-            atc_info['class_type'] = druginfo["rxclassMinConceptItem"].get("classType","")
-            atc_info["drug_name"] = druginfo["minConcept"].get("name","")
-            atc_info["drug_tty"] = druginfo["minConcept"].get("tty","") #
-            atc_info["rela"] = druginfo["minConcept"].get("rela","")
-            atc_info["rela_source"] = druginfo["minConcept"].get("relaSource","")            
+    for response in response_list:
+        rxclasses = response['rxclassDrugInfoList']['rxclassDrugInfo']
+        for rxclass in rxclasses:
+            rxclass_row = {
+                "rxcui": rxclass["minConcept"]["rxcui"],
+                "name": rxclass["minConcept"]["name"],
+                "tty": rxclass["minConcept"]["tty"],
+                "class_id": rxclass["rxclassMinConceptItem"]["classId"],
+                "class_name": rxclass["rxclassMinConceptItem"]["className"],
+                "class_type": rxclass["rxclassMinConceptItem"]["classType"],
+                "rela": rxclass["rela"],
+                "rela_source": rxclass["relaSource"]
+            }
+                
+            rxclass_hash = generate_hash(rxclass_row)
+    
+            '''
+            all of this hash stuff is for efficiency
 
-            atcs[rxcui] = atc_info
+            there are many, many duplicates in the responses of
+            the api calls. for instance, a SBD call and a SCD
+            call for a given product will likely return a lot of
+            duplicate class information.
 
-    atc_df = pd.DataFrame.from_dict(atcs, orient='index')
-    atc_df.index.names = ['rxcui']
-    load_df_to_pg(atc_df.reset_index(),"sagerx_lake","rxclass_atc_to_product","replace",index=False)
+            this approach cleans it up in the most efficient way
+            because there are 2 million rows in the full response,
+            most of which are likely duplicates.
+            '''
+            # check if the hash is not in the set
+            if rxclass_hash not in existing_hashes:
+                # add the hash to the set
+                existing_hashes.add(rxclass_hash)
+                # append the object to the dataframe
+                rxclass_df = rxclass_df.append(rxclass_row, ignore_index=True)
+
+    load_df_to_pg(rxclass_df,"sagerx_lake","rxclass","replace",index=False)

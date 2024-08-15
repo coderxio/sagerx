@@ -1,10 +1,17 @@
 from pathlib import Path
 from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperator
 from airflow.models import Variable
+from airflow.decorators import task
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import requests
 from time import sleep
 import pandas as pd
+from urllib.request import urlopen
+import json
+from concurrent.futures import ThreadPoolExecutor
+import time
+from urllib.error import HTTPError
+import threading
 
 # Filesystem functions
 def create_path(*args):
@@ -219,3 +226,61 @@ def parallel_api_calls(api_calls:list) -> list:
             else:
                 print(f"Empty response for url: {url}")
     return output
+
+
+class RateLimiter:
+    def __init__(self, max_calls, period):
+        self.max_calls = max_calls
+        self.period = period
+        self.calls = []
+        self.lock = threading.Lock()
+
+    def __call__(self, f):
+        def wrapped(*args, **kwargs):
+            with self.lock:
+                now = time.time()
+                self.calls = [c for c in self.calls if now - c < self.period]
+                if len(self.calls) >= self.max_calls:
+                    time.sleep(self.period - (now - self.calls[0]))
+                self.calls.append(time.time())
+            return f(*args, **kwargs)
+        return wrapped
+
+@RateLimiter(max_calls=20, period=1)
+def fetch_json(url):
+    with urlopen(url) as response:
+        return json.loads(response.read())
+
+def api_call(url, max_retries=3, initial_delay=1):
+    for attempt in range(max_retries):
+        try:
+            json = fetch_json(url)
+            return json
+        except HTTPError as e:
+            if e.code == 429:
+                delay = initial_delay * (2 ** attempt)
+                time.sleep(delay)
+            else:
+                time.sleep(initial_delay)
+        except Exception:
+            time.sleep(initial_delay)
+    
+    return None
+
+@task
+def get_rxcuis(ttys:list) -> list:
+    ttys_str = '+'.join(ttys)
+    base_url = f"https://rxnav.nlm.nih.gov/REST/allconcepts.json?tty={ttys_str}"
+
+    json = fetch_json(base_url)
+    concepts = json['minConceptGroup']['minConcept']
+    rxcuis = [concept['rxcui'] for concept in concepts]
+    
+    print(f"Number of RxCUIs: {len(rxcuis)}")
+    return rxcuis
+
+def rate_limited_api_calls(url_list:list) -> list:
+    with ThreadPoolExecutor(max_workers=20) as executor:
+        responses = list(executor.map(api_call, url_list))
+
+    return responses

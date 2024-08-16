@@ -63,6 +63,61 @@ with dag:
             shortage_detail_data = requests.get(base_url + shortage['detail_url'])
             soup = BeautifulSoup(shortage_detail_data.content, 'html.parser')
 
+            # Get shortage reasons
+            shortage_reasons = []
+            try:
+                for reason in soup.find(id='1_lblReason').find_all('li'):
+                    shortage_reasons.append(reason.get_text())
+            except AttributeError:
+                logging.info(f'No shortage reasons for {shortage.get("name")}')
+                shortage['shortage_reasons'] = None
+            else:
+                shortage['shortage_reasons'] = json.dumps(shortage_reasons)
+
+            # Get resupply dates
+            resupply_dates = []
+            try:
+                for date_info in soup.find(id='1_lblResupply').find_all('li'):
+                    resupply_dates.append(date_info.get_text())
+            except AttributeError:
+                logging.info(f'No resupply dates for {shortage.get("name")}')
+                shortage['resupply_dates'] = None
+            else:
+                shortage['resupply_dates'] = json.dumps(resupply_dates)
+
+            # Get implications on patient care
+            care_implications = []
+            try:
+                for implication in soup.find(id='1_lblImplications').find_all('li'):
+                    care_implications.append(implication.get_text())
+            except AttributeError:
+                logging.info(f'No care implications for {shortage.get("name")}')
+                shortage['care_implications'] = None
+            else:
+                shortage['care_implications'] = json.dumps(care_implications)
+
+            # Get safety information
+            safety_notices = []
+            try:
+                for notice in soup.find(id='1_lblSafety').find_all('li'):
+                    safety_notices.append(notice.get_text())
+            except AttributeError:
+                logging.info(f'No safety notices for {shortage.get("name")}')
+                shortage['safety_notices'] = None
+            else:
+                shortage['safety_notices'] = json.dumps(safety_notices)
+
+            # Get alternative agents and management info
+            alternatives = []
+            try:
+                for alternative in soup.find(id='1_lblAlternatives').find_all('li'):
+                    alternatives.append(alternative.get_text())
+            except AttributeError:
+                logging.info(f'No alternatives/management information for {shortage.get("name")}')
+                shortage['alternatives_and_management'] = None
+            else:
+                shortage['alternatives_and_management'] = json.dumps(alternatives)
+
             # Get affected NDCs
             affected_ndcs = []
             try:
@@ -112,7 +167,9 @@ with dag:
         
         if len(ashp_drugs) > 0:
             # Load the main shortage table
-            shortage_columns = ['name', 'detail_url', 'created_date', 'updated_date']
+            shortage_columns = ['name', 'detail_url', 'shortage_reasons', 'resupply_dates',
+                                'alternatives_and_management', 'care_implications', 'safety_notices',
+                                'created_date', 'updated_date']
             shortages = pd.DataFrame(ashp_drugs, columns=shortage_columns)
             load_df_to_pg(shortages, "sagerx_lake", "ashp_shortage_list", "replace", index=False)
 

@@ -18,6 +18,16 @@ sources:
               Also, this field is weirdly camel-case for some reason
               (Drug-Shortage-Detail.aspx?id=123) even though the actual
               link it takes you to is all lower case.
+          - name: shortage_reasons
+            description: A list of reasons provided by ASHP for the shortage.
+          - name: resupply_dates
+            description: A list of resupply dates provided by ASHP.
+          - name: alternatives_and_management
+            description: Alternatives and management information from ASHP.
+          - name: care_implications
+            description: Implications on patient care.
+          - name: safety_notices
+            description: Safety notices related to the shortage.
           - name: created_date
             description: The date the shortage record was created by ASHP.
           - name: updated_date

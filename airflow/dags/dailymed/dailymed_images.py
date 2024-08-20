@@ -3,6 +3,8 @@ import pandas as pd
 from dailymed.dailymed import DailyMed
 from xml_functions import parse_dm_xml_to_dict
 from sagerx import load_df_to_pg
+import logging
+
 
 class DailyMedImages(DailyMed):
     def __init__(self, data_folder: os.PathLike) -> None:
@@ -41,7 +43,7 @@ class DailyMedImages(DailyMed):
     'ndcIds': '83295-5000-1'}}
     """
 
-    def get_full_ndc_varients(self, ndcs):
+    def get_full_ndc_variants(self, ndcs):
         ndcs_11 = [self.convert_ndc_10_to_11(ndc) for ndc in ndcs]
         ndcs.extend(ndcs_11)
         ndcs_nd = [self.convert_ndc_no_dash(ndc) for ndc in ndcs]
@@ -50,16 +52,19 @@ class DailyMedImages(DailyMed):
         return ndcs
     
     def get_ndc_from_image_filename(self, ndcs, image_id):
-        ndcs= self.get_full_ndc_varients(ndcs)
-
         image_ndc = self.ndc_format(image_id)
+
+        logging.debug(f"Got NDC varients, total {len(ndcs)}")
+        logging.debug(f"image ndc: {image_ndc} from {image_id}")
 
         if image_ndc: 
             for ndc in ndcs:
                 if ndc == image_ndc:
                     return ndc
+            return None
+
         else:
-            #print(f"NDC {image_ndc} from {id} not found in NDC list of: {converted_ndc_ids}")
+            #logging.debug(f"NDC {image_ndc} from {id} not found in NDC list of: {ndcs}")
             return None
         
     def find_image_components(self,xml_doc):
@@ -122,9 +127,9 @@ class DailyMedImages(DailyMed):
                 if ndc in ndc_ids and image in image_ids:
                     mapped_dict[ndc] = image
                 else:
-                    print(f"Found unknown ndc or image")
-                    print(f"NDC {ndc}, vs expected {ndc_ids}")
-                    print(f"Image {image}, vs expected {image_ids}")
+                    logging.debug(f"Found unknown ndc or image")
+                    logging.debug(f"NDC {ndc}, vs expected {ndc_ids}")
+                    logging.debug(f"Image {image}, vs expected {image_ids}")
         return mapped_dict
 
 
@@ -133,13 +138,23 @@ class DailyMedImages(DailyMed):
         image_ndc_mapping = {}
 
         for spl, mapping in mapping_dict.items():
-            #print(spl, mapping)
+            
             ndcs = mapping.get('ndcIds')
+            ndc_variants = self.get_full_ndc_variants(ndcs)
             image_files = mapping.get('image_files')
 
+            logging.debug(f"image file check for {spl}")
+            logging.debug(f"NDCs found from mapping: {len(ndcs)}")
+            logging.debug(f"NDC varients: {len(ndc_variants)}")
+
             # Get NDCs when found in the image filenames 
+            logging.debug(f"Found {len(image_files)} image files")
+
             for image_file in image_files:
-                matched_ndc = self.get_ndc_from_image_filename(ndcs, image_file)
+                matched_ndc = self.get_ndc_from_image_filename(ndc_variants, image_file)
+
+                logging.debug(f"Mapping dict length of: {len(image_ndc_mapping)}")
+
                 if matched_ndc:
                     image_ndc_mapping[matched_ndc] = {
                         'image_file':image_file,
@@ -149,7 +164,9 @@ class DailyMedImages(DailyMed):
                         'confidence_level':1,
                         'matched':1} 
             
-            for ndc in ndcs:
+            logging.debug(f"NDCs found from mapping post: {len(mapping.get('ndcIds'))}")
+
+            for ndc in mapping.get('ndcIds'):
                 if ndc not in image_ndc_mapping.keys():
                     image_ndc_mapping[ndc] = {
                         'image_file':'',
@@ -158,6 +175,8 @@ class DailyMedImages(DailyMed):
                         'methodology':'image_filename',
                         'confidence_level':1,
                         'matched':0} 
+                    
+            logging.debug(f"Mapping keys: {image_ndc_mapping.keys()}")
 
             
         df = pd.DataFrame.from_dict(image_ndc_mapping, orient='index')
@@ -170,7 +189,8 @@ class DailyMedImages(DailyMed):
         image_ndc_mapping = {}
 
         for spl, mapping in mapping_dict.items():
-            #print(spl, mapping)
+            logging.debug(f"image component check for {spl}")
+
             ndcs = mapping.get('ndcIds')
             image_files = mapping.get('image_files')
 
@@ -178,7 +198,7 @@ class DailyMedImages(DailyMed):
             spl_folder_name = mapping.get("spl_folder_name")
             xml_file_path = self.get_file_path(spl_folder_name, mapping.get("xml_file"))
             xml_doc = parse_dm_xml_to_dict(xml_file_path)
-            print(xml_file_path)
+            logging.debug(xml_file_path)
             
             matched_components = self.get_ndcs_from_image_components(xml_doc, ndcs, image_files)
 
@@ -224,7 +244,8 @@ class DailyMedImages(DailyMed):
         image_ndc_mapping = {}
 
         for spl, mapping in mapping_dict.items():
-            #print(spl, mapping)
+            logging.debug(f"image barcode check for {spl}")
+
             ndcs = mapping.get('ndcIds')
             ndcs = self.get_full_ndc_varients(ndcs)
             image_files = mapping.get('image_files')
@@ -240,7 +261,7 @@ class DailyMedImages(DailyMed):
                 barcodes = decode(img)
         
                 if not barcodes:
-                    print("No barcode found in the image.")
+                    logging.debug("No barcode found in the image.")
                     return
                 
                 for barcode in barcodes:
@@ -278,7 +299,8 @@ class DailyMedImages(DailyMed):
         image_ndc_mapping = {}
 
         for spl, mapping in mapping_dict.items():
-            #print(spl, mapping)
+            logging.debug(f"image OCR check for {spl}")
+
             ndcs = mapping.get('ndcIds')
             ndcs = self.get_full_ndc_varients(ndcs)
             image_files = mapping.get('image_files')

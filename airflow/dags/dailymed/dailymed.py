@@ -3,11 +3,21 @@ from pathlib import Path
 from xml_functions import transform_xml_to_dict, get_xsl_template_path, transform_xml
 import pandas as pd
 from sagerx import load_df_to_pg
+import logging
+from airflow import configuration as conf
 
 class DailyMed():
     def __init__(self, data_folder: os.PathLike) -> None:
         self.data_folder = data_folder
         self.rx_folder = Path(data_folder) / "prescription"
+
+        airflow_logging_level = conf.get('logging', 'logging_level')
+
+        if airflow_logging_level == 'DEBUG':
+            logging.debug("This is a debug message that will only be logging.debuged when logging_level is set to DEBUG.")
+        else:
+            logging.info("This is an info message, but DEBUG level messages will not be logging.debuged.")
+
 
     ### 
     # Supplementary Functions
@@ -91,7 +101,7 @@ class DailyMed():
         import zipfile
         for zip_folder in self.rx_folder.iterdir():
             if zip_folder.is_file() and zip_folder.suffix == '.zip':
-                #print(zip_folder)
+                logging.debug(zip_folder)
                 with zipfile.ZipFile(zip_folder) as unzipped_folder:
                     folder_name = zip_folder.stem
                     extracted_folder_path = self.rx_folder / folder_name
@@ -128,7 +138,7 @@ class DailyMed():
             }
             file_mapping[spl] = dict(file_dict, **metadata)
         self.file_mapping = file_mapping
-        print(file_mapping)
+        logging.debug(file_mapping)
 
     
     def get_file_path(self, spl_folder_name, file_name):

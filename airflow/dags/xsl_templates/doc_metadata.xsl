@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:v3="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exclude-result-prefixes="v3 xsl">
-<xsl:output method="html" version="1.0" encoding="UTF-8" indent="yes" />
+<xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes" />
 <xsl:strip-space elements="*" />
+
+<xsl:template match="/">
+    <Metadata>
+        <xsl:apply-templates select="v3:document"/>
+    </Metadata>
+</xsl:template>
 
 <xsl:template match="v3:document">
     <metadata>

@@ -40,7 +40,7 @@ class DailyMedImages(DailyMed):
     'EffectiveDate': '20240724', 
     'MarketStatus': 'unapproved drug other', 
     'imageIds': ['Xiclofen Box.jpg', 'Xiclofen Tube.jpg'], 
-    'ndcIds': '83295-5000-1'}}
+    'ndcIds': ['83295-5000-1']}}
     """
 
     def get_full_ndc_variants(self, ndcs):
@@ -74,49 +74,23 @@ class DailyMedImages(DailyMed):
                 components.append(component)
         return components
 
-    def find_ndcs_in_component(self, component, results=None):
-        if results is None:
-            results = []
-
-        if isinstance(component, str) and self.ndc_format(component):
-            results.append(self.ndc_format(component))
-        elif isinstance(component, dict):
-            if '#text' in component and self.ndc_format(component['#text']):
-                results.append(self.ndc_format(component['#text']))
-            for _, value in component.items():
-                    if isinstance(value, (dict, list)):
-                        self.find_ndcs_in_component(value, results)
-        elif isinstance(component, list):
-            for item in component:
-                self.find_ndcs_in_component(item,results)
-        return list(set(results))
+    def find_ndcs_in_component(self, component):
+        ndcs = self.ndc_format(component['Text'][0])
+        # NOTE: may need to modify ndc_format function to return multiple matches
+        # for now, just returning a list containing the single response
+        return [ndcs]
     
-    def find_images_in_component(self, xml_doc, results=None):
-        if results is None:
-            results = []
-
-        if isinstance(xml_doc, dict):
-            if '@mediaType' in xml_doc and xml_doc['@mediaType'] == 'image/jpeg':
-                results.append(xml_doc.get('reference', {}).get('@value'))
-            for _, value in xml_doc.items():
-                if isinstance(value, (dict, list)):
-                    self.find_images_in_component(value, results)
-        elif isinstance(xml_doc, list):
-            for item in xml_doc:
-                self.find_images_in_component(item, results)
-        return list(set(results))
-
-    def get_ndcs_from_image_components(self,xml_doc, ndc_ids, image_ids):
+    def get_ndcs_from_image_components(self, xml_doc, ndc_ids, image_ids):
         mapped_dict = {}
-        image_components = self.find_image_components(xml_doc)
+
+        image_components = [xml_doc] # leaving as a list because we need to modify the XSL to find multiple PRIMARY DISPLAY PANELS
 
         if image_components == []:
             return None 
 
         for component in image_components:
             ndcs = self.find_ndcs_in_component(component)
-            images = self.find_images_in_component(component)
-
+            images = component['Image']
             if not ndcs or not images:
                 continue
 
@@ -140,6 +114,7 @@ class DailyMedImages(DailyMed):
         for spl, mapping in mapping_dict.items():
             
             ndcs = mapping.get('ndcIds')
+            #print(mapping)
             ndc_variants = self.get_full_ndc_variants(ndcs)
             image_files = mapping.get('image_files')
 
@@ -194,22 +169,26 @@ class DailyMedImages(DailyMed):
             ndcs = mapping.get('ndcIds')
             image_files = mapping.get('image_files')
 
+
             # Get NDCs from XML components
             spl_folder_name = mapping.get("spl_folder_name")
             xml_file_path = self.get_file_path(spl_folder_name, mapping.get("xml_file"))
-            xml_doc = parse_dm_xml_to_dict(xml_file_path)
+            xml_doc = self.find_xml_package_data(xml_file_path)
+            #xml_doc = parse_dm_xml_to_dict(xml_file_path)
+            print(xml_doc)
             logging.debug(xml_file_path)
             
-            matched_components = self.get_ndcs_from_image_components(xml_doc, ndcs, image_files)
+            if ('Image' in xml_doc):
+                matched_components = self.get_ndcs_from_image_components(xml_doc, ndcs, image_files)
 
-            for ndc,image_file in matched_components.items():
-                image_ndc_mapping[ndc] = {
-                        'image_file':image_file,
-                        'spl':spl, 
-                        'image_url':self.create_dailymed_image_url(image_file, spl),
-                        'methodology':'image_component',
-                        'confidence_level':0.75,
-                        'matched':1} 
+                for ndc,image_file in matched_components.items():
+                    image_ndc_mapping[ndc] = {
+                            'image_file':image_file,
+                            'spl':spl, 
+                            'image_url':self.create_dailymed_image_url(image_file, spl),
+                            'methodology':'image_component',
+                            'confidence_level':0.75,
+                            'matched':1} 
             
             for ndc in ndcs:
                 if ndc not in image_ndc_mapping.keys():

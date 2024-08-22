@@ -67,6 +67,7 @@ class DailyMed():
     def find_xml_ndc_numbers(self, xml_doc) -> list:
         xslt = get_xsl_template_path("ndcs.xsl")
         results = transform_xml_to_dict(xml_doc,xslt)
+        #print(results)
         return list(set(results.get('NDC',[])))
     
     def find_xml_metadata(self, xml_doc) -> dict:
@@ -74,6 +75,11 @@ class DailyMed():
         results = transform_xml_to_dict(xml_doc,xslt)
         return results
     
+    def find_xml_package_data(self, xml_doc) -> dict:
+        xslt = get_xsl_template_path("package_data.xsl")
+        results = transform_xml_to_dict(xml_doc,xslt)
+        return results
+
     def metadata_dict_cleanup(self, metadata):
         new_dict = {}
         for key, value in metadata.items():
@@ -85,18 +91,18 @@ class DailyMed():
 
 
     def process_xml_doc(self, xml_doc):
-        print('process_xml_doc')
+        #print('process_xml_doc')
         image_ids = self.find_xml_image_ids(xml_doc)
-        print('found_xml_image_ids')
+        #print('found_xml_image_ids')
         ndc_ids = self.find_xml_ndc_numbers(xml_doc)
-        print('found_ndc_ids')
+        #print('found_ndc_ids')
 
         metadata = self.find_xml_metadata(xml_doc)
-        print('found_xml_metadata')
+        #print('found_xml_metadata')
 
         metadata['imageIds'] = image_ids
         metadata['ndcIds'] = ndc_ids
-        return self.metadata_dict_cleanup(metadata)
+        return metadata
 
     ### 
     # File Processing
@@ -133,7 +139,7 @@ class DailyMed():
                     image_files.append(subfile.name)
 
             spl = spl_folder.name.split("_")[1]
-            print(spl)
+            #print(spl)
 
             xml_path = self.get_file_path(spl_folder, xml_file_name)
             metadata = self.process_xml_doc(xml_path)

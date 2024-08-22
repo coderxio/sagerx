@@ -18,14 +18,14 @@ dag = create_dag(
 with dag:
     file_name = "{{ macros.ds_format(macros.ds_add(ds,-1), '%Y-%m-%d', '%m%d%Y') }}"
     #url = f"https://dailymed-data.nlm.nih.gov/public-release-files/dm_spl_daily_update_{file_name}.zip"
-    url = "https://dailymed-data.nlm.nih.gov/public-release-files/dm_spl_release_human_rx_part1.zip"
+    url = "https://dailymed-data.nlm.nih.gov/public-release-files/dm_spl_release_human_rx_part3.zip"
     
     ds_folder = get_ds_folder(dag_id)
 
     extract_task = extract(dag_id,url)
 
     unzip = unzip_data(extract_task)
-    process = process_dailymed(extract_task)
+    #process = process_dailymed(extract_task)
     process_images = process_dailymed_images(extract_task)
     # transform_task = transform(dag_id)
 
@@ -41,5 +41,6 @@ with dag:
     #     )
     #     sql_tasks.append(sql_task)
 
-    extract_task >> unzip >> process >> process_images 
+    #extract_task >> unzip >> process >> process_images 
+    extract_task >> unzip >> process_images 
     #>> sql_tasks >> transform_task

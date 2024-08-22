@@ -154,13 +154,15 @@ def alert_slack_channel(context):
             message=msg,
         ).execute(context=None)
 
-def load_df_to_pg(df,schema_name:str,table_name:str,if_exists:str,dtype_name:str="",index:bool=True, 
-                  create_index: bool = False, index_columns: list = None) -> None:
-    from airflow.hooks.postgres_hook import PostgresHook
-    import sqlalchemy
+from airflow.hooks.postgres_hook import PostgresHook
+import sqlalchemy
 
-    pg_hook = PostgresHook(postgres_conn_id="postgres_default")
-    engine = pg_hook.get_sqlalchemy_engine()
+pg_hook = PostgresHook(postgres_conn_id="postgres_default")
+engine = pg_hook.get_sqlalchemy_engine()
+
+
+def load_df_to_pg(df,schema_name:str,table_name:str,if_exists:str,dtype_name:str="",index:bool=True, 
+                  create_index: bool = False, index_columns: list = None, engine=engine) -> None:
 
     if dtype_name:
         dtype = {dtype_name:sqlalchemy.types.JSON}

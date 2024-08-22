@@ -23,20 +23,22 @@ def parse_dm_xml_to_dict(input_xml):
     return xml_doc
 
 def transform_xml_to_dict(input_xml, xslt):
-    
-    dom =  ET.parse(input_xml)
-    xslt_doc = ET.parse(xslt)
-    xslt_transformer = ET.XSLT(xslt_doc)
-    new_xml = xslt_transformer(dom)
-    root = ET.fromstring(ET.tostring(new_xml))
-    
     result_dict = defaultdict(list)
-    
-    for elem in root.iter():
-        if elem.tag not in result_dict:
-            result_dict[elem.tag] = []
-        if elem.text is not None: 
-            result_dict[elem.tag].append(elem.text)
+    try:
+        dom =  ET.parse(input_xml)
+        xslt_doc = ET.parse(xslt)
+        xslt_transformer = ET.XSLT(xslt_doc)
+        new_xml = xslt_transformer(dom)
+        root = ET.fromstring(ET.tostring(new_xml))
+        
+        
+        for elem in root.iter():
+            if elem.tag not in result_dict:
+                result_dict[elem.tag] = []
+            if elem.text is not None: 
+                result_dict[elem.tag].append(elem.text)
+    except:
+        print('ERROR in transform_xml_to_dict')
     
     return dict(result_dict)
 

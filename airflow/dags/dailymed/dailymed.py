@@ -85,10 +85,15 @@ class DailyMed():
 
 
     def process_xml_doc(self, xml_doc):
+        print('process_xml_doc')
         image_ids = self.find_xml_image_ids(xml_doc)
+        print('found_xml_image_ids')
         ndc_ids = self.find_xml_ndc_numbers(xml_doc)
-        
+        print('found_ndc_ids')
+
         metadata = self.find_xml_metadata(xml_doc)
+        print('found_xml_metadata')
+
         metadata['imageIds'] = image_ids
         metadata['ndcIds'] = ndc_ids
         return self.metadata_dict_cleanup(metadata)
@@ -127,10 +132,12 @@ class DailyMed():
                 elif subfile.suffix == '.jpg':
                     image_files.append(subfile.name)
 
+            spl = spl_folder.name.split("_")[1]
+            print(spl)
+
             xml_path = self.get_file_path(spl_folder, xml_file_name)
             metadata = self.process_xml_doc(xml_path)
 
-            spl = spl_folder.name.split("_")[1]
             file_dict = {
                 "xml_file":xml_file_name,
                 "image_files": image_files,

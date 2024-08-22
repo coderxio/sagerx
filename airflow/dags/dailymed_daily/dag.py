@@ -17,7 +17,8 @@ dag = create_dag(
 
 with dag:
     file_name = "{{ macros.ds_format(macros.ds_add(ds,-1), '%Y-%m-%d', '%m%d%Y') }}"
-    url = f"https://dailymed-data.nlm.nih.gov/public-release-files/dm_spl_daily_update_{file_name}.zip"
+    #url = f"https://dailymed-data.nlm.nih.gov/public-release-files/dm_spl_daily_update_{file_name}.zip"
+    url = "https://dailymed-data.nlm.nih.gov/public-release-files/dm_spl_release_human_rx_part1.zip"
     
     ds_folder = get_ds_folder(dag_id)
 

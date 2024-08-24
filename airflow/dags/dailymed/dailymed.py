@@ -5,6 +5,8 @@ import pandas as pd
 from sagerx import load_df_to_pg
 import logging
 from airflow import configuration as conf
+import re
+
 
 class DailyMed():
     def __init__(self, data_folder: os.PathLike) -> None:
@@ -19,31 +21,27 @@ class DailyMed():
             logging.info("This is an info message, but DEBUG level messages will not be logging.debuged.")
 
 
-    ### 
-    # Supplementary Functions
-    ### 
-
-    def ndc_format(self,text_data):
-        import re
+        ### 
+        # Supplementary Functions
+        ### 
 
         # order of patterns is important
         # largest to smallest
-        patterns = [
-        (r'\d{11}', '11 Digit'),
-        (r'\d{10}', '10 Digit'),
-        (r'\d{5}-\d{5}', '5-5'),
-        (r'\d{5}-\d{4}-\d{2}', '5-4-2'),
-        (r'\d{5}-\d{4}-\d{1}', '5-4-1'),
-        (r'\d{5}-\d{3}-\d{2}', '5-3-2'),
-        (r'\d{4}-\d{6}', '4-6'),
-        (r'\d{4}-\d{4}-\d{2}', '4-4-2')
-        ]
+        self.ndc_pattern = re.compile(r"""
+                        \d{11}              | # 11 digit
+                        \d{10}              | # 10 digit
+                        \d{5}-\d{5}         | # 5-5
+                        \d{5}-\d{4}-\d{2}   | # 5-4-2
+                        \d{5}-\d{4}-\d{1}   | # 5-4-1
+                        \d{5}-\d{3}-\d{2}   | # 5-3-2
+                        \d{4}-\d{6}         | # 4-6
+                        \d{4}-\d{4}-\d{2}     # 4-4-2
+                    """, re.X)
 
-        for pattern, _ in patterns:
-            match = re.search(pattern, text_data)
-            if match:
-                return match.group(0)
-        
+    def ndc_format(self,text_data):
+        matches = re.findall(self.ndc_pattern, text_data)
+        if matches:
+            return matches      
         return None
     
     def convert_ndc_10_to_11(self,ndc):
@@ -67,7 +65,6 @@ class DailyMed():
     def find_xml_ndc_numbers(self, xml_doc) -> list:
         xslt = get_xsl_template_path("ndcs.xsl")
         results = transform_xml_to_dict(xml_doc,xslt)
-        #print(results)
         return list(set(results.get('NDCs', {}).get('NDC', [])))
     
     def find_xml_metadata(self, xml_doc) -> dict:
@@ -91,14 +88,10 @@ class DailyMed():
 
 
     def process_xml_doc(self, xml_doc):
-        #print('process_xml_doc')
         image_ids = self.find_xml_image_ids(xml_doc)
-        #print('found_xml_image_ids')
         ndc_ids = self.find_xml_ndc_numbers(xml_doc)
-        #print('found_ndc_ids')
 
         metadata = self.find_xml_metadata(xml_doc)
-        #print('found_xml_metadata')
 
         metadata['imageIds'] = image_ids
         metadata['ndcIds'] = ndc_ids
@@ -139,7 +132,6 @@ class DailyMed():
                     image_files.append(subfile.name)
 
             spl = spl_folder.name.split("_")[1]
-            #print(spl)
 
             xml_path = self.get_file_path(spl_folder, xml_file_name)
             metadata = self.process_xml_doc(xml_path)

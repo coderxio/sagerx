@@ -20,10 +20,11 @@ class DailyMedImages(DailyMed):
     
     def get_ndc_from_image_filename(self, ndc_variants, image_id):
         # attempt to regex an NDC from image file name
-        image_ndc = self.ndc_format(image_id)
+        ndc_matches = self.ndc_format(image_id)
 
         # if NDC match found
-        if image_ndc:
+        if ndc_matches:
+            image_ndc = ndc_matches[0]
             # compare it against all valid NDC variants in SPL
             # TODO: convert ndc_variants to a dict and iterate
             # through items so that it compares to the list of variants,
@@ -44,39 +45,58 @@ class DailyMedImages(DailyMed):
             if component['section']['code']['@code'] == '51945-4':
                 components.append(component)
         return components
-
-    def find_ndcs_in_component(self, component):
-        ndcs = self.ndc_format(component['Text'][0])
-        # NOTE: may need to modify ndc_format function to return multiple matches
-        # for now, just returning a list containing the single response
-        return [ndcs]
     
     def get_ndcs_from_image_components(self, xml_doc, ndc_ids, image_ids):
         mapped_dict = {}
+        #print(xml_doc)
+        packages = xml_doc.get('PackageData', {}).get('Package', [])
+        if not isinstance(packages, list):
+            packages = [packages]
 
-        image_components = [xml_doc] # leaving as a list because we need to modify the XSL to find multiple PRIMARY DISPLAY PANELS
+        # loop through the packages and apply the regex
+        for package in packages:
+            text = package.get('Text', '')
 
-        if image_components == []:
-            return None 
+            # there can be multiple Media in a Package
+            # for some reason the xmltodict and/or XML
+            # stores as a non-list if only one element
+            media_list = package.get('MediaList', {})
+            if media_list:
+                medias = media_list.get('Media', [])
+                if not isinstance(medias, list):
+                    medias = [medias]
 
-        for component in image_components:
-            ndcs = self.find_ndcs_in_component(component)
-            images = component['Image']
-            if not ndcs or not images:
-                continue
+                # add all valid images
+                images = []
+                for media in medias:
+                    image = media.get('Image', '')
+                    # TODO: not sure we need the below check
+                    # since we are starting with a subset of components
+                    # we know/believe to be package label info
+                    if image in image_ids:
+                        images.append(image)
 
-            elif len(ndcs) == 1 and len(images) == 1:
-                ndc = ndcs[0]
-                image = images[0]
+                # check if the text matches the regex pattern
+                ndc_matches = self.ndc_format(text)
+                # get distinct ndc_matches because
+                # sometimes the NDC is repeated multiples
+                # times in a component
+                if ndc_matches:
+                    ndc_matches = list(set(ndc_matches))
+                    # if the number of NDC maches equals
+                    # the number of images
+                    if len(ndc_matches) == len(images):
+                        for idx, ndc_match in enumerate(ndc_matches):
+                            # if ndc is valid compared to
+                            # all known NDCs in SPL
+                            if ndc_match in ndc_ids:
+                                # map the NDC to the image in the
+                                # same list position
+                                # NOTE: this is an assumption and needs
+                                # to be validated / verified
+                                mapped_dict[ndc_match] = images[idx]
 
-                if ndc in ndc_ids and image in image_ids:
-                    mapped_dict[ndc] = image
-                else:
-                    logging.debug(f"Found unknown ndc or image")
-                    logging.debug(f"NDC {ndc}, vs expected {ndc_ids}")
-                    logging.debug(f"Image {image}, vs expected {image_ids}")
         return mapped_dict
-
 
     def extract_and_upload_mapped_ndcs_from_image_files(self):
         mapping_dict = self.file_mapping
@@ -86,10 +106,8 @@ class DailyMedImages(DailyMed):
         for spl, mapping in mapping_dict.items():
             # get all image file names associated with the SPL
             image_files = mapping.get('image_files')
-            print(image_files)
             # get all NDCs associated with the SPL
             ndcs = mapping.get('ndcIds')
-            print(ndcs)
             # get all variants of each NDC to check against potential
             # different formatting in the image name
             # TODO: reconfigure this as a dict so that the original NDC
@@ -131,34 +149,29 @@ class DailyMedImages(DailyMed):
 
     def extract_and_upload_mapped_ndcs_from_image_components(self):
         mapping_dict = self.file_mapping
+
         image_ndc_mapping = {}
 
         for spl, mapping in mapping_dict.items():
-            logging.debug(f"image component check for {spl}")
-
-            ndcs = mapping.get('ndcIds')
+            # get all image file names associated with the SPL
             image_files = mapping.get('image_files')
-
+            # get all NDCs associated with the SPL
+            ndcs = mapping.get('ndcIds')
 
             # Get NDCs from XML components
             spl_folder_name = mapping.get("spl_folder_name")
             xml_file_path = self.get_file_path(spl_folder_name, mapping.get("xml_file"))
             xml_doc = self.find_xml_package_data(xml_file_path)
-            #xml_doc = parse_dm_xml_to_dict(xml_file_path)
-            #print(xml_doc)
-            logging.debug(xml_file_path)
             
-            if ('Image' in xml_doc):
-                matched_components = self.get_ndcs_from_image_components(xml_doc, ndcs, image_files)
+            matched_components = self.get_ndcs_from_image_components(xml_doc, ndcs, image_files)
 
-                for ndc,image_file in matched_components.items():
-                    image_ndc_mapping[ndc] = {
-                            'image_file':image_file,
-                            'spl':spl, 
-                            'image_url':self.create_dailymed_image_url(image_file, spl),
-                            'methodology':'image_component',
-                            'confidence_level':0.75,
-                            'matched':1} 
+            for ndc,image_file in matched_components.items():
+                image_ndc_mapping[ndc] = {
+                        'image_file':image_file,
+                        'spl':spl, 
+                        'methodology':'image_component',
+                        'confidence_level':0.75,
+                        'matched':1} 
             
             for ndc in ndcs:
                 if ndc not in image_ndc_mapping.keys():
@@ -166,7 +179,6 @@ class DailyMedImages(DailyMed):
                         'image_file':'',
                         'spl':spl, 
                         'image_url':'',
-                        'methodology':'image_filename',
                         'confidence_level':1,
                         'matched':0} 
                 

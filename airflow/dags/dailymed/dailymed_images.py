@@ -10,39 +10,6 @@ class DailyMedImages(DailyMed):
     def __init__(self, data_folder: os.PathLike) -> None:
         super().__init__(data_folder)
 
-    def create_dailymed_image_url(self, image_id, spl):
-        return f"https://dailymed.nlm.nih.gov/dailymed/image.cfm?name={image_id}&setid={spl}&type=img"
-
-
-    def has_none_values(self,d):
-        for value in d.values():
-            if value is {}:
-                return True
-        return False
-    
-    def validate_ndc(self,ndc):
-        """"
-        Validates that the NDC is greater than 9 characters
-        """
-        raw_ndc = ndc.replace("-","")
-        if len(raw_ndc) > 9:
-            return True
-        return False
-
-    """
-    {'1d9f4044-a333-ecd3-e063-6294a90ab1fe': 
-    {'xml_file': '1e004cc6-580a-1e62-e063-6294a90aa220.xml',
-    'image_files': ['Xiclofen Box.jpg', 'Xiclofen Tube.jpg'], 
-    'spl_folder_name': '20240725_1d9f4044-a333-ecd3-e063-6294a90ab1fe',
-    'documentId': '1e004cc6-580a-1e62-e063-6294a90aa220',
-    'SetId': '1d9f4044-a333-ecd3-e063-6294a90ab1fe', 
-    'VersionNumber': '3', 
-    'EffectiveDate': '20240724', 
-    'MarketStatus': 'unapproved drug other', 
-    'imageIds': ['Xiclofen Box.jpg', 'Xiclofen Tube.jpg'], 
-    'ndcIds': ['83295-5000-1']}}
-    """
-
     def get_full_ndc_variants(self, ndcs):
         ndcs_11 = [self.convert_ndc_10_to_11(ndc) for ndc in ndcs]
         ndcs.extend(ndcs_11)
@@ -51,20 +18,24 @@ class DailyMedImages(DailyMed):
         ndcs.sort(key=lambda s: len(s), reverse=True)
         return ndcs
     
-    def get_ndc_from_image_filename(self, ndcs, image_id):
+    def get_ndc_from_image_filename(self, ndc_variants, image_id):
+        # attempt to regex an NDC from image file name
         image_ndc = self.ndc_format(image_id)
 
-        logging.debug(f"Got NDC varients, total {len(ndcs)}")
-        logging.debug(f"image ndc: {image_ndc} from {image_id}")
-
-        if image_ndc: 
-            for ndc in ndcs:
+        # if NDC match found
+        if image_ndc:
+            # compare it against all valid NDC variants in SPL
+            # TODO: convert ndc_variants to a dict and iterate
+            # through items so that it compares to the list of variants,
+            # but returns the original NDC that is represnted by those variants
+            for ndc in ndc_variants:
                 if ndc == image_ndc:
                     return ndc
+            # if no valid NDC variant match, assume it is a
+            # random NDC-length number and disregard match
             return None
-
+        # if no NDC match found in image file name, return None
         else:
-            #logging.debug(f"NDC {image_ndc} from {id} not found in NDC list of: {ndcs}")
             return None
         
     def find_image_components(self,xml_doc):
@@ -109,50 +80,49 @@ class DailyMedImages(DailyMed):
 
     def extract_and_upload_mapped_ndcs_from_image_files(self):
         mapping_dict = self.file_mapping
+
         image_ndc_mapping = {}
 
         for spl, mapping in mapping_dict.items():
-            
-            ndcs = mapping.get('ndcIds')
-            #print(mapping)
-            ndc_variants = self.get_full_ndc_variants(ndcs)
+            # get all image file names associated with the SPL
             image_files = mapping.get('image_files')
-
-            logging.debug(f"image file check for {spl}")
-            logging.debug(f"NDCs found from mapping: {len(ndcs)}")
-            logging.debug(f"NDC varients: {len(ndc_variants)}")
-
-            # Get NDCs when found in the image filenames 
-            logging.debug(f"Found {len(image_files)} image files")
+            print(image_files)
+            # get all NDCs associated with the SPL
+            ndcs = mapping.get('ndcIds')
+            print(ndcs)
+            # get all variants of each NDC to check against potential
+            # different formatting in the image name
+            # TODO: reconfigure this as a dict so that the original NDC
+            # points to a list of all variations of itself, including itself
+            ndc_variants = self.get_full_ndc_variants(ndcs)            
 
             for image_file in image_files:
+                # attempt to regex an NDC out of each image
+                # and also ensure that the NDC matches an NDC
+                # from the SPL - not a random NDC-length number
                 matched_ndc = self.get_ndc_from_image_filename(ndc_variants, image_file)
-
-                logging.debug(f"Mapping dict length of: {len(image_ndc_mapping)}")
-
+                
+                # if a match is found, add it to a mapping dict
                 if matched_ndc:
                     image_ndc_mapping[matched_ndc] = {
                         'image_file':image_file,
                         'spl':spl, 
-                        'image_url':self.create_dailymed_image_url(image_file, spl),
                         'methodology':'image_filename',
                         'confidence_level':1,
-                        'matched':1} 
+                        'matched':1
+                    }
             
-            logging.debug(f"NDCs found from mapping post: {len(mapping.get('ndcIds'))}")
-
-            for ndc in mapping.get('ndcIds'):
+            # add un-matched NDCs to the list
+            # NOTE: maybe instead, we add un-matched images to the list?
+            for ndc in ndcs:
                 if ndc not in image_ndc_mapping.keys():
                     image_ndc_mapping[ndc] = {
                         'image_file':'',
                         'spl':spl, 
-                        'image_url':'',
                         'methodology':'image_filename',
                         'confidence_level':1,
-                        'matched':0} 
-                    
-            logging.debug(f"Mapping keys: {image_ndc_mapping.keys()}")
-
+                        'matched':0
+                    }
             
         df = pd.DataFrame.from_dict(image_ndc_mapping, orient='index')
         df = df.reset_index().rename(columns={'index':'ndc'})
@@ -175,7 +145,7 @@ class DailyMedImages(DailyMed):
             xml_file_path = self.get_file_path(spl_folder_name, mapping.get("xml_file"))
             xml_doc = self.find_xml_package_data(xml_file_path)
             #xml_doc = parse_dm_xml_to_dict(xml_file_path)
-            print(xml_doc)
+            #print(xml_doc)
             logging.debug(xml_file_path)
             
             if ('Image' in xml_doc):

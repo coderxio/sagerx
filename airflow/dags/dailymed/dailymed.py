@@ -23,13 +23,12 @@ class DailyMed():
     # Supplementary Functions
     ### 
 
-    def create_dailymed_url(self,set_id): 
-        return f"https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid={set_id}"
-    
     def ndc_format(self,text_data):
-     import re
-    # order of patterns is important, largest to smalles
-     patterns = [
+        import re
+
+        # order of patterns is important
+        # largest to smallest
+        patterns = [
         (r'\d{11}', '11 Digit'),
         (r'\d{10}', '10 Digit'),
         (r'\d{5}-\d{5}', '5-5'),
@@ -38,13 +37,14 @@ class DailyMed():
         (r'\d{5}-\d{3}-\d{2}', '5-3-2'),
         (r'\d{4}-\d{6}', '4-6'),
         (r'\d{4}-\d{4}-\d{2}', '4-4-2')
-     ]
-    
-     for pattern, _ in patterns:
-        match = re.search(pattern, text_data)
-        if match:
-            return match.group(0)
-     return None
+        ]
+
+        for pattern, _ in patterns:
+            match = re.search(pattern, text_data)
+            if match:
+                return match.group(0)
+        
+        return None
     
     def convert_ndc_10_to_11(self,ndc):
         parts = ndc.split('-')
@@ -68,7 +68,7 @@ class DailyMed():
         xslt = get_xsl_template_path("ndcs.xsl")
         results = transform_xml_to_dict(xml_doc,xslt)
         #print(results)
-        return list(set(results.get('NDC',[])))
+        return list(set(results.get('NDCs', {}).get('NDC', [])))
     
     def find_xml_metadata(self, xml_doc) -> dict:
         xslt = get_xsl_template_path("doc_metadata.xsl")

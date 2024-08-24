@@ -35,6 +35,7 @@ def transform_xml_to_dict(input_xml, xslt):
     xslt_doc = ET.parse(xslt)
     xslt_transformer = ET.XSLT(xslt_doc)
     new_xml = xslt_transformer(dom)
+    '''
     root = ET.fromstring(ET.tostring(new_xml))
     
     
@@ -43,8 +44,10 @@ def transform_xml_to_dict(input_xml, xslt):
             result_dict[elem.tag] = []
         if elem.text is not None: 
             result_dict[elem.tag].append(elem.text)
-    
-    return dict(result_dict)
+    '''
+    xml_dict = xmltodict.parse(new_xml)
+    print(xml_dict)
+    return xml_dict
 
 
 def transform_xml(input_xml, xslt):

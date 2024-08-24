@@ -5,11 +5,11 @@
 
 <xsl:template match="/">
     <NDCs>
-        <xsl:apply-templates select="//*[@codeSystem = '2.16.840.1.113883.6.69' or @codeSystem = '2.16.840.1.113883.3.6277']"/>
+        <xsl:apply-templates select="//*[contains(@codeSystem, '2.16.840.1.113883.6.69')]"/>
     </NDCs>
 </xsl:template>
 
-<xsl:template match="*[@codeSystem = '2.16.840.1.113883.6.69' and @code] | *[@codeSystem = '2.16.840.1.113883.3.6277' and @code]">
+<xsl:template match="*[@codeSystem = '2.16.840.1.113883.6.69' or @codeSystem = '2.16.840.1.113883.3.6277']">
     <NDC>
         <xsl:value-of select="@code"/>
     </NDC>

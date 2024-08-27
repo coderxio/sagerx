@@ -75,26 +75,38 @@ class DailyMedImages(DailyMed):
                     # we know/believe to be package label info
                     if image in image_ids:
                         images.append(image)
+                
+                print(images)
 
                 # check if the text matches the regex pattern
                 ndc_matches = self.ndc_format(text)
+                print(f'initial ndc_matches: {ndc_matches}')
                 # get distinct ndc_matches because
                 # sometimes the NDC is repeated multiples
                 # times in a component
                 if ndc_matches:
-                    ndc_matches = list(set(ndc_matches))
+                    # keep the list of ndc_matches in the same order it was found
+                    # but filter out NDCs that are not in the SPL
+                    final_ndc_matches = []
+                    found_ndc_matches = set()
+
+                    # compare ndc_matches to list of SPL NDCs
+                    # maintain the order of NDCs found in the free text
+                    # remove duplicate NDCs found in the free text
+                    for ndc in ndc_matches:
+                        if ndc in ndc_ids and ndc not in found_ndc_matches:
+                            final_ndc_matches.append(ndc)
+                            found_ndc_matches.add(ndc)
+                    print(f'de-dup ndc_matches: {final_ndc_matches}')
                     # if the number of NDC maches equals
                     # the number of images
-                    if len(ndc_matches) == len(images):
-                        for idx, ndc_match in enumerate(ndc_matches):
-                            # if ndc is valid compared to
-                            # all known NDCs in SPL
-                            if ndc_match in ndc_ids:
-                                # map the NDC to the image in the
-                                # same list position
-                                # NOTE: this is an assumption and needs
-                                # to be validated / verified
-                                mapped_dict[ndc_match] = images[idx]
+                    if len(final_ndc_matches) == len(images):
+                        for idx, ndc_match in enumerate(final_ndc_matches):
+                            # map the NDC to the image in the
+                            # same list position
+                            # NOTE: this is an assumption and needs
+                            # to be validated / verified
+                            mapped_dict[ndc_match] = images[idx]
 
         return mapped_dict
 
@@ -178,7 +190,7 @@ class DailyMedImages(DailyMed):
                     image_ndc_mapping[ndc] = {
                         'image_file':'',
                         'spl':spl, 
-                        'image_url':'',
+                        'methodology':'image_component',
                         'confidence_level':1,
                         'matched':0} 
                 
@@ -231,7 +243,6 @@ class DailyMedImages(DailyMed):
                         image_ndc_mapping[barcode_ndc] = {
                         'image_file':image_file,
                         'spl':spl, 
-                        'image_url':self.create_dailymed_image_url(image_file, spl),
                         'methodology':'image_barcode',
                         'confidence_level':0.5,
                         'matched':1} 
@@ -241,7 +252,6 @@ class DailyMedImages(DailyMed):
                     image_ndc_mapping[ndc] = {
                         'image_file':'',
                         'spl':spl, 
-                        'image_url':'',
                         'methodology':'image_barcode',
                         'confidence_level':0.5,
                         'matched':0} 
@@ -282,7 +292,6 @@ class DailyMedImages(DailyMed):
                         image_ndc_mapping[matched_ndc] = {
                         'image_file':image_file,
                         'spl':spl, 
-                        'image_url':self.create_dailymed_image_url(image_file, spl),
                         'methodology':'image_ocr',
                         'confidence_level':0.25,
                         'matched':1} 
@@ -292,7 +301,6 @@ class DailyMedImages(DailyMed):
                     image_ndc_mapping[ndc] = {
                         'image_file':'',
                         'spl':spl, 
-                        'image_url':'',
                         'methodology':'image_ocr',
                         'confidence_level':0.25,
                         'matched':0} 

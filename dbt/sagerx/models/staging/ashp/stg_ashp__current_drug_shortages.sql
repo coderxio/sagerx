@@ -11,7 +11,7 @@ ashp_shortage_list as (
 current_drug_shortages as (
 
     select
-        split_part(detail_url, '=', 2) as id,
+        split_part(detail_url, '=', 2)::int as id,
         name,
         concat(
             'https://www.ashp.org/drug-shortages/current-shortages/',

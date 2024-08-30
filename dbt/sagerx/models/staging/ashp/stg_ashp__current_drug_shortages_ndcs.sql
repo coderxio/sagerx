@@ -11,7 +11,7 @@ ashp_shortage_list as (
 current_drug_shortages_ndcs as (
 
     select
-        split_part(detail_url, '=', 2) as id,
+        split_part(detail_url, '=', 2)::int as id,
         replace(ndc, '-', '') as ndc_11,
         ndc_type
     from ashp_shortage_list

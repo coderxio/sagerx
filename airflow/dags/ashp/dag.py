@@ -126,7 +126,7 @@ with dag:
                     ndc = re.search(ndc_regex, ndc_description.get_text())[0]
                     affected_ndcs.append(ndc)
                     shortage['affected_ndcs'] = affected_ndcs
-            except TypeError:
+            except (TypeError, AttributeError):
                 logging.info(f'No affected NDCs for {shortage.get("name")}')
 
             # Get currently available NDCs
@@ -136,7 +136,7 @@ with dag:
                     ndc = ndc_regex.search(ndc_description.get_text())[0]
                     available_ndcs.append(ndc)
                 shortage['available_ndcs'] = available_ndcs
-            except TypeError:
+            except (TypeError, AttributeError):
                 logging.info(f'No available NDCs for {shortage.get("name")}')
 
             # Get created date

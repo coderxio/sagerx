@@ -116,10 +116,12 @@ def extract(dag_id,url) -> str:
 
 
 @task
-def transform(dag_id, models_subdir='staging',task_id="") -> None:
+def transform(dag_id, models_subdir=['staging'], task_id="") -> None:
     # Task to transform data using dbt
+    models = [f'models/{model_subdir}/{dag_id}' for model_subdir in models_subdir]
+    command = ['docker', 'exec', 'dbt', 'dbt', 'run', '--select'] + models
 
     run_subprocess_command(
-        command=['docker', 'exec', 'dbt','dbt', 'run', '--select', f'models/{models_subdir}/{dag_id}'],
+        command=command,
         cwd='/dbt/sagerx'
     )

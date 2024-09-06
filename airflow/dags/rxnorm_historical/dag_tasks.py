@@ -47,4 +47,4 @@ def extract_ndc(ndc_list:list)->None:
         df['rxcui'] = rxcui
         dfs.append(df)
 
-    load_df_to_pg(pd.concat(dfs),"sagerx_lake","rxnorm_historical","replace",index=False)
+    load_df_to_pg(pd.concat(dfs),"sagerx_lake","rxnorm_historical","replace",index=False, create_index=True, index_columns=['ndc','end_date'])

@@ -2,7 +2,7 @@ version: "3.8"
 x-airflow-common: &airflow-common
   build:
     context: ./airflow
-  image: sagerx_airflow:v0.0.5 # versioning allows a rebuild of docker image where necessary
+  image: sagerx_airflow:v0.0.77 # versioning allows a rebuild of docker image where necessary
   networks:
       - airflow-dbt-network
   env_file:
@@ -73,7 +73,7 @@ services:
       - .env
     environment:
       AIRFLOW_CONN_GOOGLE_CLOUD_DEFAULT: google-cloud-platform://?key_path=/opt/gcp.json
-    image: dbt:v0.0.5
+    image: dbt:v0.0.77
     networks:
       - airflow-dbt-network
     container_name: dbt

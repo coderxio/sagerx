@@ -4,7 +4,7 @@ rxnorm_synonyms as (
 
     select
         str as synonym,
-        rxcui,
+        rxcui as product_rxcui,
         'RXNORM' as source
     from {{ source('rxnorm', 'rxnorm_rxnconso') }}
     where sab = 'RXNORM'
@@ -16,7 +16,7 @@ nadac_synonyms as (
 
     select distinct
         ndc_description as synonym,
-        product_rxcui as rxcui,
+        product_rxcui,
         'NADAC' as source
     from {{ source('nadac', 'nadac') }} n
     left join {{ ref('int_rxnorm_ndcs_to_products') }} r
@@ -46,7 +46,7 @@ fda_synonyms as (
                 , ']'
                 ) else '' end
             )) as synonym,
-            product_rxcui as rxcui,
+            product_rxcui,
             'FDA' as source
     from sagerx_dev.stg_fda_ndc__ndcs f
     left join sagerx_dev.int_rxnorm_ndcs_to_products r
@@ -81,7 +81,7 @@ prescribable_product_synonyms as (
         all_synonyms.*
     from all_synonyms
     inner join rxnorm_products
-        on rxnorm_products.product_rxcui = all_synonyms.rxcui
+        on rxnorm_products.rxcui = all_synonyms.product_rxcui
     where rxnorm_products.prescribable = true
 
 )

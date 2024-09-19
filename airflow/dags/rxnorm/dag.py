@@ -73,7 +73,6 @@ def rxnorm():
             )
         )
 
-<<<<<< jrlegrand/transform-update
     transform_task = transform(dag_id, models_subdir=['staging', 'intermediate'])
 
     extract(get_st(get_tgt())) >> load >> transform_task

@@ -18,9 +18,12 @@ def dailymed():
 
     ds_folder = Path("/opt/airflow/dags") / dag_id
     data_folder = Path("/opt/airflow/data") / dag_id
-    # NOTE: ...human_* accounts for both rx and otc SPLs
-    file_set = "dm_spl_release_human_*"
-    #file_set = "dm_spl_daily_update_07092024"
+    # NOTE: "dm_spl_release_human" accounts for both 
+    # rx and otc SPLs (but no other types of SPLs)
+    # - change to "...human_rx" or "...human_otc" as needed
+    # - change to "dm_spl_daily_update_MMDDYYYY" for a given date
+    #   (replace MMDDYYY with the date's month, day, and year)
+    file_set = "dm_spl_daily_update_09192024"
 
     def connect_to_ftp_dir(ftp_str: str, dir: str):
         import ftplib
@@ -52,6 +55,7 @@ def dailymed():
 
         with zipfile.ZipFile(zip_path, "r") as zip_ref:
             zip_ref.extractall(data_folder.with_suffix(""))
+        
         os.remove(zip_path)
 
     def transform_xml(input_xml, xslt):
@@ -63,6 +67,55 @@ def dailymed():
         # apply XSLT on loaded dom
         new_xml = xslt_transformer(dom)
         return etree.tostring(new_xml, pretty_print=True).decode("utf-8")
+
+    def load_xml_data(spl_type: str):
+        import zipfile
+        import re
+        import os
+        import pandas as pd
+        import sqlalchemy
+
+        xslt = ds_folder / "template.xsl"
+
+        db_conn_string = os.environ["AIRFLOW_CONN_POSTGRES_DEFAULT"]
+        db_conn = sqlalchemy.create_engine(db_conn_string)
+
+        spl_type_data_folder = (
+            data_folder
+            / spl_type
+        )
+
+        data = []
+        for zip_folder in spl_type_data_folder.iterdir():
+            with zipfile.ZipFile(zip_folder) as unzipped_folder:
+                zip_file = zip_folder.stem
+                for subfile in unzipped_folder.infolist():
+                    if re.search("\.xml$", subfile.filename):
+                        # example xml_file 20210220_9143da80-d575-d227-e053-2995a90a7529
+                        xml_file = subfile.filename
+                        # example set_id 9143da80-d575-d227-e053-2995a90a7529
+                        set_id = xml_file.split('_', 1)
+
+                        # xslt transform
+                        temp_xml_file = unzipped_folder.extract(subfile, spl_type_data_folder)
+                        xml_content = transform_xml(temp_xml_file, xslt)
+                        os.remove(temp_xml_file)
+
+                        # append row to the data list
+                        data.append({"set_id": set_id, "zip_file": zip_file, "xml_file": xml_file, "xml_content": xml_content})
+        
+        df = pd.DataFrame(
+            data,
+            columns=["set_id", "zip_file", "xml_file", "xml_content"],
+        )
+
+        load_df_to_pg(
+            df,
+            schema_name="sagerx_lake",
+            table_name="dailymed",
+            if_exists="replace",
+            index=False,
+        )
 
     @task
     def extract():
@@ -79,48 +132,12 @@ def dailymed():
 
     @task
     def load():
-        import zipfile
-        import re
-        import os
-        import pandas as pd
-        import sqlalchemy
-
-        xslt = ds_folder / "template.xsl"
-
-        db_conn_string = os.environ["AIRFLOW_CONN_POSTGRES_DEFAULT"]
-        db_conn = sqlalchemy.create_engine(db_conn_string)
-
-        prescription_data_folder = (
-            data_folder
-            / "otc"
-        )
-
-        data = []
-        for zip_folder in prescription_data_folder.iterdir():
-            # logging.info(zip_folder)
-            with zipfile.ZipFile(zip_folder) as unzipped_folder:
-                folder_name = zip_folder.stem
-                for subfile in unzipped_folder.infolist():
-                    if re.search("\.xml$", subfile.filename):
-                        new_file = unzipped_folder.extract(subfile, prescription_data_folder)
-                        # xslt transform
-                        xml_content = transform_xml(new_file, xslt)
-                        os.remove(new_file)
-                        # append row to the data list
-                        data.append({"spl": folder_name, "file_name": subfile.filename, "xml_content": xml_content})
+        spl_types = ['prescription', 'otc']
         
-        df = pd.DataFrame(
-            data,
-            columns=["spl", "file_name", "xml_content"],
-        )
+        for spl_type in spl_types:
+            print(f'Loading {spl_type} SPLs')
+            load_xml_data(spl_type)
 
-        load_df_to_pg(
-            df,
-            schema_name="sagerx_lake",
-            table_name="dailymed",
-            if_exists="replace",
-            index=False,
-        )
 
     # Task to transform data using dbt
     @task

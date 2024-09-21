@@ -18,7 +18,8 @@ def dailymed():
 
     ds_folder = Path("/opt/airflow/dags") / dag_id
     data_folder = Path("/opt/airflow/data") / dag_id
-    file_set = "dm_spl_release_human_rx_part"
+    # NOTE: ...human_* accounts for both rx and otc SPLs
+    file_set = "dm_spl_release_human_*"
     #file_set = "dm_spl_daily_update_07092024"
 
     def connect_to_ftp_dir(ftp_str: str, dir: str):
@@ -70,7 +71,10 @@ def dailymed():
 
         ftp = connect_to_ftp_dir(dailymed_ftp, ftp_dir)
 
-        for file_name in obtain_ftp_file_list(ftp):
+        file_list = obtain_ftp_file_list(ftp)
+        print(f'Extracting {file_list}')
+
+        for file_name in file_list:
             get_dailymed_files(ftp, file_name)
 
     @task
@@ -88,7 +92,7 @@ def dailymed():
 
         prescription_data_folder = (
             data_folder
-            / "prescription"
+            / "otc"
         )
 
         data = []

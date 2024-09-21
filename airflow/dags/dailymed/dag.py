@@ -1,5 +1,7 @@
 from pathlib import Path
 import pendulum
+import zipfile
+import os
 
 from airflow.decorators import dag, task
 from airflow.hooks.subprocess import SubprocessHook
@@ -20,10 +22,12 @@ def dailymed():
     data_folder = Path("/opt/airflow/data") / dag_id
     # NOTE: "dm_spl_release_human" accounts for both 
     # rx and otc SPLs (but no other types of SPLs)
-    # - change to "...human_rx" or "...human_otc" as needed
-    # - change to "dm_spl_daily_update_MMDDYYYY" for a given date
-    #   (replace MMDDYYY with the date's month, day, and year)
-    file_set = "dm_spl_daily_update_09192024"
+    # - "dm_spl_release_human_rx" for rx meds only
+    # - "dm_spl_release_human_otc" for otc meds only
+    # - "dm_spl_release_human_rx_part1" for a given part
+    # - "dm_spl_daily_update_MMDDYYYY" for a given date
+    #   (replace MMDDYYY with your month, day, and year)
+    file_set = "dm_spl_release_human_rx_part2"
 
     def connect_to_ftp_dir(ftp_str: str, dir: str):
         import ftplib
@@ -45,9 +49,6 @@ def dailymed():
         return file_list
     
     def get_dailymed_files(ftp, file_name: str):
-        import zipfile
-        import os
-
         zip_path = create_path(data_folder) / file_name
 
         with open(zip_path, "wb") as file:
@@ -68,10 +69,8 @@ def dailymed():
         new_xml = xslt_transformer(dom)
         return etree.tostring(new_xml, pretty_print=True).decode("utf-8")
 
-    def load_xml_data(spl_type: str):
-        import zipfile
+    def load_xml_data(spl_type_data_folder: Path):
         import re
-        import os
         import pandas as pd
         import sqlalchemy
 
@@ -80,21 +79,14 @@ def dailymed():
         db_conn_string = os.environ["AIRFLOW_CONN_POSTGRES_DEFAULT"]
         db_conn = sqlalchemy.create_engine(db_conn_string)
 
-        spl_type_data_folder = (
-            data_folder
-            / spl_type
-        )
-
         data = []
         for zip_folder in spl_type_data_folder.iterdir():
             with zipfile.ZipFile(zip_folder) as unzipped_folder:
                 zip_file = zip_folder.stem
+                set_id = zip_file.split('_')[1]
                 for subfile in unzipped_folder.infolist():
                     if re.search("\.xml$", subfile.filename):
-                        # example xml_file 20210220_9143da80-d575-d227-e053-2995a90a7529
                         xml_file = subfile.filename
-                        # example set_id 9143da80-d575-d227-e053-2995a90a7529
-                        set_id = xml_file.split('_', 1)
 
                         # xslt transform
                         temp_xml_file = unzipped_folder.extract(subfile, spl_type_data_folder)
@@ -135,8 +127,13 @@ def dailymed():
         spl_types = ['prescription', 'otc']
         
         for spl_type in spl_types:
-            print(f'Loading {spl_type} SPLs')
-            load_xml_data(spl_type)
+            spl_type_data_folder = (
+                data_folder
+                / spl_type
+            )
+            if os.path.exists(spl_type_data_folder):
+                print(f'Loading {spl_type} SPLs...')
+                load_xml_data(spl_type_data_folder)
 
 
     # Task to transform data using dbt

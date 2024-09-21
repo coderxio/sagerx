@@ -1,6 +1,6 @@
 with
 
-images as (
+package_label_section_images as (
 
     select * from {{ ref('stg_dailymed__package_label_section_images') }}
 
@@ -10,8 +10,8 @@ regex_ndcs as (
 
     select
         *,
-        (regexp_matches(image, '\d+-\d+(?:-\d+)?|d{11}|d{10}', 'g'))[1] as ndc
-    from images
+        (regexp_matches(image, '\d+-\d+(?:-\d+)?|d{11}|d{10}', 'g'))[1] as regex_ndc
+    from package_label_section_images
 
     /*
         \d{11}              | # 11 digit
@@ -22,7 +22,6 @@ regex_ndcs as (
         \d{5}-\d{3}-\d{2}   | # 5-3-2
         \d{4}-\d{6}         | # 4-6
         \d{4}-\d{4}-\d{2}     # 4-4-2
-
     */
 
 ),
@@ -35,13 +34,14 @@ valid_spl_ndcs as (
 
 validated_ndcs as (
 
-    -- TODO: convert SPL NDCs to NDC11 and hyphenless and compare
-    -- to regex_ndc - but select the SPL version of the NDC
     select
-        regex_ndcs.*
+        regex_ndcs.*,
+        spl_ndc.ndc,
+        spl_ndc.ndc11
     from regex_ndcs
     inner join valid_spl_ndcs spl_ndc
-        on spl_ndc.ndc = regex_ndcs.ndc
+        on spl_ndc.set_id = regex_ndcs.set_id
+        and {{ ndc_to_11('spl_ndc.ndc') }} = {{ ndc_to_11('regex_ndcs.regex_ndc') }}
 
 )
 

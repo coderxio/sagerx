@@ -2,11 +2,11 @@
 
 with xml_table as
 (
-	select spl, xml_content::xml as xml_column
+	select zip_file, xml_content::xml as xml_column
 	from sagerx_lake.dailymed
 )
 
-select spl, y.*, 'https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=' || y.set_id
+select zip_file, y.*, 'https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=' || y.set_id
     from   xml_table x,
             xmltable('dailymed'
               passing xml_column

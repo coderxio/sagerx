@@ -31,6 +31,17 @@ all_image_ndcs as (
 		image
 	from image_name_ndcs
 
+),
+
+all_image_ndcs_ndc11 as (
+
+	select
+		set_id,
+		{{ ndc_to_11('ndc') }} as ndc11,
+		ndc,
+		image
+	from all_image_ndcs
+
 )
 
-select * from all_image_ndcs
+select * from all_image_ndcs_ndc11

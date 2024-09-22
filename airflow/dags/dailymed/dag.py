@@ -20,6 +20,7 @@ def dailymed():
 
     ds_folder = Path("/opt/airflow/dags") / dag_id
     data_folder = Path("/opt/airflow/data") / dag_id
+
     # NOTE: "dm_spl_release_human" accounts for both 
     # rx and otc SPLs (but no other types of SPLs)
     # - "dm_spl_release_human_rx" for rx meds only
@@ -27,7 +28,7 @@ def dailymed():
     # - "dm_spl_release_human_rx_part1" for a given part
     # - "dm_spl_daily_update_MMDDYYYY" for a given date
     #   (replace MMDDYYY with your month, day, and year)
-    file_set = "dm_spl_release_human_rx_part2"
+    file_set = "dm_spl_release_human"
 
     def connect_to_ftp_dir(ftp_str: str, dir: str):
         import ftplib
@@ -105,7 +106,7 @@ def dailymed():
             df,
             schema_name="sagerx_lake",
             table_name="dailymed",
-            if_exists="replace",
+            if_exists="append", # TODO: make this better - maybe don't put stuff in multiple folders?
             index=False,
         )
 

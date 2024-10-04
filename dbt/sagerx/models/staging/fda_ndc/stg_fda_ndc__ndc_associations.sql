@@ -1,4 +1,4 @@
--- stg_fda_ndc__ndc_relations
+-- stg_fda_ndc__ndc_associations
 
 with package as (
 
@@ -47,16 +47,22 @@ final_array as (
 		packagedescription
     from ranked_array
 
+),
+
+ndc_associations as (
+
+    select
+        ndcpackagecode as outer_ndc,
+        {{ ndc_to_11('ndcpackagecode') }} as outer_ndc11,
+        ndc_line,
+        token as ndc,
+        {{ ndc_to_11('token') }} as ndc11,
+        packagedescription
+    from final_array
+    order by
+        ndcpackagecode,
+        ndc_line
+
 )
 
-select
-    ndcpackagecode as outer_ndc,
-	{{ ndc_to_11('ndcpackagecode') }} as outer_ndc11,
-    ndc_line,
-    token as ndc,
-	{{ ndc_to_11('token') }} as ndc11,
-	packagedescription
-from final_array
-order by
-	ndcpackagecode,
-	ndc_line
+select * from ndc_associations

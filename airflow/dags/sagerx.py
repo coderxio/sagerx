@@ -208,7 +208,7 @@ def get_api(url):
 def parallel_api_calls(api_calls:list) -> list:
     from concurrent.futures import ThreadPoolExecutor, as_completed
     output = []
-    with ThreadPoolExecutor(max_workers=32) as executor:
+    with ThreadPoolExecutor(max_workers=3) as executor:
         futures = {executor.submit(get_api, api_call):api_call for api_call in api_calls}
 
         for future in as_completed(futures):
@@ -216,6 +216,8 @@ def parallel_api_calls(api_calls:list) -> list:
             response = future.result()
             if not len(response) == 0:
                 output.append({"url":url,"response":response})
-            else:
-                print(f"Empty response for url: {url}")
+                if len(output) % 1000 == 0:
+                    print(f'MILESTONE {len(output)}')
+            # else:
+            #     print(f"Empty response for url: {url}")
     return output

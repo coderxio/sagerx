@@ -12,7 +12,7 @@ regex_ndcs as (
 
     select
         *,
-        (regexp_matches(image, '\d+-\d+(?:-\d+)?|d{11}|d{10}', 'g'))[1] as regex_ndc
+        (regexp_matches(image, '(?:\d{4}|\d{5})-\d{3,6}(?:-\d{1,2})?|\d{11}|\d{10}', 'g'))[1] as regex_ndc
     from package_label_section_images
 
     /*

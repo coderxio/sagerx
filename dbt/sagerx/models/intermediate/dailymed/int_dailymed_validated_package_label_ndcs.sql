@@ -17,10 +17,16 @@ package_label_ndc_matches as (
 validated_package_ndcs as (
 
     select
-        pkg_ndc.*
+        *
     from package_label_ndc_matches pkg_ndc
-    inner join valid_spl_ndcs spl_ndc
-        on spl_ndc.ndc = pkg_ndc.ndc
+    where exists (
+
+        select
+            ndc
+        from valid_spl_ndcs
+        where ndc = pkg_ndc.ndc
+        
+    )
 
 )
 

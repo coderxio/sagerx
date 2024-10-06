@@ -85,6 +85,23 @@
                     </Image>
                 </Media>
             </xsl:for-each>
+
+            <!-- then, handle renderMultiMedia tags by resolving their referenced observationMedia -->
+            <xsl:for-each select=".//v3:renderMultiMedia">
+                <xsl:variable name="refID" select="@referencedObject"/>
+                
+                <!-- look for the corresponding observationMedia with the same ID -->
+                <xsl:for-each select="//v3:observationMedia[@ID=$refID]">
+                    <Media>
+                        <ID>
+                            <xsl:value-of select="./@ID"/>
+                        </ID>
+                        <Image>
+                            <xsl:value-of select="v3:value/v3:reference/@value"/>
+                        </Image>
+                    </Media>
+                </xsl:for-each>
+            </xsl:for-each>
         </MediaList>
         <ID><xsl:value-of select=".//@root"/></ID>
         <Text><xsl:value-of select="."/></Text>

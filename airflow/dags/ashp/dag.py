@@ -70,7 +70,7 @@ with dag:
                 for reason in soup.find(id='1_lblReason').find_all('li'):
                     shortage_reasons.append(reason.get_text())
             except AttributeError:
-                logging.info(f'No shortage reasons for {shortage.get("name")}')
+                logging.debug(f'No shortage reasons for {shortage.get("name")}')
                 shortage['shortage_reasons'] = None
             else:
                 shortage['shortage_reasons'] = json.dumps(shortage_reasons)
@@ -81,7 +81,7 @@ with dag:
                 for date_info in soup.find(id='1_lblResupply').find_all('li'):
                     resupply_dates.append(date_info.get_text())
             except AttributeError:
-                logging.info(f'No resupply dates for {shortage.get("name")}')
+                logging.debug(f'No resupply dates for {shortage.get("name")}')
                 shortage['resupply_dates'] = None
             else:
                 shortage['resupply_dates'] = json.dumps(resupply_dates)
@@ -92,7 +92,7 @@ with dag:
                 for implication in soup.find(id='1_lblImplications').find_all('li'):
                     care_implications.append(implication.get_text())
             except AttributeError:
-                logging.info(f'No care implications for {shortage.get("name")}')
+                logging.debug(f'No care implications for {shortage.get("name")}')
                 shortage['care_implications'] = None
             else:
                 shortage['care_implications'] = json.dumps(care_implications)
@@ -103,7 +103,7 @@ with dag:
                 for notice in soup.find(id='1_lblSafety').find_all('li'):
                     safety_notices.append(notice.get_text())
             except AttributeError:
-                logging.info(f'No safety notices for {shortage.get("name")}')
+                logging.debug(f'No safety notices for {shortage.get("name")}')
                 shortage['safety_notices'] = None
             else:
                 shortage['safety_notices'] = json.dumps(safety_notices)
@@ -114,7 +114,7 @@ with dag:
                 for alternative in soup.find(id='1_lblAlternatives').find_all('li'):
                     alternatives.append(alternative.get_text())
             except AttributeError:
-                logging.info(f'No alternatives/management information for {shortage.get("name")}')
+                logging.debug(f'No alternatives/management information for {shortage.get("name")}')
                 shortage['alternatives_and_management'] = None
             else:
                 shortage['alternatives_and_management'] = json.dumps(alternatives)
@@ -127,7 +127,7 @@ with dag:
                     affected_ndcs.append(ndc)
                     shortage['affected_ndcs'] = affected_ndcs
             except (TypeError, AttributeError):
-                logging.info(f'No affected NDCs for {shortage.get("name")}')
+                logging.debug(f'No affected NDCs for {shortage.get("name")}')
 
             # Get currently available NDCs
             available_ndcs = []
@@ -137,7 +137,7 @@ with dag:
                     available_ndcs.append(ndc)
                 shortage['available_ndcs'] = available_ndcs
             except (TypeError, AttributeError):
-                logging.info(f'No available NDCs for {shortage.get("name")}')
+                logging.debug(f'No available NDCs for {shortage.get("name")}')
 
             # Get created date
             stamp = soup.find(id='1_lblUpdated').find('p').get_text()
@@ -146,7 +146,7 @@ with dag:
                 created_date = datetime.strptime(created_date, '%B %d, %Y')
                 shortage['created_date'] = created_date
             except AttributeError:
-                logging.info(f'Missing ASHP created date for {shortage.get("name")}')
+                logging.debug(f'Missing ASHP created date for {shortage.get("name")}')
                 shortage['created_date'] = None
             except ValueError:
                 logging.error(f'Could not parse created date for {shortage.get("name")}')
@@ -158,7 +158,7 @@ with dag:
                 updated_date = datetime.strptime(updated_date, '%B %d, %Y')
                 shortage['updated_date'] = updated_date
             except AttributeError:
-                logging.info(f'Missing ASHP update date for {shortage.get("name")}')
+                logging.debug(f'Missing ASHP update date for {shortage.get("name")}')
                 shortage['updated_date'] = None
             except ValueError:
                 logging.error(f'Could not parse update date for {shortage.get("name")}')

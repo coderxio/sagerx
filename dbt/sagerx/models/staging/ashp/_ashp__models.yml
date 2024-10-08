@@ -2,46 +2,43 @@ version: 2
 
 models:
   - name: current_drug_shortages
-    description: Current ASHP drug shortages.
+    description: Current ASHP drug shortages
     columns:
       - name: id
-        description: The ID of the shortage as defined by the detail page URL ID.
+        description: The ID of the shortage as defined by the detail page URL ID
         data_tests:
           - unique
           - not_null
       - name: name
-        description: The name of the shortage as described by ASHP.
+        description: The name of the shortage as described by ASHP
       - name: url
-        description: |
-          The full URL link to the shortage detail page, completely
-          lower case because it bugs me that part of the URL is
-          camel case on the ASHP website.
+        description: The full URL link to the shortage detail page
       - name: shortage_reasons
-        description: A list of reasons provided by ASHP for the shortage.
+        description: A list of reasons for the shortage
       - name: resupply_dates
-        description: A list of resupply dates provided by ASHP.
+        description: A list of resupply dates
       - name: alternatives_and_management
-        description: Alternatives and management information from ASHP.
+        description: Alternatives and management information
       - name: care_implications
-        description: Implications on patient care.
+        description: Implications on patient care
       - name: safety_notices
-        description: Safety notices related to the shortage.
+        description: Safety notices related to the shortage
       - name: created_date
-        description: The date the shortage record was created by ASHP.
+        description: The date the shortage record was created by ASHP
       - name: updated_date
-        description: The date the shortage record was last updated by ASHP.
+        description: The date the shortage record was last updated by ASHP
 
   - name: current_drug_shortages_ndcs
     description: Affected and available NDCs for each ASHP drug shortage.
     columns:
       - name: id
-        description: The ID of the shortage as defined by the detail page URL ID.
+        description: The ID of the shortage as defined by the detail page URL ID
         data_tests:
           - unique
           - not_null
       - name: ndc_11
-        description: The NDC relevant to the shortage in NDC-11 format.
+        description: The NDC relevant to the shortage in NDC-11 format
       - name: ndc_type
         description: |
-          The relationship between the NDC and the shortage. Can
-          either be 'affected' or 'available'.
+          NDC package status as it relates to the shortage
+          (either 'affected' or 'available')

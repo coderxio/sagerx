@@ -1,0 +1,44 @@
+version: 2
+
+models:
+  - name: current_drug_shortages
+    description: Current ASHP drug shortages
+    columns:
+      - name: id
+        description: The ID of the shortage as defined by the detail page URL ID
+        data_tests:
+          - unique
+          - not_null
+      - name: name
+        description: The name of the shortage as described by ASHP
+      - name: url
+        description: The full URL link to the shortage detail page
+      - name: shortage_reasons
+        description: A list of reasons for the shortage
+      - name: resupply_dates
+        description: A list of resupply dates
+      - name: alternatives_and_management
+        description: Alternatives and management information
+      - name: care_implications
+        description: Implications on patient care
+      - name: safety_notices
+        description: Safety notices related to the shortage
+      - name: created_date
+        description: The date the shortage record was created by ASHP
+      - name: updated_date
+        description: The date the shortage record was last updated by ASHP
+
+  - name: current_drug_shortages_ndcs
+    description: Affected and available NDCs for each ASHP drug shortage.
+    columns:
+      - name: id
+        description: The ID of the shortage as defined by the detail page URL ID
+        data_tests:
+          - unique
+          - not_null
+      - name: ndc_11
+        description: The NDC relevant to the shortage in NDC-11 format
+      - name: ndc_type
+        description: |
+          NDC package status as it relates to the shortage
+          (either 'affected' or 'available')

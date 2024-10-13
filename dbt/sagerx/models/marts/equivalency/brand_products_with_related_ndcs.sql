@@ -1,3 +1,5 @@
+-- brand_products_with_related_ndcs
+
 with brand_products as (
     select * from {{ ref('stg_rxnorm__brand_products') }}
 )

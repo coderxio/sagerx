@@ -1,4 +1,4 @@
--- all_ndc_descriptions.sql
+-- ndcs.sql
 
 with 
 

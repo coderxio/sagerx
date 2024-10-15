@@ -37,9 +37,11 @@ all_image_ndcs_ndc11 as (
 
 	select
 		set_id,
-		{{ ndc_to_11('ndc') }} as ndc11,
 		ndc,
-		image
+		{{ ndc_to_11('ndc') }} as ndc11,
+		concat('https://dailymed.nlm.nih.gov/dailymed/image.cfm?name=', image, '&setid=', set_id) as image_url,
+		image as image_file,
+		concat('https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=', set_id) as dailymed_spl_url
 	from all_image_ndcs
 
 )

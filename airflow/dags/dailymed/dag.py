@@ -28,7 +28,7 @@ def dailymed():
     # - "dm_spl_release_human_rx_part1" for a given part
     # - "dm_spl_daily_update_MMDDYYYY" for a given date
     #   (replace MMDDYYY with your month, day, and year)
-    file_set = "dm_spl_release_human"
+    file_set = "dm_spl_release_human_rx"
 
     def connect_to_ftp_dir(ftp_str: str, dir: str):
         import ftplib

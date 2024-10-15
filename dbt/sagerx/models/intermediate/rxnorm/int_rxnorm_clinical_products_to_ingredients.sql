@@ -37,7 +37,7 @@ select
     , rcp.name as clinical_product_name
     , rcp.tty as clinical_product_tty
     , string_agg(rcpc.rxcui, ' | ') as clinical_product_component_rxcui
-    , string_agg(rcpc.name, ' | ') as clinical_product_compnent_name
+    , string_agg(rcpc.name, ' | ') as clinical_product_component_name
     , string_agg(rcpc.tty, ' | ') as clinical_product_component_tty
     , string_agg(rdf.rxcui, ' | ') as dose_form_rxcui
     , string_agg(rdf.name, ' | ') as dose_form_name

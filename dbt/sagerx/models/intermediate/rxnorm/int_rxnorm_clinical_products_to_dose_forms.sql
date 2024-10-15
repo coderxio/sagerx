@@ -31,7 +31,7 @@ select
     , rcp.name as clinical_product_name
     , rcp.tty as clinical_product_tty
     , rcpc.rxcui as clinical_product_component_rxcui
-    , rcpc.name as clinical_product_compnent_name
+    , rcpc.name as clinical_product_component_name
     , rcpc.tty as clinical_product_component_tty
     , rdf.rxcui as dose_form_rxcui
     , rdf.name as dose_form_name

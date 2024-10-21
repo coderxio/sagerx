@@ -1,4 +1,4 @@
-{{ config(materialized='table') }}
+{{ config(materialized='view') }}
 
 with 
 
@@ -50,12 +50,12 @@ all_fda as (
 		, trim(substring(component_text from '(.*) in ')) as inner_text
 		, trim(substring(component_text from ' in (.*?)(?:\(|$)')) as outer_text
 		, trim(substring(component_text from '\((.+)\)')) as outer_ndc
-		, ndc_to_11(trim(substring(component_text from '\((.+)\)'))) as outer_ndc11
 	from split_components c
 )
 
 select
 	*
+	, {{ ndc_to_11('outer_ndc') }} as outer_ndc11
 	, (regexp_match(inner_text, '^(\w+)\s(.*)'))[1] as inner_value
 	, (regexp_match(inner_text, '(\w+)\s(.*)'))[2] as inner_unit
 	, (regexp_match(outer_text, '^(\w+)\s(.*)'))[1] as outer_value

@@ -15,7 +15,7 @@ package as (
 )
 
 select
-	ndc_to_11(ndcpackagecode) as ndc11
+	{{ndc_to_11 ('ndcpackagecode') }} as ndc11
 	, package.productid
 	, package.productndc
 	, producttypename

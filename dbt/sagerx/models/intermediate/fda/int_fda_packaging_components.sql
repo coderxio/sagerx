@@ -1,4 +1,4 @@
-{{ config(materialized='view') }}
+{{ config(materialized='table') }}
 
 with 
 
@@ -15,9 +15,9 @@ all_fda as (
 
 	select ndc11, packagedescription
 	from {{ ref('stg_fda_unfinished__ndcs') }}
-)
+),
 
-, split_components as (
+split_components as (
 	select
 		z.ndc11
 		, z.packagedescription
@@ -42,22 +42,61 @@ all_fda as (
 				) with ordinality as s(token, ordinality)
 	) z
 	order by ndc11, component_line
-)
+),
 
-, inner_outer_text as (
+inner_outer_text as (
 	select
 		c.*
 		, trim(substring(component_text from '(.*) in ')) as inner_text
 		, trim(substring(component_text from ' in (.*?)(?:\(|$)')) as outer_text
 		, trim(substring(component_text from '\((.+)\)')) as outer_ndc
 	from split_components c
+),
+
+inner_outer_value_unit as (
+
+	select
+		*
+		, {{ ndc_to_11('outer_ndc') }} as outer_ndc11
+		, (regexp_match(inner_text, '^([^ ]+) (.+)'))[1]::numeric as inner_value
+		, (regexp_match(inner_text, '^([^ ]+) (.+)'))[2] as inner_unit
+		, (regexp_match(outer_text, '^([^ ]+) (.+)'))[1]::numeric as outer_value
+		, (regexp_match(outer_text, '^([^ ]+) (.+)'))[2] as outer_unit
+	from inner_outer_text
+
+),
+
+inner_outer_product as (
+
+	select
+		*,
+		(inner_value * outer_value)::numeric as product
+	from inner_outer_value_unit
+
+),
+
+total_product as (
+
+	select
+		ndc11,
+		array_product(array_agg(product)) as total_product
+	from inner_outer_product
+	where product > 0
+	group by ndc11
+
+),
+
+final as (
+
+	select
+		total_product,
+		inner_outer_value_unit.*
+	from inner_outer_value_unit
+	left join total_product
+		on total_product.ndc11 = inner_outer_value_unit.ndc11
+
 )
 
-select
+select 
 	*
-	, {{ ndc_to_11('outer_ndc') }} as outer_ndc11
-	, (regexp_match(inner_text, '^(\w+)\s(.*)'))[1] as inner_value
-	, (regexp_match(inner_text, '(\w+)\s(.*)'))[2] as inner_unit
-	, (regexp_match(outer_text, '^(\w+)\s(.*)'))[1] as outer_value
-	, (regexp_match(outer_text, '(\w+)\s(.*)'))[2] as outer_unit
-from inner_outer_text
+from final

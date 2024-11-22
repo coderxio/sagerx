@@ -32,7 +32,11 @@ select distinct
     packaging_components.ndc11,
     outermost_unit.outer_unit as outermost_unit,
     total_product,
-    innermost_unit.inner_unit as innermost_unit,
+    case
+        when innermost_unit.inner_unit like('%KIT %')
+            then 'KIT' 
+        else innermost_unit.inner_unit 
+    end as innermost_unit,
     packagedescription
 from packaging_components
 left join innermost_unit

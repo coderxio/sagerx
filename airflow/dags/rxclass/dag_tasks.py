@@ -38,38 +38,41 @@ def extract_rxclass(rxcui_list:list) -> None:
     existing_hashes = set()
 
     for response in response_list:
-        rxclasses = response['rxclassDrugInfoList']['rxclassDrugInfo']
-        for rxclass in rxclasses:
-            rxclass_row = {
-                "rxcui": rxclass["minConcept"]["rxcui"],
-                "name": rxclass["minConcept"]["name"],
-                "tty": rxclass["minConcept"]["tty"],
-                "class_id": rxclass["rxclassMinConceptItem"]["classId"],
-                "class_name": rxclass["rxclassMinConceptItem"]["className"],
-                "class_type": rxclass["rxclassMinConceptItem"]["classType"],
-                "rela": rxclass["rela"],
-                "rela_source": rxclass["relaSource"]
-            }
-                
-            rxclass_hash = generate_hash(rxclass_row)
-    
-            '''
-            all of this hash stuff is for efficiency
+        if 'rxclassDrugInfoList' in response:
+            rxclasses = response['rxclassDrugInfoList']['rxclassDrugInfo']
+            for rxclass in rxclasses:
+                rxclass_row = {
+                    "rxcui": rxclass["minConcept"]["rxcui"],
+                    "name": rxclass["minConcept"]["name"],
+                    "tty": rxclass["minConcept"]["tty"],
+                    "class_id": rxclass["rxclassMinConceptItem"]["classId"],
+                    "class_name": rxclass["rxclassMinConceptItem"]["className"],
+                    "class_type": rxclass["rxclassMinConceptItem"]["classType"],
+                    "rela": rxclass["rela"],
+                    "rela_source": rxclass["relaSource"]
+                }
+                    
+                rxclass_hash = generate_hash(rxclass_row)
+        
+                '''
+                all of this hash stuff is for efficiency
 
-            there are many, many duplicates in the responses of
-            the api calls. for instance, a SBD call and a SCD
-            call for a given product will likely return a lot of
-            duplicate class information.
+                there are many, many duplicates in the responses of
+                the api calls. for instance, a SBD call and a SCD
+                call for a given product will likely return a lot of
+                duplicate class information.
 
-            this approach cleans it up in the most efficient way
-            because there are 2 million rows in the full response,
-            most of which are likely duplicates.
-            '''
-            # check if the hash is not in the set
-            if rxclass_hash not in existing_hashes:
-                # add the hash to the set
-                existing_hashes.add(rxclass_hash)
-                # append the object to the dataframe
-                rxclass_df = rxclass_df.append(rxclass_row, ignore_index=True)
+                this approach cleans it up in the most efficient way
+                because there are 2 million rows in the full response,
+                most of which are likely duplicates.
+                '''
+                # check if the hash is not in the set
+                if rxclass_hash not in existing_hashes:
+                    # add the hash to the set
+                    existing_hashes.add(rxclass_hash)
+                    # append the object to the dataframe
+                    rxclass_df = rxclass_df.append(rxclass_row, ignore_index=True)
+        else:
+            print(response)
 
     load_df_to_pg(rxclass_df,"sagerx_lake","rxclass","replace",index=False)

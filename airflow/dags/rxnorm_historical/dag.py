@@ -37,4 +37,5 @@ with dag:
     data_folder = get_data_folder(dag_id)
 
     rxcuis = get_rxcuis(ttys=['SCD', 'SBD', 'GPCK', 'BPCK'])
+    #rxcuis = get_rxcuis(ttys=['BPCK'])
     rxcuis >> extract_ndc(rxcuis) >> transform(dag_id)

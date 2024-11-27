@@ -38,8 +38,8 @@ def extract_rxclass(rxcui_list:list) -> None:
     existing_hashes = set()
 
     for response in response_list:
-        if 'rxclassDrugInfoList' in response:
-            rxclasses = response['rxclassDrugInfoList']['rxclassDrugInfo']
+        if 'rxclassDrugInfoList' in response['response']:
+            rxclasses = response['response']['rxclassDrugInfoList']['rxclassDrugInfo']
             for rxclass in rxclasses:
                 rxclass_row = {
                     "rxcui": rxclass["minConcept"]["rxcui"],

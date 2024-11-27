@@ -17,4 +17,4 @@ sources:
       The original ingredient-level mapping to ATC from the WHO Collaborating Centre for Drug Statistics Methodology remains available in RxClass (select ATC under Edit Drug Sources) and through the RxClass API (relaSource=ATC).
     schema: sagerx_lake
     tables:
-      - name: rxclass_atc_to_product
+      - name: rxclass

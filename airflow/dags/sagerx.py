@@ -255,7 +255,8 @@ def api_call(url, max_retries=3, initial_delay=1):
     for attempt in range(max_retries):
         try:
             json = fetch_json(url)
-            return json
+            return {"url":url,"response":json}
+            #return json
         except HTTPError as e:
             if e.code == 429:
                 delay = initial_delay * (2 ** attempt)
@@ -270,6 +271,9 @@ def api_call(url, max_retries=3, initial_delay=1):
 @task
 def get_rxcuis(ttys:list) -> list:
     ttys_str = '+'.join(ttys)
+    # NOTE: this API seems to only return ACTIVE RXCUIs
+    # this is important to note for things like RxNorm Historical
+    # which probably requires more than just currently active RXCUIs
     base_url = f"https://rxnav.nlm.nih.gov/REST/allconcepts.json?tty={ttys_str}"
 
     json = fetch_json(base_url)

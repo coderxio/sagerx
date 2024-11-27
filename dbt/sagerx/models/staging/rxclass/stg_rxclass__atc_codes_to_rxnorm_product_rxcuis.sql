@@ -2,7 +2,10 @@
 
 with atc_codes_to_rxnorm_product_rxcuis as (
     
-    select * from {{ source('rxclass', 'rxclass_atc_to_product') }}
+    select
+        *
+    from {{ source('rxclass', 'rxclass') }}
+    where rela_source = 'ATCPROD'
 
 )
 

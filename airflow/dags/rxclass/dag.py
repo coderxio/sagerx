@@ -18,5 +18,6 @@ with dag:
     ds_folder = get_ds_folder(dag_id)
     data_folder = get_data_folder(dag_id)
     all_ttys = ['IN','PIN','MIN','SCDC','SCDF','SCDFP','SCDG','SCDGP','SCD','GPCK','BN','SBDC','SBDF','SBDFP','SBDG','SBD','BPCK']
+    #all_ttys = ['BPCK']
     rxcuis = get_rxcuis(ttys=all_ttys)
     rxcuis >> extract_rxclass(rxcuis)

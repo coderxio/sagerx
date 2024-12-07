@@ -38,22 +38,24 @@ def extract_rxclass(rxcui_list: list) -> None:
     rxclass_rows = []
 
     for response in response_list:
-        if 'rxclassDrugInfoList' in response['response']:
-            rxclasses = response['response']['rxclassDrugInfoList']['rxclassDrugInfo']
-            for rxclass in rxclasses:
-                rxclass_row = {
-                    "rxcui": rxclass["minConcept"]["rxcui"],
-                    "name": rxclass["minConcept"]["name"],
-                    "tty": rxclass["minConcept"]["tty"],
-                    "class_id": rxclass["rxclassMinConceptItem"]["classId"],
-                    "class_name": rxclass["rxclassMinConceptItem"]["className"],
-                    "class_type": rxclass["rxclassMinConceptItem"]["classType"],
-                    "rela": rxclass["rela"],
-                    "rela_source": rxclass["relaSource"],
-                }
-                rxclass_rows.append(rxclass_row)
-        else:
-            print(f"Unexpected response format: {response}")
+        # this is terrible
+        if 'response' in response:
+            if 'rxclassDrugInfoList' in response['response']:
+                rxclasses = response['response']['rxclassDrugInfoList']['rxclassDrugInfo']
+                for rxclass in rxclasses:
+                    rxclass_row = {
+                        "rxcui": rxclass["minConcept"]["rxcui"],
+                        "name": rxclass["minConcept"]["name"],
+                        "tty": rxclass["minConcept"]["tty"],
+                        "class_id": rxclass["rxclassMinConceptItem"]["classId"],
+                        "class_name": rxclass["rxclassMinConceptItem"]["className"],
+                        "class_type": rxclass["rxclassMinConceptItem"]["classType"],
+                        "rela": rxclass["rela"],
+                        "rela_source": rxclass["relaSource"],
+                    }
+                    rxclass_rows.append(rxclass_row)
+            else:
+                print(f"Unexpected response format: {response}")
 
     # Create DataFrame from list of rows
     rxclass_df = pd.DataFrame(rxclass_rows)

@@ -1,5 +1,5 @@
 SELECT
-	ndc_to_11(pack.ndcpackagecode) AS ndc11
+	{{ndc_to_11('pack.ndcpackagecode')}} AS ndc11
 	, pack.productid
 	, pack.productndc
 	, producttypename

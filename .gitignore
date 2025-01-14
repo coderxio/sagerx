@@ -1,4 +1,5 @@
 .env
+notebooks
 
 # Python files
 __pycache__
@@ -15,3 +16,6 @@ plugins
 
 # Desktop Services Store
 .DS_Store
+
+# GCP
+gcp.json

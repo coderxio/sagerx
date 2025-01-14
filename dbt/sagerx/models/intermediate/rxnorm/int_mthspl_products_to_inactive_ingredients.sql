@@ -3,15 +3,11 @@
 with
 
 substance as (
-
     select * from {{ ref('stg_rxnorm__mthspl_substances') }}
+)
 
-),
-
-product as (
-
+, product as (
     select * from {{ ref('stg_rxnorm__mthspl_products') }}
-
 )
 
 select distinct
@@ -26,9 +22,9 @@ select distinct
     , substance.tty as inactive_ingredient_tty	
     , product.active as active
     , product.prescribable as prescribable
-from sagerx_lake.rxnorm_rxnrel rxnrel
-inner join substance
-    on rxnrel.rxaui1 = substance.rxaui
-inner join product
+from product
+inner join sagerx_lake.rxnorm_rxnrel rxnrel
     on rxnrel.rxaui2 = product.rxaui
+inner join substance
+    on substance.rxaui = rxnrel.rxaui1
 where rela = 'has_inactive_ingredient'

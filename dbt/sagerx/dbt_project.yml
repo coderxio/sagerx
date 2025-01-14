@@ -39,3 +39,6 @@ models:
     marts:
       +schema: sagerx
       +materialized: table
+    +persist_docs:
+      relation: true
+      columns: true

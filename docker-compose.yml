@@ -2,12 +2,16 @@ version: "3.8"
 x-airflow-common: &airflow-common
   build:
     context: ./airflow
-  image: sagerx_airflow
+  image: sagerx_airflow:v0.0.5 # versioning allows a rebuild of docker image where necessary
+  networks:
+      - airflow-dbt-network
+  env_file:
+      - .env
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
-    #AIRFLOW__WEBSERVER__WEB_SERVER_MASTER_TIMEOUT: "300" #un-comment if gunicorn timeout reached
+    #AIRFLOW__WEBSERVER__WEB_SERVER_MASTER_TIMEOUT: "300" # un-comment if gunicorn timeout reached
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
     AIRFLOW_CONN_POSTGRES_DEFAULT: postgresql://sagerx:sagerx@postgres:5432/sagerx
     AIRFLOW_VAR_UMLS_API: ${UMLS_API}
@@ -15,17 +19,22 @@ x-airflow-common: &airflow-common
     AIRFLOW_CONN_SLACK: http://:@https%3A%2F%2Fhooks.slack.com%2Fservices%2F${SLACK_API:-}
     _PIP_ADDITIONAL_REQUIREMENTS: ""
     DBT_PROFILES_DIR: /dbt
+    AIRFLOW_CONN_GOOGLE_CLOUD_DEFAULT: google-cloud-platform://?key_path=/opt/gcp.json
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
   volumes:
     - ./airflow/dags:/opt/airflow/dags
     - ./airflow/logs:/opt/airflow/logs
     - ./airflow/plugins:/opt/airflow/plugins
     - ./airflow/data:/opt/airflow/data
+    - ./airflow/config/airflow.cfg:/opt/airflow/airflow.cfg
     - ./dbt:/dbt
-
+    - ./gcp.json:/opt/gcp.json
+    - /var/run/docker.sock:/var/run/docker.sock #not the most secure way of connecting
 services:
   postgres:
     image: postgres:14-alpine
+    networks:
+      - airflow-dbt-network
     container_name: postgres
     environment:
       POSTGRES_USER: sagerx
@@ -44,6 +53,8 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4:6.15
+    networks:
+      - airflow-dbt-network
     container_name: pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: pgadmin@pgadmin.org
@@ -58,13 +69,20 @@ services:
   dbt:
     build:
       context: ./dbt
-    image: dbt
+    env_file:
+      - .env
+    environment:
+      AIRFLOW_CONN_GOOGLE_CLOUD_DEFAULT: google-cloud-platform://?key_path=/opt/gcp.json
+    image: dbt:v0.0.5
+    networks:
+      - airflow-dbt-network
     container_name: dbt
     user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
     ports:
       - 8081:8081
     volumes:
       - ./dbt:/dbt
+      - ./gcp.json:/opt/gcp.json
     command: tail -f /dev/null
 
   airflow-init:
@@ -111,3 +129,7 @@ services:
       AWS_ACCESS_KEY_ID: ${ACCESS_KEY}
       AWS_SECRET_ACCESS_KEY: ${SECRET_ACCESS_KEY}
       AWS_DEST_BUCKET: ${DEST_BUCKET}
+
+networks:
+  airflow-dbt-network:
+    driver: bridge

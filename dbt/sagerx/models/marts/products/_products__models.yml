@@ -1,0 +1,99 @@
+version: 2
+
+models:
+  - name: products
+    description: |
+      Product information including name, RXCUI, brand vs generic, ingredient, and dose form.
+
+      Data generally comes from RxNorm.
+    columns:
+      - name: product_rxcui
+        description: >
+          Product-level RxNorm RXCUI.
+        data_tests:
+          - unique
+          - not_null    
+      - name: brand_vs_generic
+        description: |
+          Simple (not comprehensive) brand vs generic flag.
+          
+          If TTY = SBD or BPCK, this will be brand.          
+          If TTY = SCD or GPCK, this will be generic.
+
+  - name: brand_products_with_related_ndcs
+    description: |
+      Brand Product RXCUI → Related Clinical Product RXCUI → NDCs related to that Clinical Product RXCUI → FDA Start Marketing Dates
+    columns:
+      - name: product_tty
+        description: Will always be SBD or BPCK since we are starting with brand products only.
+      - name: product_name
+        description: The name of the brand product we are starting from.
+      - name: ndc_product_tty
+        description: |
+          Could be SCD, SBD, GPCK, BPCK, or null.
+
+          A product related to the original brand product based on a clinical product identifier.
+
+          Example: starting with a product TTY / RXCUI of SBD 1000000, you could have a related ndc_product
+          of SBD 1000000 because that brand product relates to itself, as well as a related ndc_product of
+          SCD 999996 which is the generic version of the same product.
+
+          Can have duplicate RXCUIs if there are multiple NDCs related to that RXCUI.
+      - name: ndc
+        description: The NDC that relates to the ndc_product_rxcui.
+      - name: product_startmarketingdate
+        description: The start marketing date of the **product**. Can be different from that of the package.
+      - name: package_startmarketingdate
+        description: The start marketing date of the **package**. Can be different from that of the product.
+
+  - name: products_to_inactive_ingredients
+    description: |
+      DailyMed (MTHSPL) products (along with 9-digit NDCs), mapped to DailyMed
+      substances, which are mapped to normalized FDA UNII display names.
+    columns:
+      - name: ndc9
+      - name: fda_unii_code
+      - name: fda_unii_display_name
+      - name: pubchem_id
+        description: >
+          The ID for this compound in PubChem.
+
+          Use this to generate a link to the PubChem detail
+          page for this compound.
+
+          Example: `concat('https://pubchem.ncbi.nlm.nih.gov/compound/', pubchem_id)`
+
+          Sodium Benzoate example: [https://pubchem.ncbi.nlm.nih.gov/compound/517055](https://pubchem.ncbi.nlm.nih.gov/compound/517055)
+      - name: usp_preservative
+        description: |
+          1 if the UNII matches a CAS RN from USP where
+          USP considers it a preservative based on preservative
+          product filter on their product website.
+
+          USP product website filtered to Preservatives: [link](https://store.usp.org/preservatives/category/USP-1213)
+
+          29 products at the time of writing this - one of which had N/A for CAS RN
+          and one which had two possible CAS RNs.
+      - name: product_rxcui
+      - name: product_name
+        description: |
+          NOTE: this field is aggregated and pipe-delimited (' | '). It appears
+          as though the MTHSPL data in RxNorm can have multiple
+          product names for a given RXCUI. Since we are mostly concerned
+          with NDC to UNII code, the names of the products as they
+          exist in the MTHSPL SAB of RxNorm should be for quick reference
+          and validation only.
+      - name: product_tty
+      - name: inactive_ingredient_unii
+      - name: inactive_ingredient_rxcui
+      - name: inactive_ingredient_name
+        description: |
+          NOTE: this field is aggregated and pipe-delimited (' | '). It appears
+          as though the MTHSPL data in RxNorm can have multiple
+          substance names for a given RXCUI. Since we are mostly concerned
+          with NDC to UNII code, the names of the substances as they
+          exist in the MTHSPL SAB of RxNorm should be for quick reference
+          and validation only.
+      - name: inactive_ingredient_tty
+      - name: active
+      - name: prescribable

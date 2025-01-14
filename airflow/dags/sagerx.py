@@ -4,6 +4,7 @@ from airflow.models import Variable
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import requests
 from time import sleep
+import pandas as pd
 
 # Filesystem functions
 def create_path(*args):
@@ -149,15 +150,13 @@ def alert_slack_channel(context):
             message=msg,
         ).execute(context=None)
 
-def load_df_to_pg(df,schema_name:str,table_name:str,if_exists:str,dtype_name:str="",index:bool=True) -> None:
+def load_df_to_pg(df,schema_name:str,table_name:str,if_exists:str,dtype_name:str="",index:bool=True, 
+                  create_index: bool = False, index_columns: list = None) -> None:
     from airflow.hooks.postgres_hook import PostgresHook
     import sqlalchemy
 
     pg_hook = PostgresHook(postgres_conn_id="postgres_default")
     engine = pg_hook.get_sqlalchemy_engine()
-
-    if if_exists == "replace":
-        engine.execute(f'DROP TABLE IF EXISTS {schema_name}.{table_name} cascade')
 
     if dtype_name:
         dtype = {dtype_name:sqlalchemy.types.JSON}
@@ -178,6 +177,19 @@ def load_df_to_pg(df,schema_name:str,table_name:str,if_exists:str,dtype_name:str
         index=index
     )
 
+    if create_index and index_columns:
+        columns_str = ', '.join(index_columns)
+        engine.execute(f'CREATE INDEX IF NOT EXISTS idx_{table_name}_{"_".join(index_columns)} ON {schema_name}.{table_name} ({columns_str})')
+
+def run_query_to_df(query:str) -> pd.DataFrame:
+    from airflow.hooks.postgres_hook import PostgresHook
+
+    pg_hook = PostgresHook(postgres_conn_id="postgres_default")
+    engine = pg_hook.get_sqlalchemy_engine()
+    df = pd.read_sql(query, con=engine)
+    
+    return df
+
 @retry(
         stop=stop_after_attempt(20),
         wait=wait_exponential(multiplier=1,max=10),
@@ -196,7 +208,7 @@ def get_api(url):
 def parallel_api_calls(api_calls:list) -> list:
     from concurrent.futures import ThreadPoolExecutor, as_completed
     output = []
-    with ThreadPoolExecutor(max_workers=32) as executor:
+    with ThreadPoolExecutor(max_workers=3) as executor:
         futures = {executor.submit(get_api, api_call):api_call for api_call in api_calls}
 
         for future in as_completed(futures):
@@ -204,6 +216,8 @@ def parallel_api_calls(api_calls:list) -> list:
             response = future.result()
             if not len(response) == 0:
                 output.append({"url":url,"response":response})
-            else:
-                print(f"Empty response for url: {url}")
+                if len(output) % 1000 == 0:
+                    print(f'MILESTONE {len(output)}')
+            # else:
+            #     print(f"Empty response for url: {url}")
     return output

@@ -14,3 +14,6 @@ sample_package      TEXT
 
 COPY sagerx_lake.fda_excluded_package
 FROM '{data_path}/Packages_excluded.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';;
+
+CREATE INDEX IF NOT EXISTS x_productid
+ON sagerx_lake.fda_excluded_package(productid);

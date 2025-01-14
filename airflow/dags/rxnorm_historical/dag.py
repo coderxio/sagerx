@@ -36,4 +36,4 @@ with dag:
     data_folder = get_data_folder(dag_id)
 
     rxcuis = get_rxcuis()
-    extract_ndc(rxcuis) >> transform(dag_id)
+    rxcuis >> extract_ndc(rxcuis) >> transform(dag_id)

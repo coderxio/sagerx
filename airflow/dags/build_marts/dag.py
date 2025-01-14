@@ -4,7 +4,8 @@ from airflow_operator import create_dag
 from common_dag_tasks import get_most_recent_dag_run
 from airflow.decorators import dag,task
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
-from airflow.hooks.subprocess import SubprocessHook
+
+from common_dag_tasks import run_subprocess_command
 
 def run_dag_condition(dag_id):
     last_run = get_most_recent_dag_run(dag_id)
@@ -54,11 +55,9 @@ with dag:
     # Once DBT freshness metrics are implemented, this task can be updated
     @task
     def transform_tasks():
-        ndc_subprocess = SubprocessHook()
-        result = ndc_subprocess.run_command(['dbt', 'run', '--select', '+models/marts/ndc'], cwd='/dbt/sagerx')
-        print("Result from dbt:", result)
-        atc_subprocess = SubprocessHook()
-        result = atc_subprocess.run_command(['dbt', 'run', '--select', '+models/marts/classification'], cwd='/dbt/sagerx')
-        print("Result from dbt:", result)
+        run_subprocess_command(['docker', 'exec', 'dbt', 'dbt', 'seed'], cwd='/dbt/sagerx')
+        run_subprocess_command(['docker', 'exec', 'dbt', 'dbt', 'run', '--select', '+models/marts/ndc'], cwd='/dbt/sagerx')
+        run_subprocess_command(['docker', 'exec', 'dbt', 'dbt', 'run', '--select', '+models/marts/classification'], cwd='/dbt/sagerx')
+        run_subprocess_command(['docker', 'exec', 'dbt', 'dbt', 'run', '--select', '+models/marts/products'], cwd='/dbt/sagerx')
 
     execute_external_dag_list() >> transform_tasks()

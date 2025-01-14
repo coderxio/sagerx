@@ -1,7 +1,7 @@
 -- stg_rxnorm__all_ndcs.sql
 
 select
-    ndc_to_11(rxnsat.atv) as ndc11
+   {{ ndc_to_11 ('rxnsat.atv') }}as ndc11
     , rxnsat.atv as ndc
     , rxnsat.rxcui
     , rxnsat.sab

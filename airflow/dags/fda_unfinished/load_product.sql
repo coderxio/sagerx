@@ -19,6 +19,7 @@ listing_record_certified_through    TEXT,
 PRIMARY KEY (productid)
 );
 
-COPY sagerx_lake.fda_unfinished_product
-FROM '{data_path}/unfinished_product.txt'
-DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';
+COPY sagerx_lake.fda_unfinished_product FROM '{data_path}/unfinished_product.txt' DELIMITER E'\t' CSV HEADER ENCODING 'WIN1252';
+
+CREATE INDEX IF NOT EXISTS x_productid
+ON sagerx_lake.fda_unfinished_product(productid);

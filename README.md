@@ -43,7 +43,7 @@ We would love to see you contribute to SageRx. Join our [Slack](https://join.sla
    - `UMLS_API=<umls_api_key>` - if you want to use RxNorm, you need an API key from [UMLS](https://uts.nlm.nih.gov/uts/signup-login).
 4. Make sure Docker is installed
 5. Run `docker-compose up airflow-init`.
-6. Run `docker-compose up`. 
+6. Run `docker-compose up`.
 
 > NOTE: if you have an [M1 Mac](https://stackoverflow.com/questions/62807717/how-can-i-solve-postgresql-scram-authentication-problem) `export DOCKER_DEFAULT_PLATFORM=linux/amd64`, and re-build your images
 
@@ -71,18 +71,43 @@ The export_marts DAG is implemented to allow users to push .csv versions of the 
 - DEST_BUCKET = 'the-name-of-your-aws-bucket'
 
 The access and secret-access keys can be found in 2 ways:
+
 1. If the user has the AWS CLI tools installed, simply type from Mac/Linux command prompt OR Windows Powershell:
-  - cat ~/.aws/credentials
+
+- cat ~/.aws/credentials
+
 2. If the user does not have AWS CLI tool installed or is unfamiliar with such, it is possible you would have saved your credentials in a location on your local machine - the file will be named after the IAM User in your AWS account, something like 'username_accessKeys.csv'. If you can't find that file, simply create a new set by following this procedure:
-  - Log in to the AWS console
-  - Search 'IAM' in the search bar and select the IAM Service --> the IAM Dashboard is displayed
-  - In the 'IAM resources' box, click on the number beneath 'Users' --> all IAM users are displayed
-  - choose the user with permissions in accordance with your needs (this will typically be the user with administrator access, but the only IAM User permission that is required is Read/Write permissions on your S3 bucket)
-  - Within the user page, click on 'Security Credentials', and scroll down to the box titled 'Access Keys'
-    - NOTE: A single user can only have 2 valid sets of login credentials at any one time. If you already have 2, you will need to either delete one or create a new user for this application
-    - NOTE: Once you have created a set of credentials, you only have 1 opportunity to view/save those credentials from the AWS UI. you should therefore be sure to save the .csv file in safe place.
-  - Click 'Create access key', select the 'Command Line Interface' option, click Next, fill in a name for the keys, click 'Create access keys', then download the .csv file and save it in safe place
-  - Open the .csv file, then paste the access key and secret access key into the .env file as described above
+
+- Log in to the AWS console
+- Search 'IAM' in the search bar and select the IAM Service --> the IAM Dashboard is displayed
+- In the 'IAM resources' box, click on the number beneath 'Users' --> all IAM users are displayed
+- choose the user with permissions in accordance with your needs (this will typically be the user with administrator access, but the only IAM User permission that is required is Read/Write permissions on your S3 bucket)
+- Within the user page, click on 'Security Credentials', and scroll down to the box titled 'Access Keys'
+  - NOTE: A single user can only have 2 valid sets of login credentials at any one time. If you already have 2, you will need to either delete one or create a new user for this application
+  - NOTE: Once you have created a set of credentials, you only have 1 opportunity to view/save those credentials from the AWS UI. you should therefore be sure to save the .csv file in safe place.
+- Click 'Create access key', select the 'Command Line Interface' option, click Next, fill in a name for the keys, click 'Create access keys', then download the .csv file and save it in safe place
+- Open the .csv file, then paste the access key and secret access key into the .env file as described above
+
+### Integration with Google Cloud Platform (GCP)
+
+Currently we are utilizing 2 GCP products: Google Cloud Storage (GCS) and BigQuery (BQ).
+
+The current workflow has all of the dbt tables are created locally with only the final products being pushed to GCP. This reduces computational expenses especially as we test out new data sources and need to run dbt more frequently.
+
+To accomplish this yourself, you need to follow these steps:
+
+1. Set up a GCP account (including billing)
+2. Made a new storage bucket under GCS
+3. Enable IAM API
+4. Create a new [service account](https://cloud.google.com/iam/docs/service-account-overview?hl=en) with permissions to add and delete content for both GCS and BQ, [dbt example](https://docs.getdbt.com/guides/bigquery?step=4)
+5. Created new key for service account and download it as JSON, this gets added to the root directory of the project as gcp.json
+6. Add the necessary environment variables to .env
+
+- GCS_BUCKET
+- GCP_PROJECT
+- GCP_DATASET
+
+7. Rebuild docker containers
 
 ### Troubleshooting
 

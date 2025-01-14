@@ -89,4 +89,16 @@ with rxnorm_historical_ndcs as
     where ndc is not null
 )
 
-select * from all_not_null_ndcs_to_sources
+, all_ndc_descriptions as (
+    select * from {{ ref('all_ndc_descriptions') }}
+)
+
+, all_ndcs_with_descriptions_to_sources as (
+    select
+        all_not_null_ndcs_to_sources.*
+    from all_not_null_ndcs_to_sources
+    inner join all_ndc_descriptions
+        on all_ndc_descriptions.ndc = all_not_null_ndcs_to_sources.ndc
+)
+
+select * from all_ndcs_with_descriptions_to_sources

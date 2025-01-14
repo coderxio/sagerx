@@ -42,6 +42,69 @@ def get_most_recent_dag_run(dag_id):
     dag_runs.sort(key=lambda x: x.execution_date, reverse=True)
     return dag_runs[0] if dag_runs else None
 
+def return_files_in_folder(dir_path) -> list:
+    files = [] 
+    for file_path in dir_path.iterdir():
+        if file_path.is_file():
+            print(file_path.name)
+            files.append(file_path)
+        elif file_path.is_dir():
+            files.append(return_files_in_folder(file_path))
+    return files
+
+def get_files_in_data_folder(dag_id) -> list:
+    final_list = []
+    ds_path = get_data_folder(dag_id)
+    file_paths = [file for file in ds_path.iterdir() if not file.name.startswith('.DS_Store')]
+
+    for file_path in file_paths:
+        final_list.extend(return_files_in_folder(file_path))
+
+    return final_list
+
+def txt2csv(txt_path):    
+    import pandas as pd
+
+    output_file =  txt_path.with_suffix('.csv')
+    csv_table = pd.read_table(txt_path, sep='\t', encoding='cp1252')
+    csv_table.to_csv(output_file, index=False)
+
+    print(f"Conversion complete. The CSV file is saved as {output_file}")
+    return output_file
+
+def upload_csv_to_gcs(dag_id):
+    from airflow.providers.google.cloud.transfers.local_to_gcs import LocalFilesystemToGCSOperator
+    from os import environ
+
+    gcp_tasks = []
+    files = get_files_in_data_folder(dag_id)
+
+    for file_path in files:
+        if file_path.suffix == '.txt':
+            csv_file_path = txt2csv(file_path)
+
+            gcp_task = LocalFilesystemToGCSOperator(
+                task_id=f'upload_to_gcs_{csv_file_path.name}',
+                src=str(csv_file_path),
+                dst=f"{dag_id}/{csv_file_path.name}",
+                bucket=environ.get("GCS_BUCKET"),
+                gcp_conn_id='google_cloud_default'
+            )
+            gcp_tasks.append(gcp_task)
+    return gcp_tasks
+
+def run_subprocess_command(command:list, cwd:str, success_code:int = 0) -> None:
+    from airflow.hooks.subprocess import SubprocessHook
+    from airflow.exceptions import AirflowException
+
+    subprocess = SubprocessHook()
+    run_results = subprocess.run_command(command, cwd=cwd)
+    if run_results.exit_code in [0,success_code]: #dbt default success code is 0
+        print(f"Command succeeded with output: {run_results.output}")
+    else:
+        raise AirflowException(f"Command failed with return code {run_results.exit_code}: {run_results.output}")
+    
+
 @task
 def extract(dag_id,url) -> str:
     # Task to download data from web location
@@ -53,10 +116,12 @@ def extract(dag_id,url) -> str:
 
 
 @task
-def transform(dag_id, models_subdir='staging',task_id="") -> None:
+def transform(dag_id, models_subdir=['staging'], task_id="") -> None:
     # Task to transform data using dbt
-    from airflow.hooks.subprocess import SubprocessHook
+    models = [f'models/{model_subdir}/{dag_id}' for model_subdir in models_subdir]
+    command = ['docker', 'exec', 'dbt', 'dbt', 'run', '--select'] + models
 
-    subprocess = SubprocessHook()
-    result = subprocess.run_command(['dbt', 'run', '--select', f'models/{models_subdir}/{dag_id}'], cwd='/dbt/sagerx')
-    print("Result from dbt:", result)
+    run_subprocess_command(
+        command=command,
+        cwd='/dbt/sagerx'
+    )

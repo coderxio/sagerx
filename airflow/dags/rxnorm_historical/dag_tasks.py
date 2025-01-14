@@ -10,7 +10,7 @@ def create_url_list(rxcui_list:list)-> list:
         urls.append(f'https://rxnav.nlm.nih.gov/REST/rxcui/{rxcui}/allhistoricalndcs.json')
     return urls
 
-@task()
+@task
 def get_rxcuis() -> list:
     from airflow.hooks.postgres_hook import PostgresHook
 
@@ -47,4 +47,4 @@ def extract_ndc(ndc_list:list)->None:
         df['rxcui'] = rxcui
         dfs.append(df)
 
-    load_df_to_pg(pd.concat(dfs),"sagerx_lake","rxnorm_historical","replace",index=False)
+    load_df_to_pg(pd.concat(dfs),"sagerx_lake","rxnorm_historical","replace",index=False, create_index=True, index_columns=['ndc','end_date'])

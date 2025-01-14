@@ -1,3 +1,7 @@
-apache-airflow[amazon]
-dbt-postgres==1.4.1
-zipfile_deflate64
+# Any change made here should accompany an increment 
+# to the image version on line 5 of docker-compose.yml
+
+dbt-core
+dbt-postgres
+apache-airflow[google]
+bs4

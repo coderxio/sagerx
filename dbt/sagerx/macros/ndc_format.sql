@@ -13,6 +13,3 @@
   {% endset %}
   {{ndc_format}}
 {% endmacro %}
-
-
-

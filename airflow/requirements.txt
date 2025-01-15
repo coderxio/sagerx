@@ -5,3 +5,4 @@ dbt-core
 dbt-postgres
 apache-airflow[google]
 bs4
+s3fs

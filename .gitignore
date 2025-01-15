@@ -9,6 +9,7 @@ venv
 data
 logs
 extracts
+exports
 plugins
 
 # dbt

@@ -8,7 +8,7 @@ from airflow.decorators import dag, task
 
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 
-from common_dag_tasks import run_subprocess_command
+from common_dag_tasks import transform
 
 starting_date = pendulum.parse("2013-12-01")
 
@@ -77,11 +77,8 @@ def nadac():
             )
         )
 
-    # Task to transform data using dbt
-    @task
-    def transform():
-        run_subprocess_command(['dbt', 'run', '--select', 'models/staging/nadac'], cwd='/dbt/sagerx')
+    transform_task = transform(dag_id)
 
-    extract() >> load >> transform()
+    extract() >> load >> transform_task
 
 nadac()

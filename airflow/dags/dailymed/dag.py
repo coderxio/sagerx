@@ -1,5 +1,7 @@
 from pathlib import Path
 import pendulum
+import zipfile
+import os
 
 from airflow.decorators import dag, task
 from airflow.hooks.subprocess import SubprocessHook
@@ -18,8 +20,15 @@ def dailymed():
 
     ds_folder = Path("/opt/airflow/dags") / dag_id
     data_folder = Path("/opt/airflow/data") / dag_id
-    file_set = "dm_spl_release_human_rx_part"
-    #file_set = "dm_spl_daily_update_07092024"
+
+    # NOTE: "dm_spl_release_human" accounts for both 
+    # rx and otc SPLs (but no other types of SPLs)
+    # - "dm_spl_release_human_rx" for rx meds only
+    # - "dm_spl_release_human_otc" for otc meds only
+    # - "dm_spl_release_human_rx_part1" for a given part
+    # - "dm_spl_daily_update_MMDDYYYY" for a given date
+    #   (replace MMDDYYY with your month, day, and year)
+    file_set = "dm_spl_release_human_rx"
 
     def connect_to_ftp_dir(ftp_str: str, dir: str):
         import ftplib
@@ -41,9 +50,6 @@ def dailymed():
         return file_list
     
     def get_dailymed_files(ftp, file_name: str):
-        import zipfile
-        import os
-
         zip_path = create_path(data_folder) / file_name
 
         with open(zip_path, "wb") as file:
@@ -51,6 +57,7 @@ def dailymed():
 
         with zipfile.ZipFile(zip_path, "r") as zip_ref:
             zip_ref.extractall(data_folder.with_suffix(""))
+        
         os.remove(zip_path)
 
     def transform_xml(input_xml, xslt):
@@ -63,21 +70,8 @@ def dailymed():
         new_xml = xslt_transformer(dom)
         return etree.tostring(new_xml, pretty_print=True).decode("utf-8")
 
-    @task
-    def extract():
-        dailymed_ftp = "public.nlm.nih.gov"
-        ftp_dir = "/nlmdata/.dailymed/"
-
-        ftp = connect_to_ftp_dir(dailymed_ftp, ftp_dir)
-
-        for file_name in obtain_ftp_file_list(ftp):
-            get_dailymed_files(ftp, file_name)
-
-    @task
-    def load():
-        import zipfile
+    def load_xml_data(spl_type_data_folder: Path):
         import re
-        import os
         import pandas as pd
         import sqlalchemy
 
@@ -86,37 +80,62 @@ def dailymed():
         db_conn_string = os.environ["AIRFLOW_CONN_POSTGRES_DEFAULT"]
         db_conn = sqlalchemy.create_engine(db_conn_string)
 
-        prescription_data_folder = (
-            data_folder
-            / "prescription"
-        )
-
         data = []
-        for zip_folder in prescription_data_folder.iterdir():
-            # logging.info(zip_folder)
+        for zip_folder in spl_type_data_folder.iterdir():
             with zipfile.ZipFile(zip_folder) as unzipped_folder:
-                folder_name = zip_folder.stem
+                zip_file = zip_folder.stem
+                set_id = zip_file.split('_')[1]
                 for subfile in unzipped_folder.infolist():
                     if re.search("\.xml$", subfile.filename):
-                        new_file = unzipped_folder.extract(subfile, prescription_data_folder)
+                        xml_file = subfile.filename
+
                         # xslt transform
-                        xml_content = transform_xml(new_file, xslt)
-                        os.remove(new_file)
+                        temp_xml_file = unzipped_folder.extract(subfile, spl_type_data_folder)
+                        xml_content = transform_xml(temp_xml_file, xslt)
+                        os.remove(temp_xml_file)
+
                         # append row to the data list
-                        data.append({"spl": folder_name, "file_name": subfile.filename, "xml_content": xml_content})
+                        data.append({"set_id": set_id, "zip_file": zip_file, "xml_file": xml_file, "xml_content": xml_content})
         
         df = pd.DataFrame(
             data,
-            columns=["spl", "file_name", "xml_content"],
+            columns=["set_id", "zip_file", "xml_file", "xml_content"],
         )
 
         load_df_to_pg(
             df,
             schema_name="sagerx_lake",
             table_name="dailymed",
-            if_exists="replace",
+            if_exists="append", # TODO: make this better - maybe don't put stuff in multiple folders?
             index=False,
         )
+
+    @task
+    def extract():
+        dailymed_ftp = "public.nlm.nih.gov"
+        ftp_dir = "/nlmdata/.dailymed/"
+
+        ftp = connect_to_ftp_dir(dailymed_ftp, ftp_dir)
+
+        file_list = obtain_ftp_file_list(ftp)
+        print(f'Extracting {file_list}')
+
+        for file_name in file_list:
+            get_dailymed_files(ftp, file_name)
+
+    @task
+    def load():
+        spl_types = ['prescription', 'otc']
+        
+        for spl_type in spl_types:
+            spl_type_data_folder = (
+                data_folder
+                / spl_type
+            )
+            if os.path.exists(spl_type_data_folder):
+                print(f'Loading {spl_type} SPLs...')
+                load_xml_data(spl_type_data_folder)
+
 
     # Task to transform data using dbt
     @task

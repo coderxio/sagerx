@@ -13,6 +13,10 @@
     <dailymed>
         <xsl:apply-templates select="v3:document"/>
 
+        <PackageLabels>
+            <xsl:apply-templates select="//v3:section[v3:code[@code='51945-4']]"/>
+        </PackageLabels>
+
         <NDCList>
             <xsl:apply-templates select="v3:document/v3:component"/>
         </NDCList>
@@ -65,6 +69,49 @@
     <EffectiveDate><xsl:value-of select="/v3:document/v3:effectiveTime/@value"/></EffectiveDate>
     <MarketStatus><xsl:value-of select="//v3:subjectOf/v3:approval/v3:code/@displayName"/></MarketStatus>
     <ApplicationNumber><xsl:value-of select="//v3:subjectOf/v3:approval/v3:id/@extension"/></ApplicationNumber>
+</xsl:template>
+
+<!-- PackageLabels -->
+<xsl:template match="//v3:section[v3:code[@code='51945-4']]">
+    <PackageLabel> <!-- there can be multiple PRINCIPAL DISPLAY PANEL sections in a SPL -->
+        <MediaList>
+            <!-- If v3:observationMedia exists, process only those -->
+            <xsl:choose>
+                <xsl:when test=".//v3:observationMedia">
+                    <xsl:for-each select=".//v3:observationMedia">
+                        <Media>
+                            <ID>
+                                <xsl:value-of select="./@ID"/>
+                            </ID>
+                            <Image>
+                                <xsl:value-of select="v3:value/v3:reference/@value"/>
+                            </Image>
+                        </Media>
+                    </xsl:for-each>
+                </xsl:when>
+                <!-- Else, process v3:renderMultiMedia -->
+                <xsl:otherwise>
+                    <xsl:for-each select=".//v3:renderMultiMedia">
+                        <xsl:variable name="refID" select="@referencedObject"/>
+                        
+                        <!-- look for the corresponding observationMedia with the same ID -->
+                        <xsl:for-each select="//v3:observationMedia[@ID=$refID]">
+                            <Media>
+                                <ID>
+                                    <xsl:value-of select="./@ID"/>
+                                </ID>
+                                <Image>
+                                    <xsl:value-of select="v3:value/v3:reference/@value"/>
+                                </Image>
+                            </Media>
+                        </xsl:for-each>
+                    </xsl:for-each>
+                </xsl:otherwise>
+            </xsl:choose>
+        </MediaList>
+        <ID><xsl:value-of select=".//@root"/></ID>
+        <Text><xsl:value-of select="."/></Text>
+    </PackageLabel>
 </xsl:template>
 
 <!-- NDCList -->

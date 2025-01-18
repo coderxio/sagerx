@@ -1,0 +1,46 @@
+version: 2
+
+sources:
+  - name: ashp
+    description: Current drug shortage list from ASHP
+    schema: sagerx_lake
+    tables:
+      - name: ashp_shortage_list
+        desciption: Current drug shortage list from ASHP
+        columns:
+          - name: name
+            description: The name of the shortage as described by ASHP
+          - name: detail_url
+            description: |
+              The partial URL for the detail about the shortage.
+              Requires a prefix to be a complete URL. That prefix is
+              `https://www.ashp.org/drug-shortages/current-shortages/`.
+          - name: shortage_reasons
+            description: A list of reasons for the shortage
+          - name: resupply_dates
+            description: A list of resupply dates
+          - name: alternatives_and_management
+            description: Alternatives and management information
+          - name: care_implications
+            description: Implications on patient care
+          - name: safety_notices
+            description: Safety notices related to the shortage
+          - name: created_date
+            description: The date the shortage record was created by ASHP
+          - name: updated_date
+            description: The date the shortage record was last updated by ASHP
+
+      - name: ashp_shortage_list_ndcs
+        desciption: Affected and available NDCs for each ASHP drug shortage.
+        columns:
+          - name: detail_url
+            description: |
+              The partial URL for the shortage detail page,
+              containing an id parameter which can be used as
+              an index
+          - name: ndc
+            description: The NDC relevant to the shortage
+          - name: ndc_type
+            description: |
+              NDC package status as it relates to the shortage
+              (either 'affected' or 'available')

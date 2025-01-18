@@ -41,7 +41,11 @@ def download_dataset(url: str, dest: Path = Path.cwd(), file_name: str = None):
     import requests
     import re
 
-    with requests.get(url, stream=True, allow_redirects=True) as r:
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
+
+    with requests.get(url, stream=True, allow_redirects=True, headers=headers) as r:
         r.raise_for_status()
 
         if file_name == None:
@@ -158,18 +162,6 @@ def load_df_to_pg(df,schema_name:str,table_name:str,if_exists:str,dtype_name:str
     pg_hook = PostgresHook(postgres_conn_id="postgres_default")
     engine = pg_hook.get_sqlalchemy_engine()
 
-    if if_exists == "replace":
-        engine.execute(f'DROP TABLE IF EXISTS {schema_name}.{table_name} cascade')
-    
-    # Create index before loading data if specified
-    if create_index and index_columns:
-        if len(index_columns) == 1:
-            engine.execute(f'CREATE INDEX IF NOT EXISTS idx_{table_name}_{index_columns[0]} ON {schema_name}.{table_name} ({index_columns[0]})')
-        else:
-            columns_str = ', '.join(index_columns)
-            engine.execute(f'CREATE INDEX IF NOT EXISTS idx_{table_name}_{"_".join(index_columns)} ON {schema_name}.{table_name} ({columns_str})')
-
-
     if dtype_name:
         dtype = {dtype_name:sqlalchemy.types.JSON}
     else:
@@ -188,6 +180,10 @@ def load_df_to_pg(df,schema_name:str,table_name:str,if_exists:str,dtype_name:str
         dtype=dtype,
         index=index
     )
+
+    if create_index and index_columns:
+        columns_str = ', '.join(index_columns)
+        engine.execute(f'CREATE INDEX IF NOT EXISTS idx_{table_name}_{"_".join(index_columns)} ON {schema_name}.{table_name} ({columns_str})')
 
 def run_query_to_df(query:str) -> pd.DataFrame:
     from airflow.hooks.postgres_hook import PostgresHook
@@ -216,7 +212,7 @@ def get_api(url):
 def parallel_api_calls(api_calls:list) -> list:
     from concurrent.futures import ThreadPoolExecutor, as_completed
     output = []
-    with ThreadPoolExecutor(max_workers=32) as executor:
+    with ThreadPoolExecutor(max_workers=3) as executor:
         futures = {executor.submit(get_api, api_call):api_call for api_call in api_calls}
 
         for future in as_completed(futures):
@@ -224,6 +220,8 @@ def parallel_api_calls(api_calls:list) -> list:
             response = future.result()
             if not len(response) == 0:
                 output.append({"url":url,"response":response})
-            else:
-                print(f"Empty response for url: {url}")
+                if len(output) % 1000 == 0:
+                    print(f'MILESTONE {len(output)}')
+            # else:
+            #     print(f"Empty response for url: {url}")
     return output

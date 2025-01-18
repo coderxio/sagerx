@@ -55,8 +55,9 @@ with dag:
     # Once DBT freshness metrics are implemented, this task can be updated
     @task
     def transform_tasks():
-        run_subprocess_command(['dbt', 'run', '--select', '+models/marts/ndc'], cwd='/dbt/sagerx')
-        run_subprocess_command(['dbt', 'run', '--select', '+models/marts/classification'], cwd='/dbt/sagerx')
-        run_subprocess_command(['dbt', 'run', '--select', '+models/marts/products'], cwd='/dbt/sagerx')
+        run_subprocess_command(['docker', 'exec', 'dbt', 'dbt', 'seed'], cwd='/dbt/sagerx')
+        run_subprocess_command(['docker', 'exec', 'dbt', 'dbt', 'run', '--select', '+models/marts/ndc'], cwd='/dbt/sagerx')
+        run_subprocess_command(['docker', 'exec', 'dbt', 'dbt', 'run', '--select', '+models/marts/classification'], cwd='/dbt/sagerx')
+        run_subprocess_command(['docker', 'exec', 'dbt', 'dbt', 'run', '--select', '+models/marts/products'], cwd='/dbt/sagerx')
 
     execute_external_dag_list() >> transform_tasks()

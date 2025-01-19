@@ -36,26 +36,23 @@ def extract_rxclass(rxcui_list: list) -> None:
 
     # Collect all rows in a list to turn into a Dataframe later
     rxclass_rows = []
-
     for response in response_list:
-        # this is terrible
-        if 'response' in response:
-            if 'rxclassDrugInfoList' in response['response']:
-                rxclasses = response['response']['rxclassDrugInfoList']['rxclassDrugInfo']
-                for rxclass in rxclasses:
-                    rxclass_row = {
-                        "rxcui": rxclass["minConcept"]["rxcui"],
-                        "name": rxclass["minConcept"]["name"],
-                        "tty": rxclass["minConcept"]["tty"],
-                        "class_id": rxclass["rxclassMinConceptItem"]["classId"],
-                        "class_name": rxclass["rxclassMinConceptItem"]["className"],
-                        "class_type": rxclass["rxclassMinConceptItem"]["classType"],
-                        "rela": rxclass["rela"],
-                        "rela_source": rxclass["relaSource"],
-                    }
-                    rxclass_rows.append(rxclass_row)
-            else:
-                print(f"Unexpected response format: {response}")
+        if 'rxclassDrugInfoList' in response:
+            rxclasses = response['rxclassDrugInfoList']['rxclassDrugInfo']
+            for rxclass in rxclasses:
+                rxclass_row = {
+                    "rxcui": rxclass["minConcept"]["rxcui"],
+                    "name": rxclass["minConcept"]["name"],
+                    "tty": rxclass["minConcept"]["tty"],
+                    "class_id": rxclass["rxclassMinConceptItem"]["classId"],
+                    "class_name": rxclass["rxclassMinConceptItem"]["className"],
+                    "class_type": rxclass["rxclassMinConceptItem"]["classType"],
+                    "rela": rxclass["rela"],
+                    "rela_source": rxclass["relaSource"],
+                }
+                rxclass_rows.append(rxclass_row)
+        else:
+            print(f"Unexpected response format: {response}")
 
     # Create DataFrame from list of rows
     rxclass_df = pd.DataFrame(rxclass_rows)
@@ -64,4 +61,4 @@ def extract_rxclass(rxcui_list: list) -> None:
     rxclass_df.drop_duplicates(inplace=True)
 
     # Load the DataFrame
-    load_df_to_pg(rxclass_df, "sagerx_lake", "rxclass_2", "replace", index=False)
+    load_df_to_pg(rxclass_df, "sagerx_lake", "rxclass", "replace", index=False)

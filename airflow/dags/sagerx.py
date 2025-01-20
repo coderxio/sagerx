@@ -270,7 +270,24 @@ def api_call(url, max_retries=3, initial_delay=1):
 
 @task
 def get_rxcuis(ttys:list) -> list:
+    from airflow.hooks.postgres_hook import PostgresHook
+
+    pg_hook = PostgresHook(postgres_conn_id="postgres_default")
+    engine = pg_hook.get_sqlalchemy_engine()
+
+    ttys_str = ', '.join(f"'{item}'" for item in array)
+    df = pd.read_sql(
+            f"select distinct rxcui from sagerx_lake.rxnorm_rxnconso where tty in ({ttys_str}) and sab = 'RXNORM'",
+            con=engine
+        )
+    results = list(df['rxcui'])
+    print(f"Number of RxCUIs: {results}")
+    return results
+
+@task
+def get_rxcuis_from_rxnorm_api(ttys:list) -> list:
     ttys_str = '+'.join(ttys)
+
     # NOTE: this API seems to only return ACTIVE RXCUIs
     # this is important to note for things like RxNorm Historical
     # which probably requires more than just currently active RXCUIs

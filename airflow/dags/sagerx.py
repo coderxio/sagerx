@@ -12,6 +12,8 @@ from concurrent.futures import ThreadPoolExecutor
 import time
 from urllib.error import HTTPError
 import threading
+import asyncio
+import aiohttp
 
 # Filesystem functions
 def create_path(*args):
@@ -275,14 +277,15 @@ def get_rxcuis(ttys:list) -> list:
     pg_hook = PostgresHook(postgres_conn_id="postgres_default")
     engine = pg_hook.get_sqlalchemy_engine()
 
-    ttys_str = ', '.join(f"'{item}'" for item in array)
+    ttys_str = ', '.join(f"'{item}'" for item in ttys)
     df = pd.read_sql(
             f"select distinct rxcui from sagerx_lake.rxnorm_rxnconso where tty in ({ttys_str}) and sab = 'RXNORM'",
             con=engine
         )
-    results = list(df['rxcui'])
-    print(f"Number of RxCUIs: {results}")
-    return results
+    rxcuis = list(df['rxcui'])
+    
+    print(f"Number of RxCUIs: {len(rxcuis)}")
+    return rxcuis
 
 @task
 def get_rxcuis_from_rxnorm_api(ttys:list) -> list:
@@ -305,3 +308,23 @@ def rate_limited_api_calls(url_list:list) -> list:
         responses = list(executor.map(api_call, url_list))
 
     return responses
+
+async def fetch(session, url, semaphore):
+    async with semaphore:
+        async with session.get(url) as response:
+            return {"url": url, "data": await response.json()}
+
+async def fetch_all(url_list:list, max_calls_per_second=20):
+    semaphore = asyncio.Semaphore(max_calls_per_second)
+    connector = aiohttp.TCPConnector(limit=max_calls_per_second)
+    async with aiohttp.ClientSession(connector=connector) as session:
+        tasks = []
+        for url in url_list:
+            tasks.append(fetch(session, url, semaphore))
+            await asyncio.sleep(1 / max_calls_per_second)
+        return await asyncio.gather(*tasks)
+
+def async_api_calls(url_list:list, max_calls_per_second=20) -> list:
+    loop = asyncio.get_event_loop()
+    response_list = loop.run_until_complete(fetch_all(url_list, max_calls_per_second=max_calls_per_second))
+    return response_list

@@ -1,9 +1,7 @@
 from airflow.decorators import task
 import pandas as pd
-import asyncio
-import aiohttp
 import time
-from sagerx import load_df_to_pg
+from sagerx import async_api_calls, load_df_to_pg
 
 def create_url_list(rxcui_list: list) -> list:
     return [
@@ -11,28 +9,11 @@ def create_url_list(rxcui_list: list) -> list:
         for rxcui in rxcui_list
     ]
 
-async def fetch(session, url, semaphore):
-    async with semaphore:
-        async with session.get(url) as response:
-            return await response.json()
-
-async def fetch_all(urls, max_calls_per_second=20):
-    semaphore = asyncio.Semaphore(max_calls_per_second)
-    connector = aiohttp.TCPConnector(limit=max_calls_per_second)
-    async with aiohttp.ClientSession(connector=connector) as session:
-        tasks = []
-        for url in urls:
-            tasks.append(fetch(session, url, semaphore))
-            await asyncio.sleep(1 / max_calls_per_second)
-        return await asyncio.gather(*tasks)
-
 @task
 def extract_rxclass(rxcui_list: list) -> None:
     url_list = create_url_list(rxcui_list)
     print(f"URL List created of length: {len(url_list)}")
-    
-    loop = asyncio.get_event_loop()
-    response_list = loop.run_until_complete(fetch_all(url_list, max_calls_per_second=20))
+    response_list = async_api_calls(url_list)
 
     # Collect all rows in a list to turn into a Dataframe later
     rxclass_rows = []

@@ -20,6 +20,10 @@ from sagerx import load_df_to_pg
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class RateLimiter:
+    """
+    Restrict calls to a maximum of `max_calls` within `period` seconds.
+    Ensures we don't exceed API rate limits.
+    """
     def __init__(self, max_calls, period):
         self.max_calls = max_calls
         self.period = period
@@ -44,11 +48,18 @@ class RateLimiter:
 
 @RateLimiter(max_calls=20, period=1)  # Limit to 20 calls/second
 def fetch_json(url):
+    """
+    Fetch JSON from a URL, respecting the rate limit.
+    """
     with urlopen(url) as response:
         return json.loads(response.read())
 
 
 def process_concept(class_base_url, concept, max_retries=3, initial_delay=1):
+    """
+    For a given concept dict that includes 'rxcui', call the rxclass API
+    to retrieve class info. Implements retry logic to handle HTTP errors.
+    """
     url = class_base_url + concept['rxcui']
     for attempt in range(max_retries):
         try:
@@ -56,7 +67,12 @@ def process_concept(class_base_url, concept, max_retries=3, initial_delay=1):
             class_data = cur_json['rxclassDrugInfoList']['rxclassDrugInfo']
             # Return a list of merged data dicts
             return [
-                dict(concept, class_data=k['rxclassMinConceptItem'])
+                dict(
+                    concept,
+                    class_data=k['rxclassMinConceptItem'],
+                    rela=k.get('rela'),
+                    relaSource=k.get('relaSource')
+                )
                 for k in class_data
             ]
 
@@ -70,25 +86,30 @@ def process_concept(class_base_url, concept, max_retries=3, initial_delay=1):
                 )
                 time.sleep(delay)
             else:
+                # Skip for other HTTP errors
                 logging.error(
-                    f"HTTP error {e.code} for {concept['rxcui']}. "
-                    f"Retrying in {initial_delay} seconds... (Attempt {attempt+1}/{max_retries})"
+                    f"HTTP error {e.code} for {concept['rxcui']}. Will skip to the next concept."
                 )
-                time.sleep(initial_delay)
+                return None
 
         except Exception as e:
+            # Skip for any non-HTTPError exceptions
             logging.error(
-                f"Error processing {concept['rxcui']}: {str(e)}. "
-                f"Retrying in {initial_delay} seconds... (Attempt {attempt+1}/{max_retries})"
+                f"Error processing {concept['rxcui']}: {str(e)}. Will skip to the next concept."
             )
-            time.sleep(initial_delay)
+            return None
 
-    logging.error(f"Max retries reached for {concept['rxcui']}. Skipping.")
+    # If we exhaust all retries, return None (concept failed)
+    logging.error(f"Max retries reached for {concept['rxcui']}. Skipping to the next concept.")
     return None
 
 
 @task
 def main_execution():
+    """
+    Retrieves RxClass concepts from RxNav for the EPC class type,
+    processes them concurrently, and loads results into Postgres.
+    """
     logging.info("Starting data retrieval for RxClass...")
 
     # Base URLs
@@ -105,7 +126,7 @@ def main_execution():
     cui_json = fetch_json(base_url)
     concepts = cui_json["minConceptGroup"]["minConcept"]
     total_concepts = len(concepts)
-    logging.info(f"Fetched {total_concepts} concepts from RxNorm.")
+    logging.info(f"Fetched {total_concepts} concepts from RxNav.")
 
     # 2. Process concepts concurrently
     results = []
@@ -165,14 +186,17 @@ dag_id = "rxclass"
     catchup=False
 )
 def rxclass():
+    """
+    DAG that retrieves RxClass concepts rate-limited at 20 calls/second.
+    """
 
-    # Start task
+    # Optional start task
     start = EmptyOperator(task_id="start")
 
     # Main processing task
     process_task = main_execution()
 
-    # End task
+    # Optional end task
     end = EmptyOperator(task_id="end")
 
     # Set dependencies: start -> process -> end

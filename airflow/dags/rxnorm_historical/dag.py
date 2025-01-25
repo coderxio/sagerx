@@ -214,11 +214,9 @@ dag_id = "rxnorm_historical"
     catchup=False
 )
 def rxnorm_historical():
-    start = EmptyOperator(task_id="start")
     rxcui_task = get_rxcuis()
     ndc_task = load_historical_data(rxcuis=rxcui_task)
-    end = EmptyOperator(task_id="end")
 
-    start >> rxcui_task >> ndc_task >> end
+    rxcui_task >> ndc_task
 
 dag = rxnorm_historical()

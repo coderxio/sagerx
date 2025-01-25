@@ -186,21 +186,7 @@ dag_id = "rxclass"
     catchup=False
 )
 def rxclass():
-    """
-    DAG that retrieves RxClass concepts rate-limited at 20 calls/second.
-    """
-
-    # Optional start task
-    start = EmptyOperator(task_id="start")
-
-    # Main processing task
     process_task = main_execution()
-
-    # Optional end task
-    end = EmptyOperator(task_id="end")
-
-    # Set dependencies: start -> process -> end
-    start >> process_task >> end
 
 # Instantiate the DAG
 dag = rxclass()

@@ -19,6 +19,7 @@ def extract():
 
     # 1. Fetch the list of concepts
     tty_list = ['SCD', 'SBD', 'GPCK', 'BPCK']
+    #tty_list = ['BPCK']
     rxcui_list = get_rxcuis(tty_list)
     logging.info(f"Fetched {len(rxcui_list)} RXCUIs.")
 
@@ -29,9 +30,9 @@ def extract():
     results = get_concurrent_api_results(url_list)
 
     dfs = []
-    for ndc_response in results:
-        url = ndc_response['url']
-        response = ndc_response['response']
+    for result in results:
+        url = result['url']
+        response = result['response']
         if 'historicalNdcConcept' in response:
             rxcui_match = re.search(rxcui_pattern, url)
             rxcui = rxcui_match.group('rxcui')
@@ -43,8 +44,48 @@ def extract():
             df['rxcui'] = rxcui
             dfs.append(df)
 
-    load_df_to_pg(pd.concat(dfs),"sagerx_lake","rxnorm_historical","replace",index=False, create_index=True, index_columns=['ndc','end_date'])
+    concat_dfs = pd.concat(dfs)
+    print(f'Processed {len(concat_dfs)} RXCUIs.')
+    load_df_to_pg(concat_dfs,"sagerx_lake","rxnorm_historical","replace",index=False, create_index=True, index_columns=['ndc','end_date'])
 
+    '''
+    # TODO: explore this as an alternative to making a ton of dataframes
+    # OR: i think i wrote some other dict-based code in a local branch
+
+    hist_concept = data_json.get("historicalNdcConcept", {})
+    hist_times = hist_concept.get("historicalNdcTime", [])
+
+    if not hist_times:
+        logging.warning(f"No historicalNdcTime found for rxcui={rxcui}. Skipping.")
+        return None
+
+    rows = []
+    for block in hist_times:
+        status = block.get("status")
+        historical_rxcui = block.get("rxcui")
+        ndc_list = block.get("ndcTime", [])
+
+        for ndc_obj in ndc_list:
+            # Grab 'ndc' from the object (could be a list or None)
+            ndc_data = ndc_obj.get("ndc")
+
+            # If 'ndc_data' is a non-empty list, take its first element and make it a string. There is always only one element according to the docs.
+            if isinstance(ndc_data, list) and ndc_data:
+                ndc_data = ndc_data[0]
+
+            # Append to the rows
+            rows.append({
+                "rxcui": rxcui,
+                "status": status,
+                "historical_rxcui": historical_rxcui,
+                "ndc": ndc_data,
+                "startDate": ndc_obj.get("startDate"),
+                "endDate": ndc_obj.get("endDate"),
+            })
+
+    return rows
+
+    '''
     
 
 @task

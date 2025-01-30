@@ -19,8 +19,9 @@ def extract():
     logging.info("Starting data retrieval for RxClass...")
 
     # 1. Fetch the list of concepts
+    tty_list = ['IN','PIN','MIN','SCDC','SCDF','SCDFP','SCDG','SCDGP','SCD','GPCK','BN','SBDC','SBDF','SBDFP','SBDG','SBD','BPCK']
     #tty_list = ['SCD', 'SBD', 'GPCK', 'BPCK']
-    tty_list = ['BPCK']
+    #tty_list = ['BPCK']
     rxcui_list = get_rxcuis(tty_list)
     logging.info(f"Fetched {len(rxcui_list)} RXCUIs.")
 
@@ -31,8 +32,9 @@ def extract():
 
     classes = {}
     for result in results:
-        if 'rxclassDrugInfoList' in result:
-            for drug_info in result["rxclassDrugInfoList"]["rxclassDrugInfo"]:
+        response = result['response']
+        if 'rxclassDrugInfoList' in response:
+            for drug_info in response["rxclassDrugInfoList"]["rxclassDrugInfo"]:
                 rxcui = drug_info["minConcept"].get("rxcui")
                 class_info = {}
                 class_info['class_id'] = drug_info["rxclassMinConceptItem"].get("classId","")

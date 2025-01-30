@@ -1,20 +1,20 @@
-from pathlib import Path
-from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperator
-from airflow.models import Variable
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import requests
-from time import sleep
 import pandas as pd
 import time
 import json
 import logging
 import threading
-from urllib.request import urlopen
-from urllib.error import HTTPError
+import pendulum
+
+from time import sleep
 from functools import partial
 from concurrent.futures import ThreadPoolExecutor
-
-import pendulum
+from urllib.request import urlopen
+from urllib.error import HTTPError, URLError
+from pathlib import Path
+from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperator
+from airflow.models import Variable
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from pandas import json_normalize
 
 # Filesystem functions
@@ -241,7 +241,13 @@ def fetch_json(url):
     Fetch JSON from a URL, respecting the rate limit.
     """
     with urlopen(url) as response:
-        return json.loads(response.read())
+        data = json.loads(response.read())
+
+    # If the body says "Too Many Requests" even though status is 200, treat it like a 429 and retry
+    if isinstance(data, dict) and data.get("error") == "Too Many Requests":
+        raise HTTPError(url, 429, "Too Many Requests (from response body)", None, None)
+
+    return data
 
 
 def concurrent_api_calls(url, max_retries=3, initial_delay=1):
@@ -256,11 +262,11 @@ def concurrent_api_calls(url, max_retries=3, initial_delay=1):
 
         except HTTPError as e:
             if e.code == 429:
-                # Exponential backoff for rate-limit errors
-                '''
+                # Exponential backoff for rate-limit or "Too Many Requests" from body
                 delay = initial_delay * (2 ** attempt)
+                '''
                 logging.warning(
-                    f"Rate limit hit for {concept['rxcui']}. "
+                    f"Rate limit (429) for rxcui={rxcui} at {url}. "
                     f"Retrying in {delay} seconds... (Attempt {attempt+1}/{max_retries})"
                 )
                 '''
@@ -284,24 +290,51 @@ def concurrent_api_calls(url, max_retries=3, initial_delay=1):
 
             return None
 
+        except URLError as e:
+            # Retry for URLError as well
+            if attempt < max_retries - 1:
+                delay = initial_delay * (2 ** attempt)
+                '''
+                logging.warning(
+                    f"URLError for rxcui={rxcui} at {url}: {e.reason}. "
+                    f"Retrying in {delay} seconds... (Attempt {attempt+1}/{max_retries})"
+                )
+                '''
+                time.sleep(delay)
+            else:
+                '''
+                logging.error(
+                    f"URLError for rxcui={rxcui} at {url}: {e.reason}. "
+                    f"Max retries reached. Skipping to the next concept."
+                )
+                '''
+                return None
+
+        except (KeyError, TypeError) as e:
+            #logging.error(f"Data structure error for rxcui={rxcui}: {str(e)}. Skipping to the next concept.")
+            return None
+
+        except Exception as e:
+            #logging.error(f"Unexpected error for rxcui={rxcui}: {str(e)}. Skipping to the next concept.")
+            return None
+
     # If we exhaust all retries, return None (concept failed)
     #logging.error(f"Max retries reached for {url}. Skipping to the next concept.")
     return None
 
-def get_concurrent_api_results(url_list):
+def get_concurrent_api_results(url_list: list):
     # 2. Process concepts concurrently
     results = []
-    with ThreadPoolExecutor(max_workers=20) as executor:
+    with ThreadPoolExecutor(max_workers=10) as executor:
         process_func = partial(concurrent_api_calls)
         mapped_results = executor.map(process_func, url_list)
 
         for i, result in enumerate(mapped_results, start=1):
             results.append(result)
-            print(result)
-            if i % 1000 == 0:  # Log every 1000 concepts
-                logging.info(f"Processed {i} concepts so far...")
+            if i % 500 == 0:  # Log every 500 concepts
+                logging.info(f"Made {i} API calls so far...")
 
-    print(f'results count: {len(results)}')
+    print(f'Concurrent API call results count: {len(results)}')
 
     return results
 

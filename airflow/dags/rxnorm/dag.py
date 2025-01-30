@@ -41,6 +41,6 @@ def rxnorm():
 
     transform_task = transform(dag_id, models_subdir=['staging', 'intermediate'])
 
-    extract_task >> load >> transform()
+    extract_task >> load >> transform_task
 
 rxnorm()

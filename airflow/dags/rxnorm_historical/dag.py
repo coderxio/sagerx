@@ -1,39 +1,23 @@
-import numpy as np
-import pandas as pd
-from time import sleep
-import requests
-from requests.adapters import HTTPAdapter, Retry
-import sqlalchemy
-
-from pathlib import Path
 import pendulum
 
-from sagerx import get_dataset, read_sql_file, get_sql_list, alert_slack_channel, create_path
+from airflow.decorators import dag
 
-from airflow.decorators import dag, task
+from rxnorm_historical.dag_tasks import extract
 
-from airflow.operators.python import get_current_context
-from airflow.providers.postgres.operators.postgres import PostgresOperator
-from airflow.hooks.postgres_hook import PostgresHook
-from airflow.hooks.subprocess import SubprocessHook
-
-
-from airflow_operator import create_dag
-from common_dag_tasks import  get_ds_folder, get_data_folder, transform
-from rxnorm_historical.dag_tasks import get_rxcuis, extract_ndc
 
 dag_id = "rxnorm_historical"
 
-dag = create_dag(
+@dag(
     dag_id=dag_id,
-    schedule= "0 0 1 1 *",
-    max_active_runs=1,
-    catchup=False,
+    schedule_interval="0 3 15 * *",  # Runs on the 15th of each month at 3 AM
+    start_date=pendulum.today('UTC').add(days=-1),
+    catchup=False
 )
+def rxnorm_historical():
+    # Main processing task
+    extract_task = extract()
 
-with dag:
-    ds_folder = get_ds_folder(dag_id)
-    data_folder = get_data_folder(dag_id)
+    extract_task
 
-    rxcuis = get_rxcuis()
-    rxcuis >> extract_ndc(rxcuis) >> transform(dag_id)
+# Instantiate the DAG
+dag = rxnorm_historical()

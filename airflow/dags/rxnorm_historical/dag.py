@@ -2,7 +2,7 @@ import pendulum
 
 from airflow.decorators import dag
 
-from rxnorm_historical.dag_tasks import extract
+from rxnorm_historical.dag_tasks import extract, load
 
 
 dag_id = "rxnorm_historical"
@@ -15,9 +15,7 @@ dag_id = "rxnorm_historical"
 )
 def rxnorm_historical():
     # Main processing task
-    extract_task = extract()
-
-    extract_task
-
+    extract(dag_id) >> load(dag_id)
+    
 # Instantiate the DAG
 dag = rxnorm_historical()

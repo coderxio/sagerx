@@ -338,7 +338,11 @@ def get_concurrent_api_results(url_list: list):
 
     return results
 
-def get_rxcuis(ttys:list) -> list:
+def get_rxcuis(ttys:list, active_only:bool = False) -> list:
+    settings = ''
+    if active_only:
+        settings += " and suppress = 'N'"
+        
     from airflow.hooks.postgres_hook import PostgresHook
 
     pg_hook = PostgresHook(postgres_conn_id="postgres_default")
@@ -346,7 +350,7 @@ def get_rxcuis(ttys:list) -> list:
 
     ttys_str = ', '.join(f"'{item}'" for item in ttys)
     df = pd.read_sql(
-            f"select distinct rxcui from sagerx_lake.rxnorm_rxnconso where tty in ({ttys_str}) and sab = 'RXNORM'",
+            f"select distinct rxcui from sagerx_lake.rxnorm_rxnconso where tty in ({ttys_str}) and sab = 'RXNORM'{settings}",
             con=engine
         )
     rxcuis = list(df['rxcui'])

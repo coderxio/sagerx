@@ -38,12 +38,12 @@ def extract():
                 classes.append(
                     dict(
                         rxcui = drug_info["minConcept"].get("rxcui"),
+                        name = drug_info["minConcept"].get("name",""),
+                        tty = drug_info["minConcept"].get("tty",""),
+                        rela = drug_info.get("rela",""),
                         class_id = drug_info["rxclassMinConceptItem"].get("classId",""),
                         class_name = drug_info["rxclassMinConceptItem"].get("className",""),
                         class_type = drug_info["rxclassMinConceptItem"].get("classType",""),
-                        drug_name = drug_info["minConcept"].get("name",""),
-                        drug_tty = drug_info["minConcept"].get("tty",""),
-                        rela = drug_info.get("rela",""),
                         rela_source = drug_info.get("relaSource","")            
                     )
                 )

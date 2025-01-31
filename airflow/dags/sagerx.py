@@ -355,7 +355,7 @@ def get_rxcuis(ttys:list, active_only:bool = False) -> list:
         )
     rxcuis = list(df['rxcui'])
 
-    print(f"Number of RxCUIs: {len(rxcuis)}")
+    print(f"Number of RXCUIs: {len(rxcuis)}")
     return rxcuis
 
 def get_rxcuis_from_rxnorm_api(ttys:list) -> list:

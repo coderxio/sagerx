@@ -15,7 +15,10 @@ dag_id = "rxnorm_historical"
 )
 def rxnorm_historical():
     # Main processing task
-    extract(dag_id) >> load(dag_id)
+    extract_task = extract(dag_id)
+    load_task = load(extract_task)
+    
+    extract_task >> load_task
     
 # Instantiate the DAG
 dag = rxnorm_historical()

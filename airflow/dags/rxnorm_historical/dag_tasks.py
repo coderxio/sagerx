@@ -1,7 +1,7 @@
 from airflow.decorators import task
 import pandas as pd
 import re
-from sagerx import get_rxcuis, load_df_to_pg, get_concurrent_api_results, read_json_file
+from sagerx import get_rxcuis, load_df_to_pg, get_concurrent_api_results, write_json_file, read_json_file, create_path
 from common_dag_tasks import get_data_folder
 import logging
 import json
@@ -18,8 +18,8 @@ rxcui_pattern = re.compile(r'rxcui\/(?P<rxcui>\d+)\/')
 @task
 def extract(dag_id:str) -> str:
     # 1. Fetch the list of concepts
-    #tty_list = ['SCD', 'SBD', 'GPCK', 'BPCK']
-    tty_list = ['BPCK']
+    tty_list = ['SCD', 'SBD', 'GPCK', 'BPCK']
+    #tty_list = ['BPCK']
     rxcui_list = get_rxcuis(tty_list)
 
     # 1.5. Create list of urls
@@ -29,23 +29,17 @@ def extract(dag_id:str) -> str:
     results = get_concurrent_api_results(url_list)
 
     data_folder = get_data_folder(dag_id)
-    file_path = data_folder / 'data.json'
+    file_path = create_path(data_folder) / 'data.json'
     file_path_str = file_path.resolve().as_posix()
 
-    with open(file_path_str, 'w') as f:
-        json.dump(results, f)
+    write_json_file(file_path_str, results)
+
     print(f"Extraction Completed! Data saved to file: {file_path_str}")
 
     return file_path_str
 
 @task
-def load(dag_id):
-    # TODO: should pass file_path_str from extract to load
-    # instead of doing this again
-    data_folder = get_data_folder(dag_id)
-    file_path = data_folder / 'data.json'
-    file_path_str = file_path.resolve().as_posix()
-
+def load(file_path_str:str):
     results = read_json_file(file_path_str)
     
     # Initialize a list to store the processed data

@@ -2,7 +2,7 @@ import pendulum
 
 from airflow.decorators import dag
 
-from rxclass.dag_tasks import extract
+from rxclass.dag_tasks import extract, load
 
 
 dag_id = "rxclass"
@@ -15,9 +15,10 @@ dag_id = "rxclass"
 )
 def rxclass():
     # Main processing task
-    extract_task = extract()
-
-    extract_task
+    extract_task = extract(dag_id)
+    load_task = load(extract_task)
+    
+    extract_task >> load_task
 
 # Instantiate the DAG
 dag = rxclass()

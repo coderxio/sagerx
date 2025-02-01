@@ -36,11 +36,13 @@ def read_sql_file(sql_path: str):
     return sql_string
 
 def read_json_file(json_path:str):
-    import json
-
-    with open(json_path,'r') as f:
+    with open(json_path, 'r') as f:
         json_object = json.load(f)
     return json_object
+
+def write_json_file(json_path:str, data):
+    with open(json_path, 'w') as f:
+        json.dump(data, f)
 
 # Web functions
 def download_dataset(url: str, dest: Path = Path.cwd(), file_name: str = None):

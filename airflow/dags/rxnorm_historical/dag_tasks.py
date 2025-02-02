@@ -1,7 +1,10 @@
 from airflow.decorators import task
 import pandas as pd
 import re
-from sagerx import load_df_to_pg, parallel_api_calls
+from sagerx import get_rxcuis, load_df_to_pg, get_concurrent_api_results, write_json_file, read_json_file, create_path
+from common_dag_tasks import get_data_folder
+import logging
+import json
 
 def create_url_list(rxcui_list:list)-> list:
     urls=[]
@@ -10,41 +13,65 @@ def create_url_list(rxcui_list:list)-> list:
         urls.append(f'https://rxnav.nlm.nih.gov/REST/rxcui/{rxcui}/allhistoricalndcs.json')
     return urls
 
-@task
-def get_rxcuis() -> list:
-    from airflow.hooks.postgres_hook import PostgresHook
-
-    pg_hook = PostgresHook(postgres_conn_id="postgres_default")
-    engine = pg_hook.get_sqlalchemy_engine()
-
-    df = pd.read_sql(
-            "select distinct rxcui from sagerx_lake.rxnorm_rxnconso where tty in ('SCD','SBD','GPCK','BPCK') and sab = 'RXNORM'",
-            con=engine
-        )
-    results = list(df['rxcui'])
-    print(f"Number of RxCUIs: {results}")
-    return results
-
 rxcui_pattern = re.compile(r'rxcui\/(?P<rxcui>\d+)\/')
 
 @task
-def extract_ndc(ndc_list:list)->None:
-    urls = create_url_list(ndc_list)
-    print(f"URL List created of length: {len(urls)}")
-    ndc_responses = parallel_api_calls(urls)
-    dfs = []
-    for ndc_response in ndc_responses:
-        if ndc_response['response'].get('historicalNdcConcept') == None:
-            print(ndc_response)
-        url = ndc_response['url']
-        rxcui_match = re.search(rxcui_pattern, url)
-        rxcui = rxcui_match.group('rxcui')
+def extract(dag_id:str) -> str:
+    # 1. Fetch the list of concepts
+    tty_list = ['SCD', 'SBD', 'GPCK', 'BPCK']
+    #tty_list = ['BPCK']
+    rxcui_list = get_rxcuis(tty_list)
 
-        df = pd.json_normalize(ndc_response['response']['historicalNdcConcept']['historicalNdcTime'], 'ndcTime', ['status', 'rxcui'], errors='ignore')
-        df['ndc_list'] = df['ndc'].apply(lambda x: x if len(x) > 1 else None)
-        df['ndc'] = df['ndc'].apply(lambda x: x[0] if len(x) == 1 else None)
-        df.rename(columns={'startDate': 'start_date', 'endDate': 'end_date', 'rxcui': 'related_rxcui'}, inplace=True)
-        df['rxcui'] = rxcui
-        dfs.append(df)
+    # 1.5. Create list of urls
+    url_list = create_url_list(rxcui_list)
 
-    load_df_to_pg(pd.concat(dfs),"sagerx_lake","rxnorm_historical","replace",index=False, create_index=True, index_columns=['ndc','end_date'])
+    # query API with each url
+    results = get_concurrent_api_results(url_list)
+
+    data_folder = get_data_folder(dag_id)
+    file_path = create_path(data_folder) / 'data.json'
+    file_path_str = file_path.resolve().as_posix()
+
+    write_json_file(file_path_str, results)
+
+    print(f"Extraction Completed! Data saved to file: {file_path_str}")
+
+    return file_path_str
+
+@task
+def load(file_path_str:str):
+    results = read_json_file(file_path_str)
+    
+    # Initialize a list to store the processed data
+    records = []
+    for result in results:
+        if not len(result['response']) == 0:
+            response = result['response']
+            if 'historicalNdcConcept' in response:
+                url = result['url']
+                rxcui_match = re.search(rxcui_pattern, url)
+                rxcui = rxcui_match.group('rxcui')
+
+                # Extract data and transform into dictionaries
+                historical_ndc = response['historicalNdcConcept']['historicalNdcTime']
+                for entry in historical_ndc:
+                    for ndc_time in entry['ndcTime']:
+                        record = {
+                            'ndc': ndc_time['ndc'][0] if len(ndc_time['ndc']) == 1 else None,
+                            'rxcui_list': ndc_time['ndc'] if len(ndc_time['ndc']) > 1 else None,
+                            'start_date': ndc_time['startDate'],
+                            'end_date': ndc_time['endDate'],
+                            'status': entry['status'],
+                            'related_rxcui': entry['rxcui'],
+                            'rxcui': rxcui
+                        }
+                        records.append(record)
+            else:
+                print(f'Error in parsing response: {response}')
+
+    # Create a single DataFrame from the list of dictionaries
+    df = pd.DataFrame.from_records(records)
+    print(f'Processed {len(df)} RXCUIs.')
+
+    # Load the final DataFrame into the database
+    load_df_to_pg(df, "sagerx_lake", "rxnorm_historical", "replace", index=False, create_index=True, index_columns=['ndc', 'end_date'])

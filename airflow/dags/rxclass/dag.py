@@ -1,20 +1,24 @@
-from airflow_operator import create_dag
+import pendulum
 
-from rxclass.dag_tasks import get_rxcuis, extract_atc
-from common_dag_tasks import  get_ds_folder, get_data_folder, transform
+from airflow.decorators import dag
 
-dag_id = 'rxclass_atc_to_product'
+from rxclass.dag_tasks import extract, load
 
-dag = create_dag(
+
+dag_id = "rxclass"
+
+@dag(
     dag_id=dag_id,
-    schedule= "0 0 1 1 *",
-    max_active_runs=1,
-    catchup=False,
+    schedule_interval="0 3 15 * *",  # Runs on the 15th of each month at 3 AM
+    start_date=pendulum.today('UTC').add(days=-1),
+    catchup=False
 )
+def rxclass():
+    # Main processing task
+    extract_task = extract(dag_id)
+    load_task = load(extract_task)
+    
+    extract_task >> load_task
 
-
-with dag:
-    ds_folder = get_ds_folder(dag_id)
-    data_folder = get_data_folder(dag_id)
-    rxcuis = get_rxcuis()
-    rxcuis >> extract_atc(rxcuis) >> transform('rxclass')
+# Instantiate the DAG
+dag = rxclass()

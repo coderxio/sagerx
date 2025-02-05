@@ -28,7 +28,9 @@ def dailymed():
     # - "dm_spl_release_human_rx_part1" for a given part
     # - "dm_spl_daily_update_MMDDYYYY" for a given date
     #   (replace MMDDYYY with your month, day, and year)
-    file_set = "dm_spl_release_human_rx"
+    file_set = "dm_spl_release_human_rx_part"
+    # NOTE: without the _part at the end, it loads all 5 parts
+    # and then a separate zip that is all 5 combined
 
     def connect_to_ftp_dir(ftp_str: str, dir: str):
         import ftplib

@@ -143,7 +143,7 @@ def dailymed():
     @task
     def transform():
         subprocess = SubprocessHook()
-        result = subprocess.run_command(['dbt', 'run', '--select', 'models/staging/dailymed', 'models/intermediate/dailymed'], cwd='/dbt/sagerx')
+        result = subprocess.run_command(['dbt', 'run', '--select', 'models/staging/dailymed', 'models/intermediate/dailymed', 'ndcs_to_label_images'], cwd='/dbt/sagerx')
         print("Result from dbt:", result)
 
     extract() >> load() >> transform()

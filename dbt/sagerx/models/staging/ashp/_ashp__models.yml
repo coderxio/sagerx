@@ -36,8 +36,14 @@ models:
         data_tests:
           - unique
           - not_null
+      - name: product
+        description: The NDC product description
+      - name: manufacturer
+        description: The NDC manufacturer
+      - name: description
+        description: The NDC description relevant to the shortage
       - name: ndc_11
-        description: The NDC relevant to the shortage in NDC-11 format
+        description: The NDC package code in NDC-11 format
       - name: ndc_type
         description: |
           NDC package status as it relates to the shortage

@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: int_rxclass_clinical_products_to_atc_class
+    description: "Clinical products to ATC class"
+    columns:
+      - name: clinical_product_ndc
+      - name: clinical_product_rxcui
+      - name: clinical_product_name
+      - name: clinical_product_code
+      - name: clinical_product_class_name
+
+  - name: int_rxclass_clinical_products_to_cvx_code
+    description: "Clinical products to CVX code"
+    columns:
+      - name: clinical_product_ndc
+      - name: clinical_product_rxcui
+      - name: clinical_product_name
+      - name: clinical_product_code
+      - name: clinical_product_class_name
+
+  - name: int_rxclass_clinical_products_to_schedule
+    description: "Clinical products to DEA schedule"
+    columns:
+      - name: clinical_product_ndc
+      - name: clinical_product_rxcui
+      - name: clinical_product_name
+      - name: clinical_product_code
+      - name: clinical_product_class_name
+
+  - name: int_rxclass_clinical_products_to_va_class
+    description: "Clinical products to VA class"
+    columns:
+      - name: clinical_product_ndc
+      - name: clinical_product_rxcui
+      - name: clinical_product_name
+      - name: clinical_product_code
+      - name: clinical_product_class_name

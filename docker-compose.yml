@@ -1,8 +1,7 @@
-version: "3.8"
 x-airflow-common: &airflow-common
   build:
     context: ./airflow
-  image: sagerx_airflow:v0.0.5 # versioning allows a rebuild of docker image where necessary
+  image: sagerx_airflow:v0.0.6 # versioning allows a rebuild of docker image where necessary
   networks:
       - airflow-dbt-network
   env_file:
@@ -26,6 +25,7 @@ x-airflow-common: &airflow-common
     - ./airflow/logs:/opt/airflow/logs
     - ./airflow/plugins:/opt/airflow/plugins
     - ./airflow/data:/opt/airflow/data
+    - ./airflow/exports:/opt/airflow/exports
     - ./airflow/config/airflow.cfg:/opt/airflow/airflow.cfg
     - ./dbt:/dbt
     - ./gcp.json:/opt/gcp.json
@@ -114,9 +114,6 @@ services:
     command: webserver
     environment:
       <<: *airflow-common-env
-      AWS_ACCESS_KEY_ID: ${ACCESS_KEY}
-      AWS_SECRET_ACCESS_KEY: ${SECRET_ACCESS_KEY}
-      AWS_DEST_BUCKET: ${DEST_BUCKET}
     ports:
       - 8001:8080
 
@@ -126,9 +123,6 @@ services:
     command: scheduler
     environment:
       <<: *airflow-common-env
-      AWS_ACCESS_KEY_ID: ${ACCESS_KEY}
-      AWS_SECRET_ACCESS_KEY: ${SECRET_ACCESS_KEY}
-      AWS_DEST_BUCKET: ${DEST_BUCKET}
 
 networks:
   airflow-dbt-network:

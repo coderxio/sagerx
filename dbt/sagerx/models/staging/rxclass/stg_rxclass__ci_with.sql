@@ -1,14 +1,13 @@
--- stg_rxclass__atcprod.sql
+-- stg_rxclass__ci_with.sql
 
-with atcprod as (
+with ci_with as (
     
     select
         *
     from {{ source('rxclass', 'rxclass') }}
-    where rela_source = 'ATCPROD'
-
+    where rela = 'ci_with'
 )
 
 select distinct
     *
-from atcprod
+from ci_with

@@ -22,7 +22,7 @@ def run_dag_condition(dag_id):
 
 def get_dag_list():
     list_of_dags = []
-    dag_dependencies = ["fda_ndc","fda_unfinished","fda_excluded","rxnorm","rxclass_atc_to_product","rxnorm_historical"]
+    dag_dependencies = ["fda_ndc","fda_unfinished","fda_excluded","rxnorm","rxclass","rxnorm_historical"]
     for dag in dag_dependencies:
         if run_dag_condition(dag):
             list_of_dags.append(dag)

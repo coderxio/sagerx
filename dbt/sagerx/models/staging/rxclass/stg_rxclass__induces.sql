@@ -1,14 +1,13 @@
--- stg_rxclass__atcprod.sql
+-- stg_rxclass__induces.sql
 
-with atcprod as (
+with induces as (
     
     select
         *
     from {{ source('rxclass', 'rxclass') }}
-    where rela_source = 'ATCPROD'
-
+    where rela = 'induces'
 )
 
 select distinct
     *
-from atcprod
+from induces

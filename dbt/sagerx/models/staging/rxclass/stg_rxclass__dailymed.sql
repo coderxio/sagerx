@@ -1,14 +1,14 @@
--- stg_rxclass__atcprod.sql
+-- stg_rxclass__dailymed.sql
 
-with atcprod as (
+with dailymed as (
     
     select
         *
     from {{ source('rxclass', 'rxclass') }}
-    where rela_source = 'ATCPROD'
+    where rela_source = 'DAILYMED'
 
 )
 
 select distinct
     *
-from atcprod
+from dailymed

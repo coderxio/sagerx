@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: current_drug_shortages
+  - name: stg_ashp__current_drug_shortages
     description: Current ASHP drug shortages
     columns:
       - name: id
@@ -28,16 +28,19 @@ models:
       - name: updated_date
         description: The date the shortage record was last updated by ASHP
 
-  - name: current_drug_shortages_ndcs
+  - name: stg_ashp__current_drug_shortages_ndcs
     description: Affected and available NDCs for each ASHP drug shortage.
     columns:
       - name: id
         description: The ID of the shortage as defined by the detail page URL ID
-        data_tests:
-          - unique
-          - not_null
+      - name: product
+        description: The NDC product description
+      - name: manufacturer
+        description: The NDC manufacturer
+      - name: description
+        description: The NDC description relevant to the shortage
       - name: ndc_11
-        description: The NDC relevant to the shortage in NDC-11 format
+        description: The NDC package code in NDC-11 format
       - name: ndc_type
         description: |
           NDC package status as it relates to the shortage

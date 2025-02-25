@@ -164,18 +164,6 @@ models:
       - name: class_type
       - name: rela_source
 
-  - name: stg_rxclass__ci_chemclass
-    description: "Drugs that are contraindicated with a chemical class"
-    columns:
-      - name: rxcui
-      - name: name
-      - name: tty
-      - name: rela
-      - name: class_id
-      - name: class_name
-      - name: class_type
-      - name: rela_source
-
   - name: stg_rxclass__has_pk
     description: "Drugs that are members of a Pharmacokinetics Class"
     columns:

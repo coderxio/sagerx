@@ -8,4 +8,4 @@ join sagerx_lake.rxnorm_rxnconso b on a.rxcui = b.rxcui
 where a.atn = 'DHJC'
 and a.atv like 'J%'
 and b.tty in ('GPCK', 'BPCK', 'SCD', 'SBD')
-order by a.atv;
+order by a.atv

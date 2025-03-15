@@ -5,7 +5,7 @@ import json
 import logging
 from sagerx import load_df_to_pg
 from airflow.models import Variable
-import os
+from airflow.hooks.postgres_hook import PostgresHook
 
 # Set up logging
 logging.basicConfig(
@@ -19,25 +19,7 @@ apikey = Variable.get("umls_api")
 # List of target vocabularies, e.g., ['ICD10CM', 'SNOMEDCT_US', 'ICD9CM']
 targets = ['SNOMEDCT_US', 'ICD10CM', 'ICD9CM']
 
-def fetch_concepts_by_tty(tty):
-    """
-    Fetch all concept dictionaries for a given Therapeutic Type (TTY)
-    from RxNav. Each concept dictionary includes fields like 'rxcui', 'name', etc.
-    """
-    url = f"https://rxnav.nlm.nih.gov/REST/allconcepts.json?tty={tty}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        return data['minConceptGroup']['minConcept']
-    else:
-        logging.error(f"Failed to fetch concepts for TTY {tty}: HTTP Status {response.status_code}")
-        return []
-
 def get_matching_codes_and_descriptions(mesh_code, version='current'):
-    """
-    For a given MeSH code, fetch matching codes and descriptions
-    from the UMLS crosswalk API.
-    """
     base_uri = 'https://uts-ws.nlm.nih.gov'
     source = 'MSH'
     combined_results = []
@@ -63,37 +45,19 @@ def get_matching_codes_and_descriptions(mesh_code, version='current'):
                 combined_results.append(result)
     return combined_results
 
-def process_data(tty):
-    """Main function to process data and generate the final DataFrame without NDC logic."""
-    session = requests.Session()
-    concepts = fetch_concepts_by_tty(tty)
-    all_data = []
-    
-    # Iterate through the list of concepts (sequentially)
-    for concept in concepts:
-        rxcui = concept['rxcui']
-        class_url = f"https://rxnav.nlm.nih.gov/REST/rxclass/class/byRxcui.json?rxcui={rxcui}"
-        class_response = session.get(class_url)
-        if class_response.status_code == 200:
-            class_data = class_response.json()
-            if 'rxclassDrugInfoList' in class_data:
-                for class_info in class_data['rxclassDrugInfoList']['rxclassDrugInfo']:
-                    if class_info['rxclassMinConceptItem']['classType'] == 'DISEASE':
-                        # Record one row per class_info, without any NDC data.
-                        all_data.append({
-                            'rxcui': rxcui,
-                            'name': concept.get('name', ''),
-                            'msh_code': class_info['rxclassMinConceptItem']['classId'],
-                            'msh_name': class_info['rxclassMinConceptItem']['className'],
-                            'rela': class_info.get('rela', '')
-                        })
-    df = pd.DataFrame(all_data)
-    total_concepts = len(concepts)
-    processed_concepts = df['rxcui'].nunique() if not df.empty else 0
-    failed_count = total_concepts - processed_concepts
-    logging.info(f"Processing complete. Total concepts: {total_concepts}, Processed: {processed_concepts}, Failed: {failed_count}")
-    
-    # Fetch UMLS mapping codes for each unique MeSH code
+def process_data():
+    # Connect to Postgres and query the table for records with class_type 'DISEASE'
+    pg_hook = PostgresHook(postgres_conn_id="postgres_default")
+    engine = pg_hook.get_sqlalchemy_engine()
+    query = """
+        SELECT DISTINCT rxcui, name, class_id AS msh_code, class_name AS msh_name, rela
+        FROM sagerx_lake.rxclass
+        WHERE class_type = 'DISEASE'
+    """
+    df = pd.read_sql(query, con=engine)
+    logging.info(f"Fetched {len(df)} rows from sagerx_lake.rxclass where class_type = 'DISEASE'.")
+
+    # Fetch UMLS mapping codes for each unique MeSH code (which comes from class_id)
     unique_mesh_ids = df['msh_code'].unique()
     all_results = []
     for mesh_id in unique_mesh_ids:
@@ -101,22 +65,25 @@ def process_data(tty):
         all_results.extend(code_results)
     
     df_results = pd.DataFrame(all_results)
-    df_results.columns = [col.lower() for col in df_results.columns]
+    if not df_results.empty:
+        df_results.columns = [col.lower() for col in df_results.columns]
     df.columns = [col.lower() for col in df.columns]
     
     # Aggregate mappings to a single row per msh_code by taking the first value for each column
-    df_final = df_results.groupby('msh_code').agg({col: 'first' for col in df_results.columns if col != 'msh_code'}).reset_index()
-    
-    # Merge aggregated mapping data with the base RxClass data (without NDC)
-    merged_df = pd.merge(df, df_final, on='msh_code', how='left')
+    if not df_results.empty:
+        df_final = df_results.groupby('msh_code').agg({col: 'first' for col in df_results.columns if col != 'msh_code'}).reset_index()
+        # Merge aggregated mapping data with the base RxClass data
+        merged_df = pd.merge(df, df_final, on='msh_code', how='left')
+    else:
+        merged_df = df
+
     merged_df.columns = [col.lower() for col in merged_df.columns]
     merged_df.drop_duplicates(inplace=True)
     return merged_df
 
 @task
 def extract(dag_id: str) -> list:
-    tty = 'IN+PIN+MIN+SCDC+SCDF+SCDFP+SCDG+SCDGP+SCD+GPCK+BN+SBDC+SBDF+SBDFP+SBDG+SBD+BPCK'
-    df = process_data(tty)
+    df = process_data()
     logging.info(f"Dataframe created with {len(df)} rows.")
     df = df.applymap(lambda x: None if pd.isna(x) else x)
     return df.to_dict(orient='records')
@@ -126,5 +93,5 @@ def load(data: list):
     df = pd.DataFrame(data)
     logging.info(f"Dataframe loaded with {len(df)} rows.")
     df = df.applymap(lambda x: None if pd.isna(x) else x)
-    load_df_to_pg(df, "sagerx_dev", "rxnorm_to_icd", "replace", index=False)
+    load_df_to_pg(df, "sagerx_lake", "umls_condition_crosswalk", "replace", index=False)
     logging.info("Data loaded to PostgreSQL.")

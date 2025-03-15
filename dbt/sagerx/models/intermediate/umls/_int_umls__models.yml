@@ -1,0 +1,122 @@
+version: 2
+
+models:
+  - name: int_umls_rxcui_to_snomed_contraindicated
+    description: "RxCUIs that are contraindicated with SNOMED concepts"
+    columns:
+      - name: rxcui
+      - name: name
+      - name: concept_code
+      - name: concept_name
+
+  - name: int_umls_rxcui_to_snomed_induces
+    description: "RxCUIs that can induce SNOMED concepts"
+    columns:
+      - name: rxcui
+      - name: name
+      - name: concept_code
+      - name: concept_name
+
+  - name: int_umls_rxcui_to_snomed_may_diagnose
+    description: "RxCUIs that may diagnose SNOMED concepts"
+    columns:
+      - name: rxcui
+      - name: name
+      - name: concept_code
+      - name: concept_name
+
+  - name: int_umls_rxcui_to_snomed_may_prevent
+    description: "RxCUIs that may prevent SNOMED concepts"
+    columns:
+      - name: rxcui
+      - name: name
+      - name: concept_code
+      - name: concept_name
+
+  - name: int_umls_rxcui_to_snomed_may_treat
+    description: "RxCUIs that may treat SNOMED concepts"
+    columns:
+      - name: rxcui
+      - name: name
+      - name: concept_code
+      - name: concept_name
+
+  - name: int_umls_rxcui_to_icd10cm_contraindicated
+    description: "RxCUIs that are contraindicated with ICD10CM concepts"
+    columns:
+      - name: rxcui
+      - name: name
+      - name: concept_code
+      - name: concept_name
+
+  - name: int_umls_rxcui_to_icd10cm_induces
+    description: "RxCUIs that can induce ICD10CM concepts"
+    columns:
+      - name: rxcui
+      - name: name
+      - name: concept_code
+      - name: concept_name
+
+  - name: int_umls_rxcui_to_icd10cm_may_diagnose
+    description: "RxCUIs that may diagnose ICD10CM concepts"
+    columns:
+      - name: rxcui
+      - name: name
+      - name: concept_code
+      - name: concept_name
+
+  - name: int_umls_rxcui_to_icd10cm_may_prevent
+    description: "RxCUIs that may prevent ICD10CM concepts"
+    columns:
+      - name: rxcui
+      - name: name
+      - name: concept_code
+      - name: concept_name
+
+  - name: int_umls_rxcui_to_icd10cm_may_treat
+    description: "RxCUIs that may treat ICD10CM concepts"
+    columns:
+      - name: rxcui
+      - name: name
+      - name: concept_code
+      - name: concept_name
+
+  - name: int_umls_rxcui_to_icd9cm_contraindicated
+    description: "RxCUIs that are contraindicated with ICD9CM concepts"
+    columns:
+      - name: rxcui
+      - name: name
+      - name: concept_code
+      - name: concept_name
+
+  - name: int_umls_rxcui_to_icd9cm_induces
+    description: "RxCUIs that can induce ICD9CM concepts"
+    columns:
+      - name: rxcui
+      - name: name
+      - name: concept_code
+      - name: concept_name
+
+  - name: int_umls_rxcui_to_icd9cm_may_diagnose
+    description: "RxCUIs that may diagnose ICD9CM concepts"
+    columns:
+      - name: rxcui
+      - name: name
+      - name: concept_code
+      - name: concept_name
+
+  - name: int_umls_rxcui_to_icd9cm_may_prevent
+    description: "RxCUIs that may prevent ICD9CM concepts"
+    columns:
+      - name: rxcui
+      - name: name
+      - name: concept_code
+      - name: concept_name
+
+  - name: int_umls_rxcui_to_icd9cm_may_treat
+    description: "RxCUIs that may treat ICD9CM concepts"
+    columns:
+      - name: rxcui
+      - name: name
+      - name: concept_code
+      - name: concept_name

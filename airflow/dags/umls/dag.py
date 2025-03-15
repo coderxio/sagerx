@@ -2,7 +2,7 @@ import pendulum
 from airflow.decorators import dag
 from umls.dag_tasks import extract, load
 
-dag_id = "rxnorm_to_icd"
+dag_id = "umls"
 
 @dag(
     dag_id=dag_id,
@@ -10,10 +10,10 @@ dag_id = "rxnorm_to_icd"
     start_date=pendulum.today('UTC').add(days=-1),
     catchup=False
 )
-def rxnorm_to_icd():
+def umls():
     extract_task = extract(dag_id)
     load_task = load(extract_task)
 
     extract_task >> load_task
 
-dag = rxnorm_to_icd()
+dag = umls()

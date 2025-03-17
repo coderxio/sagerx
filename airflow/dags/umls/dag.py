@@ -14,7 +14,7 @@ dag_id = "umls"
 def umls():
     extract_task = extract(dag_id)
     load_task = load(extract_task)
-    transform_task = transform(dag_id, models_subdir=['intermediate'])
+    transform_task = transform(dag_id, models_subdir=['staging', 'intermediate'])
 
     extract_task >> load_task >> transform_task
 

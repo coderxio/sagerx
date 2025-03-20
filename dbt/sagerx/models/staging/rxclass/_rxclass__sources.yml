@@ -3,7 +3,13 @@ version: 2
 sources:
   - name: rxclass
     description: |
-      A product-level mapping of RxNorm to ATC1-4 classes.
+      This data source represents all of RxClass.
+
+      Below are descriptions of a select few of the RxClass sources.
+
+      ## ATCPROD
+
+      > A product-level mapping of RxNorm to ATC1-4 classes.
 
       RxClass has added RxNorm product-level mapping for ATC. The product-level mapping is now the default source mapping for the ATC classes in the RxClass browser.
 
@@ -17,4 +23,4 @@ sources:
       The original ingredient-level mapping to ATC from the WHO Collaborating Centre for Drug Statistics Methodology remains available in RxClass (select ATC under Edit Drug Sources) and through the RxClass API (relaSource=ATC).
     schema: sagerx_lake
     tables:
-      - name: rxclass_atc_to_product
+      - name: rxclass

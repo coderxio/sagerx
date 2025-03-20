@@ -1,10 +1,21 @@
+import requests
+import pandas as pd
+import time
+import json
+import logging
+import threading
+import pendulum
+
+from time import sleep
+from functools import partial
+from concurrent.futures import ThreadPoolExecutor
+from urllib.request import urlopen
+from urllib.error import HTTPError, URLError
 from pathlib import Path
 from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperator
 from airflow.models import Variable
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
-import requests
-from time import sleep
-import pandas as pd
+from pandas import json_normalize
 
 # Filesystem functions
 def create_path(*args):
@@ -25,11 +36,13 @@ def read_sql_file(sql_path: str):
     return sql_string
 
 def read_json_file(json_path:str):
-    import json
-
-    with open(json_path,'r') as f:
+    with open(json_path, 'r') as f:
         json_object = json.load(f)
     return json_object
+
+def write_json_file(json_path:str, data):
+    with open(json_path, 'w') as f:
+        json.dump(data, f)
 
 # Web functions
 def download_dataset(url: str, dest: Path = Path.cwd(), file_name: str = None):
@@ -194,34 +207,170 @@ def run_query_to_df(query:str) -> pd.DataFrame:
     
     return df
 
-@retry(
-        stop=stop_after_attempt(20),
-        wait=wait_exponential(multiplier=1,max=10),
-        reraise=True
-)
-def get_api(url):
-    response = requests.get(url)
-    if response.status_code == 429:
-        sleep(60)
-        raise requests.exceptions.RequestException("429 Too Many Requests, retry after 60 seconds", response=response)
-    elif response.status_code != 200:
-        raise Exception("API call failed with status code: {}".format(response.status_code))
-    data = response.json()
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+class RateLimiter:
+    """
+    Restrict calls to a maximum of `max_calls` within `period` seconds.
+    Ensures we don't exceed API rate limits.
+    """
+    def __init__(self, max_calls, period):
+        self.max_calls = max_calls
+        self.period = period
+        self.calls = []
+        self.lock = threading.Lock()
+
+    def __call__(self, f):
+        def wrapped(*args, **kwargs):
+            with self.lock:
+                now = time.time()
+                # Remove calls that fell outside the time window
+                self.calls = [c for c in self.calls if now - c < self.period]
+                # If we've reached the limit, sleep until we're allowed to call again
+                if len(self.calls) >= self.max_calls:
+                    sleep_time = self.period - (now - self.calls[0])
+                    #logging.info(f"Rate limit reached. Sleeping for {sleep_time:.2f} seconds.")
+                    time.sleep(sleep_time)
+                self.calls.append(time.time())
+            return f(*args, **kwargs)
+        return wrapped
+
+
+@RateLimiter(max_calls=20, period=1)  # Limit to 20 calls/second
+def fetch_json(url):
+    """
+    Fetch JSON from a URL, respecting the rate limit.
+    """
+    with urlopen(url) as response:
+        data = json.loads(response.read())
+
+    # If the body says "Too Many Requests" even though status is 200, treat it like a 429 and retry
+    if isinstance(data, dict) and data.get("error") == "Too Many Requests":
+        raise HTTPError(url, 429, "Too Many Requests (from response body)", None, None)
+
     return data
 
-def parallel_api_calls(api_calls:list) -> list:
-    from concurrent.futures import ThreadPoolExecutor, as_completed
-    output = []
-    with ThreadPoolExecutor(max_workers=3) as executor:
-        futures = {executor.submit(get_api, api_call):api_call for api_call in api_calls}
 
-        for future in as_completed(futures):
-            url = futures[future]
-            response = future.result()
-            if not len(response) == 0:
-                output.append({"url":url,"response":response})
-                if len(output) % 1000 == 0:
-                    print(f'MILESTONE {len(output)}')
-            # else:
-            #     print(f"Empty response for url: {url}")
-    return output
+def concurrent_api_calls(url, max_retries=3, initial_delay=1):
+    """
+    For a given concept dict that includes 'rxcui', call the rxclass API
+    to retrieve class info. Implements retry logic to handle HTTP errors.
+    """
+    for attempt in range(max_retries):
+        try:
+            response = fetch_json(url)
+            return { "url": url, "response": response }
+
+        except HTTPError as e:
+            if e.code == 429:
+                # Exponential backoff for rate-limit or "Too Many Requests" from body
+                delay = initial_delay * (2 ** attempt)
+                '''
+                logging.warning(
+                    f"Rate limit (429) for rxcui={rxcui} at {url}. "
+                    f"Retrying in {delay} seconds... (Attempt {attempt+1}/{max_retries})"
+                )
+                '''
+                time.sleep(delay)
+            else:
+                # Skip for other HTTP errors
+                '''
+                logging.error(
+                    f"HTTP error {e.code} for {url}. Will skip to the next concept."
+                )
+                '''
+                return None
+
+        except Exception as e:
+            # Skip for any non-HTTPError exceptions
+            '''
+            logging.error(
+                f"Error processing {url}: {str(e)}. Will skip to the next concept."
+            )
+            '''
+
+            return None
+
+        except URLError as e:
+            # Retry for URLError as well
+            if attempt < max_retries - 1:
+                delay = initial_delay * (2 ** attempt)
+                '''
+                logging.warning(
+                    f"URLError for rxcui={rxcui} at {url}: {e.reason}. "
+                    f"Retrying in {delay} seconds... (Attempt {attempt+1}/{max_retries})"
+                )
+                '''
+                time.sleep(delay)
+            else:
+                '''
+                logging.error(
+                    f"URLError for rxcui={rxcui} at {url}: {e.reason}. "
+                    f"Max retries reached. Skipping to the next concept."
+                )
+                '''
+                return None
+
+        except (KeyError, TypeError) as e:
+            #logging.error(f"Data structure error for rxcui={rxcui}: {str(e)}. Skipping to the next concept.")
+            return None
+
+        except Exception as e:
+            #logging.error(f"Unexpected error for rxcui={rxcui}: {str(e)}. Skipping to the next concept.")
+            return None
+
+    # If we exhaust all retries, return None (concept failed)
+    #logging.error(f"Max retries reached for {url}. Skipping to the next concept.")
+    return None
+
+def get_concurrent_api_results(url_list: list):
+    # 2. Process concepts concurrently
+    results = []
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        process_func = partial(concurrent_api_calls)
+        mapped_results = executor.map(process_func, url_list)
+
+        for i, result in enumerate(mapped_results, start=1):
+            results.append(result)
+            if i % 500 == 0:  # Log every 500 concepts
+                logging.info(f"Made {i} API calls so far...")
+
+    print(f'Concurrent API call results count: {len(results)}')
+
+    return results
+
+def get_rxcuis(ttys:list, active_only:bool = False) -> list:
+    settings = ''
+    if active_only:
+        settings += " and suppress = 'N'"
+        
+    from airflow.hooks.postgres_hook import PostgresHook
+
+    pg_hook = PostgresHook(postgres_conn_id="postgres_default")
+    engine = pg_hook.get_sqlalchemy_engine()
+
+    ttys_str = ', '.join(f"'{item}'" for item in ttys)
+    df = pd.read_sql(
+            f"select distinct rxcui from sagerx_lake.rxnorm_rxnconso where tty in ({ttys_str}) and sab = 'RXNORM'{settings}",
+            con=engine
+        )
+    rxcuis = list(df['rxcui'])
+
+    print(f"Number of RXCUIs: {len(rxcuis)}")
+    return rxcuis
+
+def get_rxcuis_from_rxnorm_api(ttys:list) -> list:
+    ttys_str = '+'.join(ttys)
+
+    # NOTE: this API seems to only return ACTIVE RXCUIs
+    # this is important to note for things like RxNorm Historical
+    # which probably requires more than just currently active RXCUIs
+    base_url = f"https://rxnav.nlm.nih.gov/REST/allconcepts.json?tty={ttys_str}"
+
+    json = fetch_json(base_url)
+    concepts = json['minConceptGroup']['minConcept']
+    rxcuis = [concept['rxcui'] for concept in concepts]
+
+    print(f"Number of RxCUIs: {len(rxcuis)}")
+    return rxcuis

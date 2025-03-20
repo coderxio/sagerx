@@ -38,8 +38,8 @@ sources:
               The partial URL for the shortage detail page,
               containing an id parameter which can be used as
               an index
-          - name: ndc
-            description: The NDC relevant to the shortage
+          - name: ndc_description
+            description: The NDC description statement associated with the shortage
           - name: ndc_type
             description: |
               NDC package status as it relates to the shortage

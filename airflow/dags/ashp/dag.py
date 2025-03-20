@@ -60,6 +60,9 @@ with dag:
                 'detail_url': link.get('href')
             })
 
+        affected_ndcs = []
+        available_ndcs = []
+
         for shortage in ashp_drugs:
             shortage_detail_data = requests.get(base_url + shortage['detail_url'])
             soup = BeautifulSoup(shortage_detail_data.content, 'html.parser')
@@ -120,22 +123,26 @@ with dag:
                 shortage['alternatives_and_management'] = json.dumps(alternatives)
 
             # Get affected NDCs
-            affected_ndcs = []
             try:
                 for ndc_description in soup.find(id='1_lblProducts').find_all('li'):
-                    ndc = re.search(ndc_regex, ndc_description.get_text())[0]
-                    affected_ndcs.append(ndc)
-                    shortage['affected_ndcs'] = affected_ndcs
+                    ndc_data = {
+                        'detail_url': shortage['detail_url'],
+                        'ndc_description': ndc_description.get_text(),
+                    }
+                    if ',' in ndc_data['ndc_description']:
+                        affected_ndcs.append(ndc_data)
             except (TypeError, AttributeError):
                 logging.debug(f'No affected NDCs for {shortage.get("name")}')
 
             # Get currently available NDCs
-            available_ndcs = []
             try:
                 for ndc_description in soup.find(id='1_lblAvailable').find_all('li'):
-                    ndc = ndc_regex.search(ndc_description.get_text())[0]
-                    available_ndcs.append(ndc)
-                shortage['available_ndcs'] = available_ndcs
+                    ndc_data = {
+                        'detail_url': shortage['detail_url'],
+                        'ndc_description': ndc_description.get_text(),
+                    }
+                    if ',' in ndc_data['ndc_description']:
+                        available_ndcs.append(ndc_data)
             except (TypeError, AttributeError):
                 logging.debug(f'No available NDCs for {shortage.get("name")}')
 
@@ -175,17 +182,13 @@ with dag:
             load_df_to_pg(shortages, "sagerx_lake", "ashp_shortage_list", "replace", index=False)
 
             # Load the table of affected and available NDCs
-            affected_ndcs = pd.DataFrame(ashp_drugs, columns=['detail_url', 'affected_ndcs']).explode('affected_ndcs')
+            affected_ndcs = pd.json_normalize(affected_ndcs)
             affected_ndcs['ndc_type'] = 'affected'
-            affected_ndcs = affected_ndcs.rename(columns={'affected_ndcs': 'ndc'})
-
-            available_ndcs = pd.DataFrame(ashp_drugs, columns=['detail_url', 'available_ndcs']).explode(
-                'available_ndcs')
+            available_ndcs = pd.json_normalize(available_ndcs)
             available_ndcs['ndc_type'] = 'available'
-            available_ndcs = available_ndcs.rename(columns={'available_ndcs': 'ndc'})
 
             ndcs = pd.concat([affected_ndcs, available_ndcs])
-            ndcs = ndcs[~ndcs['ndc'].isnull()]  # Remove shortages that have no associated NDCs
+            ndcs = ndcs[~ndcs['ndc_description'].isnull()]  # Remove shortages that have no associated NDCs
             load_df_to_pg(ndcs, "sagerx_lake", "ashp_shortage_list_ndcs", "replace", index=False)
         else:
             logging.error('Drug shortage list not found')

@@ -1,8 +1,7 @@
 from pathlib import Path
 import os
 import pendulum
-# zipfile_deflate64 is needed likely because of how CMS zips these files
-import zipfile_deflate64 as zipfile # this package is not easily accessible in this context - consider an alternative
+import zipfile
 
 from sagerx import create_path, get_dataset, read_sql_file, get_sql_list, alert_slack_channel
 
@@ -21,14 +20,19 @@ import user_macros
     start_date=pendulum.yesterday(),
     catchup=False,
 )
-def cms_part_d_plans():
-    dag_id = "cms_part_d_plans"
-    file_date = "20230908"
-    file_date_year = file_date[:4]
-    file_date_quarter = user_macros.get_quarter(pendulum.from_format(file_date, 'YYYYMMDD'))
+def cms_part_d():
+    dag_id = "cms_part_d"
+    file_date = "20250109"
+    file_date_year = '2024'
+    file_date_quarter = '4'
+    # NOTE: this file is from 2025 and yet the files inside represent 2024 Q4 data...
+    # so this logic needs to be revisited
+    #file_date_year = file_date[:4]
+    #file_date_quarter = user_macros.get_quarter(pendulum.from_format(file_date, 'YYYYMMDD'))
 
-    ds_url = f"https://download.cms.gov/Research-Statistics-Data-and-Systems/Downloadable-Public-Use-Files/Pharmacy-Puf/Downloads/SPUF_{file_date_year}_{file_date}.zip"
-
+    #ds_url = f"https://download.cms.gov/Research-Statistics-Data-and-Systems/Downloadable-Public-Use-Files/Pharmacy-Puf/Downloads/SPUF_{file_date_year}_{file_date}.zip"
+    ds_url = f"https://data.cms.gov/sites/default/files/2025-01/e78ce888-f571-4d86-baf0-7a1f9efffff4/SPUF_2025_{file_date}.zip"
+    
     # Task to download data from web location
     @task
     def extract():
@@ -83,4 +87,4 @@ def cms_part_d_plans():
     unzip(extract()) >> load
     # extract() >> load >> transform()
 
-cms_part_d_plans()
+cms_part_d()

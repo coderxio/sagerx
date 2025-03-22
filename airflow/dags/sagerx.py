@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 import time
+import re
 import json
 import logging
 import threading
@@ -266,29 +267,23 @@ def concurrent_api_calls(url, max_retries=3, initial_delay=1):
             if e.code == 429:
                 # Exponential backoff for rate-limit or "Too Many Requests" from body
                 delay = initial_delay * (2 ** attempt)
-                '''
                 logging.warning(
                     f"Rate limit (429) for rxcui={rxcui} at {url}. "
                     f"Retrying in {delay} seconds... (Attempt {attempt+1}/{max_retries})"
                 )
-                '''
                 time.sleep(delay)
             else:
                 # Skip for other HTTP errors
-                '''
                 logging.error(
                     f"HTTP error {e.code} for {url}. Will skip to the next concept."
                 )
-                '''
                 return None
 
         except Exception as e:
             # Skip for any non-HTTPError exceptions
-            '''
             logging.error(
                 f"Error processing {url}: {str(e)}. Will skip to the next concept."
             )
-            '''
 
             return None
 
@@ -296,32 +291,29 @@ def concurrent_api_calls(url, max_retries=3, initial_delay=1):
             # Retry for URLError as well
             if attempt < max_retries - 1:
                 delay = initial_delay * (2 ** attempt)
-                '''
                 logging.warning(
                     f"URLError for rxcui={rxcui} at {url}: {e.reason}. "
                     f"Retrying in {delay} seconds... (Attempt {attempt+1}/{max_retries})"
                 )
-                '''
                 time.sleep(delay)
             else:
-                '''
                 logging.error(
                     f"URLError for rxcui={rxcui} at {url}: {e.reason}. "
                     f"Max retries reached. Skipping to the next concept."
                 )
-                '''
+                
                 return None
 
         except (KeyError, TypeError) as e:
-            #logging.error(f"Data structure error for rxcui={rxcui}: {str(e)}. Skipping to the next concept.")
+            logging.error(f"Data structure error for rxcui={rxcui}: {str(e)}. Skipping to the next concept.")
             return None
 
         except Exception as e:
-            #logging.error(f"Unexpected error for rxcui={rxcui}: {str(e)}. Skipping to the next concept.")
+            logging.error(f"Unexpected error for rxcui={rxcui}: {str(e)}. Skipping to the next concept.")
             return None
 
     # If we exhaust all retries, return None (concept failed)
-    #logging.error(f"Max retries reached for {url}. Skipping to the next concept.")
+    logging.error(f"Max retries reached for {url}. Skipping to the next concept.")
     return None
 
 def get_concurrent_api_results(url_list: list):
@@ -374,3 +366,7 @@ def get_rxcuis_from_rxnorm_api(ttys:list) -> list:
 
     print(f"Number of RxCUIs: {len(rxcuis)}")
     return rxcuis
+
+# Function to convert camelCase to snake_case
+def camel_to_snake(name):
+    return re.sub(r'(?<!^)(?=[A-Z])', '_', name).lower()

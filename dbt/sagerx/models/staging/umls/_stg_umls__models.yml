@@ -1,122 +1,20 @@
 version: 2
 
 models:
-  - name: stg_umls_ingredient_rxcui_to_snomed_contraindicated
-    description: "RxCUIs that are contraindicated with SNOMED concepts"
-    columns:
-      - name: rxcui
-      - name: name
-      - name: concept_code
-      - name: concept_name
+  - name: stg_umls__crosswalk_codes
+    description: |
+      UMLS crosswalk from MeSH to ICD9, ICD10, and SNOMED.
 
-  - name: stg_umls_ingredient_rxcui_to_snomed_induces
-    description: "RxCUIs that can induce SNOMED concepts"
+      TODO: Make this more generic - not just MeSH but other
+      potential "from_sources".
     columns:
-      - name: rxcui
-      - name: name
-      - name: concept_code
-      - name: concept_name
-
-  - name: stg_umls_ingredient_rxcui_to_snomed_may_diagnose
-    description: "RxCUIs that may diagnose SNOMED concepts"
-    columns:
-      - name: rxcui
-      - name: name
-      - name: concept_code
-      - name: concept_name
-
-  - name: stg_umls_ingredient_rxcui_to_snomed_may_prevent
-    description: "RxCUIs that may prevent SNOMED concepts"
-    columns:
-      - name: rxcui
-      - name: name
-      - name: concept_code
-      - name: concept_name
-
-  - name: stg_umls_ingredient_rxcui_to_snomed_may_treat
-    description: "RxCUIs that may treat SNOMED concepts"
-    columns:
-      - name: rxcui
-      - name: name
-      - name: concept_code
-      - name: concept_name
-
-  - name: stg_umls_ingredient_rxcui_to_icd10cm_contraindicated
-    description: "RxCUIs that are contraindicated with ICD10CM concepts"
-    columns:
-      - name: rxcui
-      - name: name
-      - name: concept_code
-      - name: concept_name
-
-  - name: stg_umls_ingredient_rxcui_to_icd10cm_induces
-    description: "RxCUIs that can induce ICD10CM concepts"
-    columns:
-      - name: rxcui
-      - name: name
-      - name: concept_code
-      - name: concept_name
-
-  - name: stg_umls_ingredient_rxcui_to_icd10cm_may_diagnose
-    description: "RxCUIs that may diagnose ICD10CM concepts"
-    columns:
-      - name: rxcui
-      - name: name
-      - name: concept_code
-      - name: concept_name
-
-  - name: stg_umls_ingredient_rxcui_to_icd10cm_may_prevent
-    description: "RxCUIs that may prevent ICD10CM concepts"
-    columns:
-      - name: rxcui
-      - name: name
-      - name: concept_code
-      - name: concept_name
-
-  - name: stg_umls_ingredient_rxcui_to_icd10cm_may_treat
-    description: "RxCUIs that may treat ICD10CM concepts"
-    columns:
-      - name: rxcui
-      - name: name
-      - name: concept_code
-      - name: concept_name
-
-  - name: stg_umls_ingredient_rxcui_to_icd9cm_contraindicated
-    description: "RxCUIs that are contraindicated with ICD9CM concepts"
-    columns:
-      - name: rxcui
-      - name: name
-      - name: concept_code
-      - name: concept_name
-
-  - name: stg_umls_ingredient_rxcui_to_icd9cm_induces
-    description: "RxCUIs that can induce ICD9CM concepts"
-    columns:
-      - name: rxcui
-      - name: name
-      - name: concept_code
-      - name: concept_name
-
-  - name: stg_umls_ingredient_rxcui_to_icd9cm_may_diagnose
-    description: "RxCUIs that may diagnose ICD9CM concepts"
-    columns:
-      - name: rxcui
-      - name: name
-      - name: concept_code
-      - name: concept_name
-
-  - name: stg_umls_ingredient_rxcui_to_icd9cm_may_prevent
-    description: "RxCUIs that may prevent ICD9CM concepts"
-    columns:
-      - name: rxcui
-      - name: name
-      - name: concept_code
-      - name: concept_name
-
-  - name: stg_umls_ingredient_rxcui_to_icd9cm_may_treat
-    description: "RxCUIs that may treat ICD9CM concepts"
-    columns:
-      - name: rxcui
-      - name: name
-      - name: concept_code
-      - name: concept_name
+      - name: from_source
+        description: The source of the original code.
+      - name: from_code
+        description: The original code to which we want to map other codes.
+      - name: to_source
+        description: The destination source we are mapping to.
+      - name: to_code
+        description: The synonymous code we are mapping to.
+      - name: to_name
+        description: The name of the concept we are mapping to.

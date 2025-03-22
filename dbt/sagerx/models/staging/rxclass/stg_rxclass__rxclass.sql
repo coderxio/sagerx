@@ -1,13 +1,13 @@
--- stg_rxclass__ci_moa.sql
+-- stg_rxclass__rxclass.sql
 
-with ci_moa as (
+with rxclass as (
     
     select
         *
     from {{ source('rxclass', 'rxclass') }}
-    where rela = 'ci_moa'
+
 )
 
 select distinct
     *
-from ci_moa
+from rxclass

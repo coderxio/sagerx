@@ -1,137 +1,14 @@
 version: 2
 
 models:
-  - name: int_umls_clinical_products_to_snomed_contraindicated
-    description: "RxNorm clinical products that are contraindicated with SNOMED concepts"
-    columns:
-      - name: clinical_product_ndc
-      - name: clinical_product_rxcui
-      - name: clinical_product_name
-      - name: concept_code
-      - name: concept_name
+  - name: int_umls_clinical_products_to_crosswalk_codes
+    description: Crosswalk of clinical products to UMLS codes.
 
-  - name: int_umls_clinical_products_to_snomed_induces
-    description: "RxNorm clinical products that can induce SNOMED concepts"
-    columns:
-      - name: clinical_product_ndc
-      - name: clinical_product_rxcui
-      - name: clinical_product_name
-      - name: concept_code
-      - name: concept_name
+  - name: int_umls_ingredient_components_to_crosswalk_codes
+    description: Crosswalk of ingredient components (TTY = IN) to UMLS codes.
 
-  - name: int_umls_clinical_products_to_snomed_may_diagnose
-    description: "RxNorm clinical products that may diagnose SNOMED concepts"
-    columns:
-      - name: clinical_product_ndc
-      - name: clinical_product_rxcui
-      - name: clinical_product_name
-      - name: concept_code
-      - name: concept_name
+  - name: int_umls_precise_ingredients_to_crosswalk_codes
+    description: Crosswalk of precise ingredients (TTY = PIN) to UMLS codes.
 
-  - name: int_umls_clinical_products_to_snomed_may_prevent
-    description: "RxNorm clinical products that may prevent SNOMED concepts"
-    columns:
-      - name: clinical_product_ndc
-      - name: clinical_product_rxcui
-      - name: clinical_product_name
-      - name: concept_code
-      - name: concept_name
-
-  - name: int_umls_clinical_products_to_snomed_may_treat
-    description: "RxNorm clinical products that may treat SNOMED concepts"
-    columns:
-      - name: clinical_product_ndc
-      - name: clinical_product_rxcui
-      - name: clinical_product_name
-      - name: concept_code
-      - name: concept_name
-
-  - name: int_umls_clinical_products_to_icd10cm_contraindicated
-    description: "RxNorm clinical products that are contraindicated with ICD10CM concepts"
-    columns:
-      - name: clinical_product_ndc
-      - name: clinical_product_rxcui
-      - name: clinical_product_name
-      - name: concept_code
-      - name: concept_name
-
-  - name: int_umls_clinical_products_to_icd10cm_induces
-    description: "RxNorm clinical products that can induce ICD10CM concepts"
-    columns:
-      - name: clinical_product_ndc
-      - name: clinical_product_rxcui
-      - name: clinical_product_name
-      - name: concept_code
-      - name: concept_name
-
-  - name: int_umls_clinical_products_to_icd10cm_may_diagnose
-    description: "RxNorm clinical products that may diagnose ICD10CM concepts"
-    columns:
-      - name: clinical_product_ndc
-      - name: clinical_product_rxcui
-      - name: clinical_product_name
-      - name: concept_code
-      - name: concept_name
-
-  - name: int_umls_clinical_products_to_icd10cm_may_prevent
-    description: "RxNorm clinical products that may prevent ICD10CM concepts"
-    columns:
-      - name: clinical_product_ndc
-      - name: clinical_product_rxcui
-      - name: clinical_product_name
-      - name: concept_code
-      - name: concept_name
-
-  - name: int_umls_clinical_products_to_icd10cm_may_treat
-    description: "RxNorm clinical products that may treat ICD10CM concepts"
-    columns:
-      - name: clinical_product_ndc
-      - name: clinical_product_rxcui
-      - name: clinical_product_name
-      - name: concept_code
-      - name: concept_name
-
-  - name: int_umls_clinical_products_to_icd9cm_contraindicated
-    description: "RxNorm clinical products that are contraindicated with ICD9CM concepts"
-    columns:
-      - name: clinical_product_ndc
-      - name: clinical_product_rxcui
-      - name: clinical_product_name
-      - name: concept_code
-      - name: concept_name
-
-  - name: int_umls_clinical_products_to_icd9cm_induces
-    description: "RxNorm clinical products that can induce ICD9CM concepts"
-    columns:
-      - name: clinical_product_ndc
-      - name: clinical_product_rxcui
-      - name: clinical_product_name
-      - name: concept_code
-      - name: concept_name
-
-  - name: int_umls_clinical_products_to_icd9cm_may_diagnose
-    description: "RxNorm clinical products that may diagnose ICD9CM concepts"
-    columns:
-      - name: clinical_product_ndc
-      - name: clinical_product_rxcui
-      - name: clinical_product_name
-      - name: concept_code
-      - name: concept_name
-
-  - name: int_umls_clinical_products_to_icd9cm_may_prevent
-    description: "RxNorm clinical products that may prevent ICD9CM concepts"
-    columns:
-      - name: clinical_product_ndc
-      - name: clinical_product_rxcui
-      - name: clinical_product_name
-      - name: concept_code
-      - name: concept_name
-
-  - name: int_umls_clinical_products_to_icd9cm_may_treat
-    description: "RxNorm clinical products that may treat ICD9CM concepts"
-    columns:
-      - name: clinical_product_ndc
-      - name: clinical_product_rxcui
-      - name: clinical_product_name
-      - name: concept_code
-      - name: concept_name
+  - name: int_umls_multiple_ingredients_to_crosswalk_codes
+    description: Crosswalk of multiple ingredients (TTY = MIN) to UMLS codes.

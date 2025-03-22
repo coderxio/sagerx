@@ -66,4 +66,3 @@ def load(file_path_str:str):
     df = pd.DataFrame(classes).drop_duplicates()
     print(f'Dataframe created of {len(df)} length.')
     load_df_to_pg(df,"sagerx_lake","rxclass","replace",index=False)
-    

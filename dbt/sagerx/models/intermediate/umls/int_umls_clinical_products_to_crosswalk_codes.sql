@@ -9,7 +9,21 @@ clinical_products as (
     from {{ ref('int_rxnorm_clinical_products_to_ingredient_components') }}
 ),
 
-crosswalk_codes as (
+ingredient_component_crosswalk_codes as (
+
+    select
+        *
+    from {{ ref('int_umls_ingredient_components_to_crosswalk_codes') }}
+),
+
+multiple_ingredient_crosswalk_codes as (
+
+    select
+        *
+    from {{ ref('int_umls_ingredient_components_to_crosswalk_codes') }}
+),
+
+precise_ingredient_crosswalk_codes as (
 
     select
         *
@@ -22,5 +36,5 @@ select
     clinical_products.clinical_product_tty,
     crosswalk_codes.*
 from clinical_products
-inner join crosswalk_codes
-    on crosswalk_codes.ingredient_component_rxcui = clinical_products.ingredient_component_rxcui
+inner join ingredient_component_crosswalk_codes
+    on ingredient_component_crosswalk_codes.ingredient_component_rxcui = clinical_products.ingredient_component_rxcui

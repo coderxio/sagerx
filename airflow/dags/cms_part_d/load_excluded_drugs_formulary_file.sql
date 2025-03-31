@@ -11,8 +11,7 @@ quantity_limit_amount    VARCHAR(8),
 quantity_limit_days    VARCHAR(3),
 prior_auth_yn      VARCHAR(1),
 step_therapy_yn      VARCHAR(1),
-capped_benefit_yn      VARCHAR(1),
-gap_cov      VARCHAR(1)
+capped_benefit_yn      VARCHAR(1)
 );
 
 COPY sagerx_lake.cms_excluded_drugs_formulary

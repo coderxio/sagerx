@@ -30,8 +30,7 @@ cost_min_amt_mail_nonpref  VARCHAR(12),
 cost_max_amt_mail_nonpref  NUMERIC(14,2),
 
 tier_specialty_yn   VARCHAR(1),
-ded_applies_yn   VARCHAR(1),
-gap_cov_tier   VARCHAR(1)
+ded_applies_yn   VARCHAR(1)
 );
 
 COPY sagerx_lake.cms_beneficiary_cost

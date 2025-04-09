@@ -21,3 +21,36 @@ models:
         description: The name of the ATC3 level associated with this product.
       - name: atc_4_name
         description: The name of the ATC4 level associated with this product.
+
+  - name: clinical_products_to_diseases
+    description: |
+      RxNorm clinical product RXCUIs (SCD / GPCK) to MeSH codes,
+      ICD-9 codes, ICD-10 codes, and SNOMED-CT codes.
+
+      This table contains multiple different types of relations
+      between these concepts, including `may_treat`, `may_prevent`,
+      and `ci_with`.
+
+      MeSH codes are more general and the other codes are more specific,
+      allowing for a hierarchy if desired.
+
+      RxClass is used for the relations between RxNorm RXCUIs and
+      MeSH codes.
+
+      UMLS is used for the relations between MeSH and the other types
+      of codes.
+    columns:
+      - name: clinical_product_rxcui
+      - name: clinical_product_name
+      - name: clinical_product_tty
+      - name: via_ingredient_rxcui
+      - name: via_ingredient_name
+      - name: via_ingredient_tty
+      - name: rela
+      - name: rela_source
+      - name: class_id
+      - name: class_name
+      - name: class_type
+      - name: disease_id
+      - name: disease_source
+      - name: to_name as disease_name        

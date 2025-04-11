@@ -1,26 +1,7 @@
 version: 2
 
 models:
-  - name: stg_nadac__all_nadac
-    description: "Deduplicates NADAC data and converts format of some columns."
-    columns:
-      # primary key would be ndc + effective_date
-      - name: ndc
-        description: "The National Drug Code (NDC) is a numerical code maintained by the FDA that includes the labeler code, product code, and package code. The NDC is an 11-digit code."
-        tests:
-          - not_null
-      - name: ndc_description
-        description: "Identifies the drug name, strength, and dosage form of the drug product."
-        tests:
-          - not_null
-      - name: nadac_per_unit
-        description: "The National Average Drug Acquisition Cost per unit. Staging table converts this to a numeric type."
-      - name: pricing_unit
-        description: "Indicates the pricing unit for the associated NDC ('ML', 'GM' or 'EA')."
-      - name: effective_date
-        description: "The effective date of the NADAC Per Unit cost. Staging table converts this to a date type."
-
-  - name: stg_nadac__enhanced_nadac
+  - name: stg_nadac__nadac
     description: "Flags NADAC survey data to make it easy to find most recent price, first price, and dollar / percent changes between prices. Can also SUM change_type to see the number of price increases over time."
     columns:
       - name: ndc

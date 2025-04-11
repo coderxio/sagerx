@@ -1,6 +1,28 @@
--- stg_nadac__enhanced_nadac.sql
+-- stg_nadac__nadac.sql
 
 with
+
+nadac as (
+
+    select distinct 
+		ndc,
+		ndc_description,
+		nadac_per_unit::numeric,
+		pricing_unit,
+		effective_date::date,
+	
+	from {{ source('nadac','nadac') }}
+
+)
+
+select distinct 
+	ndc
+	, ndc_description
+	, nadac_per_unit::numeric
+	, pricing_unit
+	, effective_date::date
+from nadac
+
 
 all_nadac as (
 

@@ -54,7 +54,12 @@ nadac_all_pricing as (
         case when (nadac_per_unit - previous_nadac_per_unit) > 0 then 1
             when (nadac_per_unit - previous_nadac_per_unit) = 0 then 0
             when (nadac_per_unit - previous_nadac_per_unit) is null then null
-            else -1 end as change_type
+            else -1 end as change_type,
+        start_date >= current_date - interval '30 days' as is_within_30_days,
+        start_date >= current_date - interval '60 days' as is_within_60_days,
+        start_date >= current_date - interval '90 days' as is_within_90_days,
+        start_date >= current_date - interval '180 days' as is_within_180_days,
+        start_date >= current_date - interval '365 days' as is_within_365_days
     from ranked_price_start_dates
     order by
         ndc,

@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: openfda
+    schema: sagerx_lake
+    tables:
+      - name: openfda_pregnancy_categories
+        description: |
+          OpenFDA Pregnancy Categories
+          
+          https://open.fda.gov/apis/drug/pregnancy-categories/
+          
+          The FDA has assigned pregnancy categories to drugs based on 
+          their potential risks to a fetus. The categories are:
+          
+          - A: Controlled studies show no risk
+          - B: No evidence of risk in humans
+          - C: Risk cannot be ruled out
+          - D: Positive evidence of risk
+          - X: Contraindicated in pregnancy

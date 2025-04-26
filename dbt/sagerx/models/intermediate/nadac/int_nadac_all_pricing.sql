@@ -38,7 +38,10 @@ nadac_all_pricing as (
         nadac_per_unit,
         pricing_unit,
         start_date,
-        end_date,
+        coalesce(
+            end_date,
+            (select max(end_date) + 7 from ranked_price_start_dates)
+        ) as end_date,
         case 
             when price_line = max_price_line
                 then true 
@@ -51,20 +54,33 @@ nadac_all_pricing as (
             end as is_last_price,
         nadac_per_unit - previous_nadac_per_unit as dollar_change,
         (nadac_per_unit - previous_nadac_per_unit) / previous_nadac_per_unit as percent_change,
-        case when (nadac_per_unit - previous_nadac_per_unit) > 0 then 1
-            when (nadac_per_unit - previous_nadac_per_unit) = 0 then 0
-            when (nadac_per_unit - previous_nadac_per_unit) is null then null
-            else -1 end as change_type,
-        start_date >= current_date - interval '30 days' as is_within_30_days,
-        start_date >= current_date - interval '60 days' as is_within_60_days,
-        start_date >= current_date - interval '90 days' as is_within_90_days,
-        start_date >= current_date - interval '180 days' as is_within_180_days,
-        start_date >= current_date - interval '365 days' as is_within_365_days
+        case
+            when (nadac_per_unit - previous_nadac_per_unit) > 0
+                then 1
+            when (nadac_per_unit - previous_nadac_per_unit) = 0
+                then 0
+            when (nadac_per_unit - previous_nadac_per_unit) is null
+                then null
+            else -1
+            end as change_type
     from ranked_price_start_dates
     order by
         ndc,
         start_date
 
+),
+
+final as (
+
+    select
+        *,
+        end_date >= current_date - interval '30 days' as is_within_30_days,
+        end_date >= current_date - interval '60 days' as is_within_60_days,
+        end_date >= current_date - interval '90 days' as is_within_90_days,
+        end_date >= current_date - interval '180 days' as is_within_180_days,
+        end_date >= current_date - interval '365 days' as is_within_365_days
+    from nadac_all_pricing
+
 )
 
-select * from nadac_all_pricing
+select * from final

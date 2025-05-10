@@ -1,10 +1,10 @@
 version: 2
 
 sources:
-  - name: openfda
+  - name: open_fda
     schema: sagerx_lake
     tables:
-      - name: openfda_pregnancy_categories
+      - name: open_fda_pregnancy_categories
         description: |
           OpenFDA Pregnancy Categories
           

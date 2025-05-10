@@ -85,16 +85,16 @@ def extract(dag_id: str) -> str:
             
             # Process each record in the batch
             for rec in records:
-                openfda = rec.get("openfda", {})
+                open_fda = rec.get("openfda", {})
                 
                 # Skip records without package_ndc
-                if "package_ndc" not in openfda or not openfda["package_ndc"]:
+                if "package_ndc" not in open_fda or not open_fda["package_ndc"]:
                     continue
                 
                 # Get rxcui if available. rxcui is not always available
                 rxcui = None
-                if "rxcui" in openfda and openfda["rxcui"]:
-                    rxcui = openfda["rxcui"][0]
+                if "rxcui" in open_fda and open_fda["rxcui"]:
+                    rxcui = open_fda["rxcui"][0]
                 
                 # Define regex pattern to extract pregnancy category
                 pattern = r"(?:Pregnancy\s+)?Category\s+([ABCDX])\b"
@@ -116,7 +116,7 @@ def extract(dag_id: str) -> str:
                     continue
                 
                 # Get package_ndc values and create a row for each package_ndc
-                for package_ndc in openfda["package_ndc"]:
+                for package_ndc in open_fda["package_ndc"]:
                     # Format the NDC
                     formatted_ndc = format_ndc_to_11_digits(package_ndc)
                     
@@ -165,7 +165,7 @@ def load(file_path_str: str):
     
     logging.info(f"Dataframe created with {len(df)} rows")
     
-    load_df_to_pg(df, "sagerx_lake", "openfda_pregnancy_categories", "replace", index=False)
+    load_df_to_pg(df, "sagerx_lake", "open_fda_pregnancy_categories", "replace", index=False)
     
     logging.info("Data successfully loaded into database")
     return "Data load complete"

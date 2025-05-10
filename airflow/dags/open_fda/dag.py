@@ -1,8 +1,8 @@
 import pendulum
 from airflow.decorators import dag
-from openFDA.dag_tasks import extract, load
+from open_fda.dag_tasks import extract, load
 
-dag_id = "openfda_pregnancy_category"
+dag_id = "open_fda_pregnancy_category"
 
 @dag(
     dag_id=dag_id,
@@ -10,11 +10,11 @@ dag_id = "openfda_pregnancy_category"
     start_date=pendulum.today('UTC').add(days=-1),
     catchup=False
 )
-def openfda():
+def open_fda():
     extract_task = extract(dag_id)
     load_task = load(extract_task)
     
     extract_task >> load_task
 
 # Instantiate the DAG
-dag = openfda()
+dag = open_fda()

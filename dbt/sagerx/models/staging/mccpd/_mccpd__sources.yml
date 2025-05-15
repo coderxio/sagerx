@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: mccpd
+    schema: sagerx_lake
+    tables:
+      - name: mccpd
+        description: >
+          Mark Cuban Cost Plus Drugs pricing.

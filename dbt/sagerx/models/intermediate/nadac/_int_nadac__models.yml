@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: int_nadac_all_pricing
+  - name: int_nadac_historical_pricing
     description: |
       All pricing from NADAC with extra helper columns.
 
@@ -43,11 +43,13 @@ models:
       - name: is_last_price
         description: True if this is the last price for this NDC.
       - name: dollar_change
-        description: The change in price from the previous price.
+        description: The change in price from the previous price, in $.
       - name: percent_change
-        description: The change in price from the previous price.
+        description: The change in price from the previous price, in %.
       - name: change_type
         description: 1 if the price went up / 0 if no change / -1 if the price went down.
+      - name: is_from_latest_release
+        description: True if the as_of_date is the same as the max as_of_date.
       - name: is_within_30_days
         description: True if the price is within 30 days of today.
       - name: is_within_60_days 
@@ -59,11 +61,11 @@ models:
       - name: is_within_365_days
         description: True if the price is within 365 days of today.
 
-  - name: int_nadac_current_pricing
+  - name: int_nadac_pricing
     description: |
-      Exactly the same columns as int_nadac_all_pricing, but
+      Exactly the same columns as int_nadac_historical_pricing, but
       filtered to only include NADAC prices where last_price
-      is true an is_within_365_days is true.
+      is true and is_within_365_days is true.
 
       This is essentially the most recent price for each NDC.
 

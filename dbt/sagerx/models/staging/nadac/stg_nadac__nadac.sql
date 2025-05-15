@@ -15,9 +15,9 @@ nadac as (
 		explanation_code,
 		classification_for_rate_setting,
 		corresponding_generic_drug_nadac_per_unit,
-		corresponding_generic_drug_effective_date,
-		as_of_date
-	from {{ source('nadac','nadac') }}
+		corresponding_generic_drug_effective_date::date,
+		as_of_date::date
+	from {{ source('nadac', 'nadac') }}
 
 )
 

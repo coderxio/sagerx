@@ -13,7 +13,8 @@ current_release as (
 
     select distinct
         ndc,
-        nadac_per_unit
+        nadac_per_unit,
+        effective_date
     from {{ ref('stg_nadac__nadac') }}
     where as_of_date = (select max(as_of_date) from {{ ref('stg_nadac__nadac') }})
 
@@ -30,10 +31,13 @@ most_recent_release as (
 
     we use this CTE to filter out prices where the as_of_date
     increases, but the effective_date decreases
+
+    we also use it to de-duplicate variations in ndc_description
 */
 
     select
         ndc,
+        ndc_description,
         effective_date
     from (
         select
@@ -53,11 +57,15 @@ distinct_nadac_prices as (
     mainly we want to filter out as_of_date which
     is just an indicator of which release the data
     came from
+
+    also - ndc_description can change over time so
+    we exclude it here and pull it instead from the
+    most_recent_release cte
 */
 
     select distinct
 		nadac.ndc,
-		nadac.ndc_description,
+        most_recent_release.ndc_description,
 		nadac.nadac_per_unit,
 		nadac.pricing_unit,
 		nadac.effective_date,
@@ -80,11 +88,18 @@ ranked_price_start_dates as (
 	
 	select 
 		ndc,
-		ndc_description,
+        ndc_description,
 		nadac_per_unit,
 		pricing_unit,
 		effective_date as start_date,
-		lag(effective_date, 1) over (partition by ndc order by effective_date desc) as end_date,
+        -- the most recent effective_date will normally have null for an end_date
+        -- however - the end date is really the last time that price was in a NADAC release
+        -- this coalesce handles that and adds 7 days to the most recent as_of_date to
+        -- account for the price being valid during the week of the most recent release
+		coalesce(
+            lag(effective_date, 1) over (partition by ndc order by effective_date desc),
+            max_as_of_for_price_and_effective_date + 7
+        ) as end_date,
         lag(nadac_per_unit, 1) over (partition by ndc order by effective_date asc) as previous_nadac_per_unit,
         row_number() over (partition by ndc order by max_as_of_for_price_and_effective_date desc) as price_line,
         count(*) over (partition by ndc) as max_price_line
@@ -100,10 +115,7 @@ nadac_historical_pricing as (
         nadac_per_unit,
         pricing_unit,
         start_date,
-        coalesce(
-            end_date,
-            (select max(end_date) + 7 from ranked_price_start_dates)
-        ) as end_date,
+        end_date,
         case 
             when price_line = max_price_line
                 then true 
@@ -149,6 +161,7 @@ final as (
     left join current_release
         on current_release.ndc = nadac_historical_pricing.ndc
         and current_release.nadac_per_unit = nadac_historical_pricing.nadac_per_unit
+        and current_release.effective_date = nadac_historical_pricing.start_date
     order by start_date desc
 
 )

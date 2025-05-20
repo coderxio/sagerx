@@ -21,9 +21,13 @@ models:
         tests:
           - not_null
       - name: ndc_description
-        description: The NADAC description of the product.
+        description: |
+          The NADAC description of the product.
+
+          If NADAC has 2 different descriptions of a given NDC
+          over time, we take the one from the most recent release.
       - name: nadac_per_unit
-        description: The NADAC (pricing) per unit of the product.
+        description: The NADAC (pricing / cost) per unit of the product.
         tests:
           - not_null
       - name: pricing_unit 
@@ -37,7 +41,16 @@ models:
           The date this price ends, if historical.
 
           If the price is the most recent price, this will be
-          NULL because there isn't a date when the price ends (yet).
+          the most recent release date (as_of_date) + 7 days because
+          presumably that price is valid until the next release which
+          is weekly.
+
+          For prices that are no longer in the current release, the most
+          recent end_date will be 7 days after the most recent release
+          where this price was included.
+
+          For prices that change over time for a given NDC, this date will
+          be the date the price changed.
       - name: is_first_price
         description: True if this is the first price for this NDC.
       - name: is_last_price
@@ -48,24 +61,26 @@ models:
         description: The change in price from the previous price, in %.
       - name: change_type
         description: 1 if the price went up / 0 if no change / -1 if the price went down.
-      - name: is_from_latest_release
-        description: True if the as_of_date is the same as the max as_of_date.
+      - name: is_from_current_release
+        description: |
+          True if the pricing information for the given NDC is in
+          the most recent release of NADAC.
       - name: is_within_30_days
-        description: True if the price is within 30 days of today.
+        description: True if the price is within the past 30 days of today.
       - name: is_within_60_days 
-        description: True if the price is within 60 days of today.
+        description: True if the price is within the past 60 days of today.
       - name: is_within_90_days
-        description: True if the price is within 90 days of today.
+        description: True if the price is within the past 90 days of today.
       - name: is_within_180_days
-        description: True if the price is within 180 days of today.
+        description: True if the price is within the past 180 days of today.
       - name: is_within_365_days
-        description: True if the price is within 365 days of today.
+        description: True if the price is within the past 365 days of today.
 
   - name: int_nadac_pricing
     description: |
       Exactly the same columns as int_nadac_historical_pricing, but
       filtered to only include NADAC prices where last_price
-      is true and is_within_365_days is true.
+      is true.
 
       This is essentially the most recent price for each NDC.
 

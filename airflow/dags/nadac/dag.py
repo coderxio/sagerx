@@ -77,7 +77,7 @@ def nadac():
             )
         )
 
-    transform_task = transform(dag_id)
+    transform_task = transform(dag_id, models_subdir=['staging', 'intermediate'])
 
     extract() >> load >> transform_task
 

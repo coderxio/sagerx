@@ -94,11 +94,11 @@ ranked_price_start_dates as (
 		effective_date as start_date,
         -- the most recent effective_date will normally have null for an end_date
         -- however - the end date is really the last time that price was in a NADAC release
-        -- this coalesce handles that and adds 7 days to the most recent as_of_date to
+        -- this coalesce handles that and adds 6 days to the most recent as_of_date to
         -- account for the price being valid during the week of the most recent release
 		coalesce(
-            lag(effective_date, 1) over (partition by ndc order by effective_date desc),
-            max_as_of_for_price_and_effective_date + 7
+            lag(effective_date, 1) over (partition by ndc order by effective_date desc) - 1,
+            max_as_of_for_price_and_effective_date + 6
         ) as end_date,
         lag(nadac_per_unit, 1) over (partition by ndc order by effective_date asc) as previous_nadac_per_unit,
         row_number() over (partition by ndc order by max_as_of_for_price_and_effective_date desc) as price_line,

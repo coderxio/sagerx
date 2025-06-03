@@ -66,6 +66,19 @@ services:
     volumes:
       - ./pgadmin/servers.json:/pgadmin4/servers.json
 
+  streamlit:
+    build:
+      context: ./streamlit
+    container_name: streamlit
+    ports:
+      - "8501:8501"
+    environment:
+      - DATABASE_URL=postgresql://sagerx:sagerx@localhost:5432
+    depends_on:
+      - postgres
+    volumes:
+      - ./streamlit:/app
+
   dbt:
     build:
       context: ./dbt

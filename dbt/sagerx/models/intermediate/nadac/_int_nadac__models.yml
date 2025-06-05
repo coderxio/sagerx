@@ -1,0 +1,94 @@
+version: 2
+
+models:
+  - name: int_nadac_historical_pricing
+    description: |
+      All pricing from NADAC with extra helper columns.
+
+      We deduplicate rows - mostly by ignoring the as_of column.
+
+      We add some useful helper columns:
+      - end_date - when the price in this row ends (if historical)
+      - is_first_price - is this the first price for this NDC?
+      - is_last_price - is this the last price for this NDC?
+      - dollar_change - the change in price from the previous price
+      - percent_change - the change in price from the previous price
+      - change_type - 1 if the price went up / 0 if no change / -1 if the price went down
+      - a variety of columns for different lookbacks so it's easy to filter out older prices
+    columns:
+      - name: ndc
+        description: The NDC11 of the product.
+        tests:
+          - not_null
+      - name: ndc_description
+        description: |
+          The NADAC description of the product.
+
+          If NADAC has 2 different descriptions of a given NDC
+          over time, we take the one from the most recent release.
+      - name: nadac_per_unit
+        description: The NADAC (pricing / cost) per unit of the product.
+        tests:
+          - not_null
+      - name: pricing_unit 
+        description: The unit used for pricing (EA / GM / ML).
+        tests:
+          - not_null
+      - name: start_date
+        description: The effective_date of the nadac_per_unit.
+      - name: end_date
+        description: |
+          The date this price ends, if historical.
+
+          If the price is the most recent price, this will be
+          the most recent release date (as_of_date) + 7 days because
+          presumably that price is valid until the next release which
+          is weekly.
+
+          For prices that are no longer in the current release, the most
+          recent end_date will be 7 days after the most recent release
+          where this price was included.
+
+          For prices that change over time for a given NDC, this date will
+          be the date the price changed.
+      - name: is_first_price
+        description: True if this is the first price for this NDC.
+      - name: is_last_price
+        description: True if this is the last price for this NDC.
+      - name: dollar_change
+        description: The change in price from the previous price, in $.
+      - name: percent_change
+        description: The change in price from the previous price, in %.
+      - name: change_type
+        description: 1 if the price went up / 0 if no change / -1 if the price went down.
+      - name: is_from_current_release
+        description: |
+          True if the pricing information for the given NDC is in
+          the most recent release of NADAC.
+      - name: is_within_30_days
+        description: True if the price is within the past 30 days of today.
+      - name: is_within_60_days 
+        description: True if the price is within the past 60 days of today.
+      - name: is_within_90_days
+        description: True if the price is within the past 90 days of today.
+      - name: is_within_180_days
+        description: True if the price is within the past 180 days of today.
+      - name: is_within_365_days
+        description: True if the price is within the past 365 days of today.
+
+  - name: int_nadac_pricing
+    description: |
+      Exactly the same columns as int_nadac_historical_pricing, but
+      filtered to only include NADAC prices where last_price
+      is true.
+
+      This is essentially the most recent price for each NDC.
+
+      There are columns to allow you to filter down to only
+      last_price prices within 30, 60, 90, 180, and 365 days.
+    columns:
+      - name: ndc
+        description: The NDC11 of the product.
+        tests:
+          - not_null
+          - unique

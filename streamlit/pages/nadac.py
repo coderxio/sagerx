@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import psycopg2
+import plotly.express as px
+import random
 
 # Set page config
 st.set_page_config(
@@ -9,6 +11,10 @@ st.set_page_config(
     page_icon="💊",
     layout="wide"
 )
+
+# Initialize session state for random selection
+if 'random_ingredient' not in st.session_state:
+    st.session_state.random_ingredient = None
 
 # Database connection configuration
 DATABASE_CONFIG = {
@@ -37,7 +43,7 @@ def get_database_connection():
 
 @st.cache_data
 def load_ingredient_options() -> pd.DataFrame:
-    """Load all available ingredients."""
+    """Load all available ingredients from historical pricing data."""
     conn = get_database_connection()
     if conn is None:
         return pd.DataFrame()
@@ -45,7 +51,7 @@ def load_ingredient_options() -> pd.DataFrame:
     try:
         query = """
         SELECT DISTINCT ingredient_name
-        FROM sagerx_dev.int_rxnorm_clinical_products_to_ingredients
+        FROM sagerx_dev.int_nadac_historical_pricing
         WHERE ingredient_name IS NOT NULL
         ORDER BY ingredient_name
         """
@@ -66,27 +72,12 @@ def load_price_data(selected_ingredient: str) -> pd.DataFrame:
     try:
         query = """
         select
-            ing.ingredient_name,
-            case
-                when prod.product_tty in ('SCD', 'GPCK')
-                    then 'Generic'
-                when prod.product_tty in ('SBD', 'BPCK')
-                    then 'Brand'
-                else 'Unknown'
-            end as generic_brand_indicator,
-            nadac.ndc,
-            nadac.ndc_description,
-            nadac.price_start_date,
-            nadac.nadac_per_unit
-        from sagerx_dev.stg_nadac__enhanced_nadac nadac
-        left join sagerx_dev.int_rxnorm_ndcs_to_products prod
-            on prod.ndc = nadac.ndc
-        left join sagerx_dev.int_rxnorm_clinical_products_to_ingredients ing
-            on ing.clinical_product_rxcui = prod.clinical_product_rxcui
-        WHERE ing.ingredient_name = %s
-        AND nadac.price_start_date IS NOT NULL
-        AND nadac.nadac_per_unit IS NOT NULL
-        ORDER BY nadac.price_start_date
+            *
+        from sagerx_dev.int_nadac_historical_pricing nadac
+        WHERE ingredient_name = %s
+        AND start_date IS NOT NULL
+        AND nadac_per_unit IS NOT NULL
+        ORDER BY start_date
         """
         
         df = pd.read_sql_query(query, conn, params=[selected_ingredient])
@@ -94,7 +85,7 @@ def load_price_data(selected_ingredient: str) -> pd.DataFrame:
         
         # Convert date column to datetime and ensure numeric types
         if not df.empty:
-            df['price_start_date'] = pd.to_datetime(df['price_start_date'])
+            df['start_date'] = pd.to_datetime(df['start_date'])
             df['nadac_per_unit'] = df['nadac_per_unit'].astype(float)
             
         return df
@@ -104,7 +95,7 @@ def load_price_data(selected_ingredient: str) -> pd.DataFrame:
 
 def main():
     st.title("💊 NADAC Price Visualization")
-    st.markdown("Search for a drug ingredient to view price trends across all NDCs")
+    st.markdown("Search for a drug ingredient to view price trends")
     
     # Load ingredient options
     with st.spinner("Loading ingredient options..."):
@@ -115,12 +106,35 @@ def main():
         return
     
     # Search interface
-    selected_ingredient = st.selectbox(
-        "Search and select an ingredient:",
-        options=ingredient_df['ingredient_name'].tolist(),
-        index=None,
-        placeholder="Start typing to search..."
-    )
+    st.markdown("""
+        <style>
+        /* Align button with selectbox */
+        div[data-testid="column"]:nth-of-type(2) {
+            display: flex;
+            align-items: flex-end;
+        }
+        div[data-testid="column"] > div.stButton > button {
+            height: 42px;      /* Matches the height of the selectbox input */
+        }
+        </style>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns([4, 1])
+    
+    # Random button first to ensure it updates before selectbox
+    with col2:
+        if st.button("🎲 Random", help="Select a random ingredient", use_container_width=True):
+            st.session_state.random_ingredient = random.choice(ingredient_df['ingredient_name'].tolist())
+    
+    with col1:
+        selected_ingredient = st.selectbox(
+            "Search and select an ingredient:",
+            options=ingredient_df['ingredient_name'].tolist(),
+            index=None if st.session_state.random_ingredient is None else ingredient_df['ingredient_name'].tolist().index(st.session_state.random_ingredient),
+            placeholder="Start typing to search..."
+        )
+        # Clear random selection after it's been used
+        st.session_state.random_ingredient = None
     
     if not selected_ingredient:
         st.info("Please select an ingredient to view price trends.")
@@ -134,79 +148,135 @@ def main():
         st.error(f"No price data available for {selected_ingredient}")
         return
 
+    # Product filter
+    st.markdown("---")
+    st.markdown("### Filter Products")
+    
+    # Custom CSS to make multiselect pills wider
+    st.markdown("""
+        <style>
+        /* Make multiselect pills take full width */
+        .stMultiSelect [data-baseweb="tag"] {
+            max-width: 100% !important;
+            white-space: normal !important;
+            height: auto !important;
+            padding: 5px 10px !important;
+            margin: 2px !important;
+        }
+        /* Ensure text inside pills doesn't get cut off */
+        .stMultiSelect [data-baseweb="tag"] span {
+            white-space: normal !important;
+            overflow: visible !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+    
+    # Get unique products
+    unique_products = sorted(price_df['product_name'].unique())
+    
+    selected_products = st.multiselect(
+        "Select products to display (defaults to all):",
+        options=unique_products,
+        default=unique_products,
+        help="You can remove products from the visualization by deselecting them here"
+    )
+    
+    # Filter the dataframe based on selected products
+    filtered_df = price_df[price_df['product_name'].isin(selected_products)]
+
+    if filtered_df.empty:
+        st.warning("No data to display for the selected products. Please select at least one product.")
+        return
+
     # Create price trend chart
     fig = go.Figure()
     
-    # Plot lines for each NDC, colored by generic/brand status
-    for ndc in price_df['ndc'].unique():
-        ndc_data = price_df[price_df['ndc'] == ndc]
-        color = '#1f77b4' if ndc_data['generic_brand_indicator'].iloc[0] == 'Generic' else '#ff7f0e'
+    # Get unique products and assign colors using Plotly's default color sequence
+    unique_products = sorted(filtered_df['product_name'].unique())
+    colors = px.colors.qualitative.Set3[:len(unique_products)]  # Using Set3 color palette
+    color_map = dict(zip(unique_products, colors))
+    
+    # Calculate average price per product per date
+    avg_prices = filtered_df.groupby(['product_name', 'start_date', 'generic_brand_indicator'])['nadac_per_unit'].mean().reset_index()
+    
+    # Plot average price line for each product
+    for product in unique_products:
+        product_data = avg_prices[avg_prices['product_name'] == product]
+        product_color = color_map[product]
+        product_type = product_data['generic_brand_indicator'].iloc[0]
+        
+        # Get NDC count for this product for hover info
+        ndc_count = len(filtered_df[filtered_df['product_name'] == product]['ndc'].unique())
         
         # Convert to lists to ensure proper plotting
-        x_values = ndc_data['price_start_date'].tolist()
-        y_values = ndc_data['nadac_per_unit'].tolist()
+        x_values = product_data['start_date'].tolist()
+        y_values = product_data['nadac_per_unit'].tolist()
         
         fig.add_trace(
             go.Scatter(
                 x=x_values,
                 y=y_values,
                 mode='lines+markers',
-                name=f"{ndc} - {ndc_data['generic_brand_indicator'].iloc[0]}",
-                line=dict(color=color),
+                name=f"{product} ({product_type})",
+                line=dict(color=product_color),
                 hovertemplate=(
                     "<b>Date:</b> %{x}<br>" +
-                    "<b>Price:</b> $%{y:.4f}<br>" +
-                    "<b>NDC:</b> " + ndc + "<br>" +
-                    "<b>Type:</b> " + ndc_data['generic_brand_indicator'].iloc[0] +
+                    "<b>Average Price:</b> $%{y:.4f}<br>" +
+                    "<b>Product:</b> " + product + "<br>" +
+                    "<b>Type:</b> " + product_type + "<br>" +
+                    "<b>NDCs Averaged:</b> " + str(ndc_count) +
                     "<extra></extra>"
                 )
             )
         )
     
     # Calculate y-axis range with padding
-    y_min = price_df['nadac_per_unit'].min()
-    y_max = price_df['nadac_per_unit'].max()
+    y_min = avg_prices['nadac_per_unit'].min()
+    y_max = avg_prices['nadac_per_unit'].max()
     y_padding = (y_max - y_min) * 0.1
     
     # Update layout
     fig.update_layout(
-        title=f"NADAC Price Trends for {selected_ingredient}",
+        title=f"Average NADAC Price Trends by Product for {selected_ingredient}",
         height=600,
-        hovermode='x unified',
+        hovermode='closest',
         xaxis_title="Price Start Date",
-        yaxis_title="NADAC Price per Unit (USD)",
+        yaxis_title="Average NADAC Price per Unit (USD)",
         yaxis=dict(
             tickformat='$.4f',
             range=[y_min - y_padding, y_max + y_padding]
         ),
         showlegend=True,
-        legend_title="NDC - Type"
+        legend_title="Product (Type)"
     )
     
     st.plotly_chart(fig, use_container_width=True)
     
     # Display summary statistics
     st.subheader("Summary Statistics")
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.metric("Total NDCs", len(price_df['ndc'].unique()))
+        st.metric("Selected Products", len(filtered_df['product_name'].unique()))
     
     with col2:
-        generic_count = len(price_df[price_df['generic_brand_indicator'] == 'Generic']['ndc'].unique())
-        st.metric("Generic NDCs", generic_count)
+        st.metric("Total NDCs", len(filtered_df['ndc'].unique()))
     
     with col3:
-        brand_count = len(price_df[price_df['generic_brand_indicator'] == 'Brand']['ndc'].unique())
-        st.metric("Brand NDCs", brand_count)
+        st.metric("Average NDCs per Product", f"{len(filtered_df['ndc'].unique()) / len(filtered_df['product_name'].unique()):.1f}")
     
-    # Display raw data table
+    with col4:
+        latest_date = filtered_df['start_date'].max()
+        latest_avg = filtered_df[filtered_df['start_date'] == latest_date]['nadac_per_unit'].mean()
+        st.metric("Latest Average Price", f"${latest_avg:.4f}")
+    
+    # Display raw data table with averages
     with st.expander("View Raw Data"):
-        st.write("Detailed price data:")
-        display_df = price_df[['price_start_date', 'ndc', 'generic_brand_indicator', 'nadac_per_unit']].copy()
+        st.write("Average price data by product:")
+        display_df = avg_prices.copy()
         display_df['nadac_per_unit_formatted'] = display_df['nadac_per_unit'].apply(lambda x: f"${x:.4f}")
         st.dataframe(
-            display_df.sort_values(['generic_brand_indicator', 'ndc', 'price_start_date']),
+            display_df.sort_values(['generic_brand_indicator', 'product_name', 'start_date']),
             use_container_width=True
         )
 

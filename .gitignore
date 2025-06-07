@@ -19,3 +19,6 @@ plugins
 
 # GCP
 gcp.json
+
+# VSCode
+.vscode

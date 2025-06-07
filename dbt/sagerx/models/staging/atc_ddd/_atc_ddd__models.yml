@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_atc_ddd__atc_ddd
+    description: All RxCUIs that have DDD according to the World Health Organization
+    columns:
+      - name: rxcui
+      - name: atc_code
+      - name: name
+      - name: tty
+      - name: ddd
+      - name: uom
+      - name: adm_route
+      - name: note

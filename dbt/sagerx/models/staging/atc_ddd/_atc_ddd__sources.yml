@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: atc_ddd
+    schema: sagerx_lake
+    tables:
+      - name: atc_ddd
+  - name: rxnorm
+    schema: sagerx_lake
+    tables:
+      - name: rxnorm_rxnconso

@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: int_atcddd_clinical_products_to_ddd
+    columns:
+      - name: clinical_product_rxcui
+      - name: clinical_product_name
+      - name: clinical_product_tty
+      - name: clinical_product_component_rxcui
+      - name: clinical_product_compnent_name
+      - name: clinical_product_component_tty
+      - name: dose_form_rxcui
+      - name: dose_form_name
+      - name: dose_form_tty
+      - name: ingredient_rxcui
+      - name: ingredient_name
+      - name: ingredient_tty
+      - name: ingredient_component_rxcui
+      - name: ingredient_component_name
+      - name: ingredient_component_tty
+      - name: active
+      - name: prescribable
+      - name: ddd
+      - name: uom
+      - name: adm_route
+      - name: note

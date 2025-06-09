@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: stg_atc_ddd__atc_ddd
+  - name: stg_atcddd__ingredient_to_ddd
     description: All RxCUIs that have DDD according to the World Health Organization
     columns:
       - name: rxcui

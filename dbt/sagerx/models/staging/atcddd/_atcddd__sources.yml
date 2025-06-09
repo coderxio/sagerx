@@ -5,7 +5,3 @@ sources:
     schema: sagerx_lake
     tables:
       - name: atc_ddd
-  - name: rxnorm
-    schema: sagerx_lake
-    tables:
-      - name: rxnorm_rxnconso

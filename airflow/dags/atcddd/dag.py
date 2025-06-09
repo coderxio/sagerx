@@ -3,7 +3,7 @@ from airflow.decorators import dag
 from atcddd.dag_tasks import extract, load
 from common_dag_tasks import transform
 
-dag_id = "atc_ddd"
+dag_id = "atcddd"
 
 @dag(
     dag_id=dag_id,

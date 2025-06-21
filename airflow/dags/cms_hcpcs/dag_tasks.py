@@ -18,7 +18,7 @@ def load(file_path_str:str):
     
     # Use the first matching file
     file_path = matching_files[0]
-    df = pd.read_excel(file_path, header=8)  # Skip first 8 rows, use row 9 as header
+    df = pd.read_excel(file_path)  # Skip first 8 rows, use row 9 as header
     # convert all column names to snake_case
     df.columns = df.columns.str.lower().str.replace(' ', '_')
     load_df_to_pg(df,"sagerx_lake","cms_hcpcs","replace",index=False)

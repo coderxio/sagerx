@@ -12,21 +12,31 @@ st.set_page_config(
     layout="wide"
 )
 
-# Initialize session state and refresh data daily
-if ('benchmark_data' not in st.session_state or 
-    'last_refresh' not in st.session_state or 
-    (datetime.now() - st.session_state.last_refresh).days >= 1):
-    
-    # Load benchmark data from Google Drive
-    GOOGLE_DRIVE_URL = "https://drive.google.com/uc?export=download&id=14E4GjYssrOSApFg5dY18nmwSpQeG0e8Q"
+# Initialize session state
+if 'benchmark_data' not in st.session_state:
+    st.session_state.benchmark_data = None
+    st.session_state.last_refresh = None
+    st.session_state.loading_benchmark = True
 
+@st.cache_data(ttl=86400)  # Cache for 24 hours
+def load_benchmark_data():
+    """Load benchmark data from Google Drive with caching"""
+    GOOGLE_DRIVE_URL = "https://drive.google.com/uc?export=download&id=14E4GjYssrOSApFg5dY18nmwSpQeG0e8Q"
     try:
-        st.session_state.benchmark_data = pd.read_csv(GOOGLE_DRIVE_URL)
-        st.session_state.last_refresh = datetime.now()
+        return pd.read_csv(GOOGLE_DRIVE_URL)
     except Exception as e:
         st.error(f"Failed to load benchmark data: {e}")
-        # Fallback to empty DataFrame
+        return pd.DataFrame()
+
+# Load benchmark data if needed
+if st.session_state.loading_benchmark:
+    try:
+        st.session_state.benchmark_data = load_benchmark_data()
+        st.session_state.last_refresh = datetime.now()
+        st.session_state.loading_benchmark = False
+    except:
         st.session_state.benchmark_data = pd.DataFrame()
+        st.session_state.loading_benchmark = False
 
 def clean_ndc(ndc):
     """Clean and standardize NDC numbers"""
@@ -126,12 +136,9 @@ def compare_prices(invoice_df, benchmark_df, threshold_percent=20):
 def create_sample_invoice():
     """Create a sample invoice file for testing"""
     sample_data = {
-        'NDC Number': ['0069-2587-68', '0173-0687-55', '0378-3915-93', '0093-0058-01', '0781-5092-01'],
-        'Drug Name': ['Lipitor 20mg Tablets', 'Metformin 500mg Tablets', 'Lisinopril 10mg Tablets', 
-                     'Amlodipine 5mg Tablets', 'Atorvastatin 20mg Generic'],
-        'Quantity': [30, 60, 90, 30, 30],
-        'Unit Cost': [1.85, 0.25, 0.15, 0.18, 1.45],  # Some higher than benchmark
-        'Total Cost': [55.50, 15.00, 13.50, 5.40, 43.50]
+        'NDC/UPC': ['27808026401', '83324008001', '72664061128', '42806040021', '43547040650'],
+        'Cost': [5.350, 2.680, 139.740, 2.210, 113.250],
+        'Ship Size': ['(1) 120.00 EA', '(1) 100.00 EA', '(1) 2.80 ML', '(1) 21.00 EA', '(1) 500.00 EA']
     }
     return pd.DataFrame(sample_data)
 
@@ -220,6 +227,11 @@ def validate_and_parse_uploaded_file(df):
 st.title("💊 Pharmacy Invoice Analyzer")
 st.markdown("Upload your medication purchasing invoices to identify potential overpayments compared to benchmark prices.")
 
+# Show loading indicator if benchmark data is still loading
+if st.session_state.loading_benchmark:
+    with st.spinner("Loading benchmark data..."):
+        st.info("Please wait while we load the latest benchmark data. This may take a few seconds on first load.")
+
 # Sidebar for settings
 st.sidebar.header("Settings")
 threshold = st.sidebar.slider("Price Difference Threshold (%)", 5, 50, 20)
@@ -265,108 +277,114 @@ with tab1:
                     st.error("\n".join(errors))
                 else:
                     st.success(f"File uploaded successfully! Found {len(df)} rows. Validated {len(parsed_df)} rows.")
-                    # --- JOIN with benchmark data and compare ---
-                    bench = st.session_state.benchmark_data
-                    bench = bench.copy()
-                    bench['ndc'] = bench['ndc'].astype(str).str.zfill(11)
-                    merged = pd.merge(parsed_df, bench, on='ndc', how='left', suffixes=('', '_benchmark'))
-                    merged['nadac_per_unit'] = pd.to_numeric(merged['nadac_per_unit'], errors='coerce')
-                    merged['unit_cost'] = pd.to_numeric(merged['unit_cost'], errors='coerce')
-                    # Calculate price comparison columns
-                    merged['percent_diff'] = ((merged['unit_cost'] - merged['nadac_per_unit']) / merged['nadac_per_unit']) * 100
-                    merged['unit_cost_diff'] = merged['unit_cost'] - merged['nadac_per_unit']
-                    # Compute sd_diff (z-score of percent_diff)
-                    percent_diff_mean = merged['percent_diff'].mean()
-                    percent_diff_std = merged['percent_diff'].std(ddof=0)
-                    merged['sd_diff'] = (merged['percent_diff'] - percent_diff_mean) / percent_diff_std if percent_diff_std != 0 else 0
-                    merged['is_more_than_nadac'] = merged['unit_cost'] > merged['nadac_per_unit']
-                    # Add unit_mismatch column: yellow warning if unit_type != pricing_unit
-                    merged['unit_mismatch'] = np.where(
-                        (merged['unit_type'].notna()) & (merged['pricing_unit'].notna()) & (merged['unit_type'] != merged['pricing_unit']),
-                        '⚠',
-                        ''
-                    )
-                    # Rename columns and add total_cost_diff
-                    merged = merged.rename(columns={
-                        'percent_diff': 'percent_diff',
-                        'unit_cost_diff': 'unit_cost_diff',
-                        'sd_diff': 'sd_diff'
-                    })
-                    merged['total_cost_diff'] = merged['unit_cost_diff'] * merged['pack_qty'] * merged['unit_size']
-                    # Add diff_icon column to the left of percent_diff
-                    def diff_icon(val, threshold):
-                        if pd.isnull(val):
+                    
+                    # Check if benchmark data is available
+                    if st.session_state.benchmark_data is None or st.session_state.benchmark_data.empty:
+                        st.warning("⚠️ Benchmark data is not available. Please check the 'Benchmark Data' tab for status.")
+                        st.dataframe(parsed_df)
+                    else:
+                        # --- JOIN with benchmark data and compare ---
+                        bench = st.session_state.benchmark_data
+                        bench = bench.copy()
+                        bench['ndc'] = bench['ndc'].astype(str).str.zfill(11)
+                        merged = pd.merge(parsed_df, bench, on='ndc', how='left', suffixes=('', '_benchmark'))
+                        merged['nadac_per_unit'] = pd.to_numeric(merged['nadac_per_unit'], errors='coerce')
+                        merged['unit_cost'] = pd.to_numeric(merged['unit_cost'], errors='coerce')
+                        # Calculate price comparison columns
+                        merged['percent_diff'] = ((merged['unit_cost'] - merged['nadac_per_unit']) / merged['nadac_per_unit']) * 100
+                        merged['unit_cost_diff'] = merged['unit_cost'] - merged['nadac_per_unit']
+                        # Compute sd_diff (z-score of percent_diff)
+                        percent_diff_mean = merged['percent_diff'].mean()
+                        percent_diff_std = merged['percent_diff'].std(ddof=0)
+                        merged['sd_diff'] = (merged['percent_diff'] - percent_diff_mean) / percent_diff_std if percent_diff_std != 0 else 0
+                        merged['is_more_than_nadac'] = merged['unit_cost'] > merged['nadac_per_unit']
+                        # Add unit_mismatch column: yellow warning if unit_type != pricing_unit
+                        merged['unit_mismatch'] = np.where(
+                            (merged['unit_type'].notna()) & (merged['pricing_unit'].notna()) & (merged['unit_type'] != merged['pricing_unit']),
+                            '⚠',
+                            ''
+                        )
+                        # Rename columns and add total_cost_diff
+                        merged = merged.rename(columns={
+                            'percent_diff': 'percent_diff',
+                            'unit_cost_diff': 'unit_cost_diff',
+                            'sd_diff': 'sd_diff'
+                        })
+                        merged['total_cost_diff'] = merged['unit_cost_diff'] * merged['pack_qty'] * merged['unit_size']
+                        # Add diff_icon column to the left of percent_diff
+                        def diff_icon(val, threshold):
+                            if pd.isnull(val):
+                                return ''
+                            if val > threshold:
+                                return '▲▲'
+                            if val > 0:
+                                return '▲'
+                            elif val < 0:
+                                return '▼'
+                            elif val == 0:
+                                return '–'
                             return ''
-                        if val > threshold:
-                            return '▲▲'
-                        if val > 0:
-                            return '▲'
-                        elif val < 0:
-                            return '▼'
-                        elif val == 0:
-                            return '–'
-                        return ''
-                    merged['diff_icon'] = merged['percent_diff'].apply(lambda v: diff_icon(v, threshold))
-                    # Reorder columns: ndc, nadac_description, analysis, then invoice, then other benchmark columns
-                    # nadac_description comes from benchmark data, do not duplicate
-                    analysis_cols = [
-                        'diff_icon',
-                        'percent_diff',
-                        'unit_cost_diff',
-                        'total_cost_diff',
-                        'sd_diff',
-                        'unit_mismatch',
-                        'is_more_than_nadac'
-                    ]
-                    invoice_cols = ['cost', 'ship_size', 'pack_qty', 'unit_size', 'unit_cost', 'unit_type']
-                    # ndc and nadac_description first
-                    first_cols = ['ndc', 'nadac_description']
-                    # All other columns, excluding those already in first_cols, analysis_cols, or invoice_cols
-                    exclude_cols = set(first_cols + analysis_cols + invoice_cols)
-                    other_cols = [c for c in merged.columns if c not in exclude_cols]
-                    # Build final column order
-                    final_cols = first_cols + analysis_cols + invoice_cols + other_cols
-                    display_df = merged[final_cols].copy()
-                    display_df = display_df.sort_values(by='percent_diff', ascending=False, na_position='last')
-
-                    # Center and color the diff_icon and unit_mismatch columns
-                    def icon_style(val, percent=None, colname=None):
-                        if colname == 'diff_icon':
-                            if val == '▲▲':
-                                return 'color: #d62727; text-align: center; font-size: 1.2em; font-weight: bold;'
-                            if val == '▲' and percent is not None:
-                                intensity = min(1, abs(percent) / 100)
-                                r = 255
-                                g = int(100 * (1 - intensity))
-                                b = int(100 * (1 - intensity))
-                                return f'color: rgb({r},{g},{b}); text-align: center; font-size: 1.2em;'
-                            elif val == '▼' and percent is not None:
-                                intensity = min(1, abs(percent) / 100)
-                                r = int(100 * (1 - intensity))
-                                g = 180
-                                b = int(100 * (1 - intensity))
-                                return f'color: rgb({r},{g},{b}); text-align: center; font-size: 1.2em;'
-                            elif val == '–':
-                                return 'color: #888; text-align: center; font-size: 1.2em;'
-                            else:
-                                return 'text-align: center; font-size: 1.2em;'
-                        elif colname == 'unit_mismatch':
-                            if val == '⚠':
-                                return 'color: #e6b800; text-align: center; font-size: 1.2em;'
-                            else:
-                                return 'text-align: center; font-size: 1.2em;'
-                        return ''
-
-                    def diff_icon_styler(col):
-                        return [icon_style(icon, percent, 'diff_icon') for icon, percent in zip(display_df['diff_icon'], display_df['percent_diff'])]
-                    def unit_mismatch_styler(col):
-                        return [
-                            'color: #e6b800; text-align: center; font-size: 1.2em;' if v == '⚠' else 'text-align: center; font-size: 1.2em;'
-                            for v in display_df['unit_mismatch']
+                        merged['diff_icon'] = merged['percent_diff'].apply(lambda v: diff_icon(v, threshold))
+                        # Reorder columns: ndc, nadac_description, analysis, then invoice, then other benchmark columns
+                        # nadac_description comes from benchmark data, do not duplicate
+                        analysis_cols = [
+                            'diff_icon',
+                            'percent_diff',
+                            'unit_cost_diff',
+                            'total_cost_diff',
+                            'sd_diff',
+                            'unit_mismatch',
+                            'is_more_than_nadac'
                         ]
-                    styled = display_df.style.apply(diff_icon_styler, subset=['diff_icon']) \
-                                             .apply(unit_mismatch_styler, subset=['unit_mismatch'])
-                    st.dataframe(styled, use_container_width=True)
+                        invoice_cols = ['cost', 'ship_size', 'pack_qty', 'unit_size', 'unit_cost', 'unit_type']
+                        # ndc and nadac_description first
+                        first_cols = ['ndc', 'nadac_description']
+                        # All other columns, excluding those already in first_cols, analysis_cols, or invoice_cols
+                        exclude_cols = set(first_cols + analysis_cols + invoice_cols)
+                        other_cols = [c for c in merged.columns if c not in exclude_cols]
+                        # Build final column order
+                        final_cols = first_cols + analysis_cols + invoice_cols + other_cols
+                        display_df = merged[final_cols].copy()
+                        display_df = display_df.sort_values(by='percent_diff', ascending=False, na_position='last')
+
+                        # Center and color the diff_icon and unit_mismatch columns
+                        def icon_style(val, percent=None, colname=None):
+                            if colname == 'diff_icon':
+                                if val == '▲▲':
+                                    return 'color: #d62727; text-align: center; font-size: 1.2em; font-weight: bold;'
+                                if val == '▲' and percent is not None:
+                                    intensity = min(1, abs(percent) / 100)
+                                    r = 255
+                                    g = int(100 * (1 - intensity))
+                                    b = int(100 * (1 - intensity))
+                                    return f'color: rgb({r},{g},{b}); text-align: center; font-size: 1.2em;'
+                                elif val == '▼' and percent is not None:
+                                    intensity = min(1, abs(percent) / 100)
+                                    r = int(100 * (1 - intensity))
+                                    g = 180
+                                    b = int(100 * (1 - intensity))
+                                    return f'color: rgb({r},{g},{b}); text-align: center; font-size: 1.2em;'
+                                elif val == '–':
+                                    return 'color: #888; text-align: center; font-size: 1.2em;'
+                                else:
+                                    return 'text-align: center; font-size: 1.2em;'
+                            elif colname == 'unit_mismatch':
+                                if val == '⚠':
+                                    return 'color: #e6b800; text-align: center; font-size: 1.2em;'
+                                else:
+                                    return 'text-align: center; font-size: 1.2em;'
+                            return ''
+
+                        def diff_icon_styler(col):
+                            return [icon_style(icon, percent, 'diff_icon') for icon, percent in zip(display_df['diff_icon'], display_df['percent_diff'])]
+                        def unit_mismatch_styler(col):
+                            return [
+                                'color: #e6b800; text-align: center; font-size: 1.2em;' if v == '⚠' else 'text-align: center; font-size: 1.2em;'
+                                for v in display_df['unit_mismatch']
+                            ]
+                        styled = display_df.style.apply(diff_icon_styler, subset=['diff_icon']) \
+                                                     .apply(unit_mismatch_styler, subset=['unit_mismatch'])
+                        st.dataframe(styled, use_container_width=True)
             except Exception as e:
                 st.error(f"Error reading file: {e}")
 
@@ -374,8 +392,17 @@ with tab2:
     st.header("Benchmark Price Data")
     st.markdown("Current benchmark prices in the system:")
     
-    # Display benchmark data
-    st.dataframe(st.session_state.benchmark_data)
+    # Show loading indicator or data
+    if st.session_state.loading_benchmark:
+        with st.spinner("Loading benchmark data..."):
+            st.info("Please wait while we load the latest benchmark data from our database.")
+    elif st.session_state.benchmark_data is None or st.session_state.benchmark_data.empty:
+        st.error("Failed to load benchmark data. Please refresh the page or try again later.")
+        st.info("If this problem persists, please check your internet connection.")
+    else:
+        # Display benchmark data
+        st.success(f"✅ Loaded {len(st.session_state.benchmark_data)} benchmark records")
+        st.dataframe(st.session_state.benchmark_data)
     
     # Option to add new benchmark data
     st.subheader("Add New Benchmark Entry")

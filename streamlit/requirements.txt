@@ -3,3 +3,4 @@ psycopg2-binary==2.9.7
 pandas==2.0.3
 sqlalchemy==2.0.21
 plotly
+openpyxl>=3.0.0

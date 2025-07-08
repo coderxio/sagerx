@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 import psycopg2
 import plotly.express as px
 import random
+from sagerx_db import run_query
 
 # Set page config
 st.set_page_config(
@@ -41,36 +42,19 @@ def get_database_connection():
         st.error(f"Database connection failed: {str(e)}")
         return None
 
+# Replace load_ingredient_options and load_price_data to use run_query
 @st.cache_data
 def load_ingredient_options() -> pd.DataFrame:
-    """Load all available ingredients from historical pricing data."""
-    conn = get_database_connection()
-    if conn is None:
-        return pd.DataFrame()
-    
-    try:
-        query = """
+    query = '''
         SELECT DISTINCT ingredient_name
         FROM sagerx_dev.int_nadac_historical_pricing
         WHERE ingredient_name IS NOT NULL
         ORDER BY ingredient_name
-        """
-        
-        df = pd.read_sql_query(query, conn)
-        conn.close()
-        return df
-    except Exception as e:
-        st.error(f"Error loading ingredient options: {str(e)}")
-        return pd.DataFrame()
+    '''
+    return run_query(query)
 
 def load_price_data(selected_ingredient: str) -> pd.DataFrame:
-    """Load price data for all NDCs containing the selected ingredient."""
-    conn = get_database_connection()
-    if conn is None:
-        return pd.DataFrame()
-    
-    try:
-        query = """
+    query = '''
         select
             *
         from sagerx_dev.int_nadac_historical_pricing nadac
@@ -78,20 +62,15 @@ def load_price_data(selected_ingredient: str) -> pd.DataFrame:
         AND start_date IS NOT NULL
         AND nadac_per_unit IS NOT NULL
         ORDER BY start_date
-        """
+    '''
+    df = run_query(query, params=[selected_ingredient])
+
+    # Convert date column to datetime and ensure numeric types
+    if not df.empty:
+        df['start_date'] = pd.to_datetime(df['start_date'])
+        df['nadac_per_unit'] = df['nadac_per_unit'].astype(float)
         
-        df = pd.read_sql_query(query, conn, params=[selected_ingredient])
-        conn.close()
-        
-        # Convert date column to datetime and ensure numeric types
-        if not df.empty:
-            df['start_date'] = pd.to_datetime(df['start_date'])
-            df['nadac_per_unit'] = df['nadac_per_unit'].astype(float)
-            
-        return df
-    except Exception as e:
-        st.error(f"Error loading price data: {str(e)}")
-        return pd.DataFrame()
+    return df
 
 def main():
     st.title("💊 NADAC Price Visualization")

@@ -19,4 +19,4 @@ plan_suppressed_yn       VARCHAR(1)
 );
 
 COPY sagerx_lake.cms_plan_information
-FROM '{{ ti.xcom_pull(task_ids='extract') }}/plan information  PPUF_{{params.year}}Q{{params.quarter}}.txt' DELIMITER '|' CSV HEADER ENCODING 'WIN1252';;
+FROM '{{ ti.xcom_pull(task_ids='extract') }}/Quarterly Prescription Drug Plan Formulary, Pharmacy Network, and Pricing Information/{{params.year}}-Q{{params.quarter}}/plan information  PPUF_{{params.year}}Q{{params.quarter}}.txt' DELIMITER '|' CSV HEADER ENCODING 'WIN1252';;

@@ -12,4 +12,4 @@ pdp_region    VARCHAR(150)
 );
 
 COPY sagerx_lake.cms_geographic_locator
-FROM '{{ ti.xcom_pull(task_ids='extract') }}/geographic locator file PPUF_{{params.year}}Q{{params.quarter}}.txt' DELIMITER '|' CSV HEADER;;
+FROM '{{ ti.xcom_pull(task_ids='extract') }}/Quarterly Prescription Drug Plan Formulary, Pharmacy Network, and Pricing Information/{{params.year}}-Q{{params.quarter}}/geographic locator file PPUF_{{params.year}}Q{{params.quarter}}.txt' DELIMITER '|' CSV HEADER;;

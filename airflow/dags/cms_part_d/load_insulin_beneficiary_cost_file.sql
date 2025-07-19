@@ -14,4 +14,4 @@ copay_amt_mail_nonpref_insln    TEXT
 );
 
 COPY sagerx_lake.cms_insulin_beneficiary_cost
-FROM '{{ ti.xcom_pull(task_ids='extract') }}/insulin beneficiary cost file  PPUF_{{params.year}}Q{{params.quarter}}.txt' DELIMITER '|' CSV HEADER;;
+FROM '{{ ti.xcom_pull(task_ids='extract') }}/Quarterly Prescription Drug Plan Formulary, Pharmacy Network, and Pricing Information/{{params.year}}-Q{{params.quarter}}/insulin beneficiary cost file  PPUF_{{params.year}}Q{{params.quarter}}.txt' DELIMITER '|' CSV HEADER;;

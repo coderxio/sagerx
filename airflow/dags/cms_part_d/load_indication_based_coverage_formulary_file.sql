@@ -9,4 +9,4 @@ disease  VARCHAR(100)
 );
 
 COPY sagerx_lake.cms_indication_based_coverage_formulary
-FROM '{{ ti.xcom_pull(task_ids='extract') }}/Indication Based Coverage Formulary File  PPUF_{{params.year}}Q{{params.quarter}}.txt' DELIMITER '|' CSV HEADER;;
+FROM '{{ ti.xcom_pull(task_ids='extract') }}/Quarterly Prescription Drug Plan Formulary, Pharmacy Network, and Pricing Information/{{params.year}}-Q{{params.quarter}}/Indication Based Coverage Formulary File  PPUF_{{params.year}}Q{{params.quarter}}.txt' DELIMITER '|' CSV HEADER;;

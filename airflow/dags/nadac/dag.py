@@ -19,6 +19,7 @@ starting_date = pendulum.parse("2013-12-01")
     description="DAG for downloading NADAC weekly",
     on_failure_callback=alert_slack_channel,
     max_active_runs=1,
+    catchup=False
 )
 def nadac():
 

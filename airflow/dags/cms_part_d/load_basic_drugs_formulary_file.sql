@@ -16,4 +16,4 @@ step_therapy_yn      VARCHAR(1)
 );
 
 COPY sagerx_lake.cms_basic_drugs_formulary
-FROM '{{ ti.xcom_pull(task_ids='extract') }}/basic drugs formulary file  PPUF_{{params.year}}Q{{params.quarter}}.txt' DELIMITER '|' CSV HEADER;;
+FROM '{{ ti.xcom_pull(task_ids='extract') }}/Quarterly Prescription Drug Plan Formulary, Pharmacy Network, and Pricing Information/{{params.year}}-Q{{params.quarter}}/basic drugs formulary file  PPUF_{{params.year}}Q{{params.quarter}}.txt' DELIMITER '|' CSV HEADER;;

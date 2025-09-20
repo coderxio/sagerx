@@ -22,19 +22,19 @@ generic_dispensing_fee_90       TEXT
 );
 
 COPY sagerx_lake.cms_pharmacy_networks
-FROM '{{ ti.xcom_pull(task_ids='extract') }}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 1.txt' DELIMITER '|' CSV HEADER;;
+FROM '{{ ti.xcom_pull(task_ids='extract') }}/Quarterly Prescription Drug Plan Formulary, Pharmacy Network, and Pricing Information/{{params.year}}-Q{{params.quarter}}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 1.txt' DELIMITER '|' CSV HEADER;;
 
 COPY sagerx_lake.cms_pharmacy_networks
-FROM '{{ ti.xcom_pull(task_ids='extract') }}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 2.txt' DELIMITER '|' CSV HEADER;;
+FROM '{{ ti.xcom_pull(task_ids='extract') }}/Quarterly Prescription Drug Plan Formulary, Pharmacy Network, and Pricing Information/{{params.year}}-Q{{params.quarter}}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 2.txt' DELIMITER '|' CSV HEADER;;
 
 COPY sagerx_lake.cms_pharmacy_networks
-FROM '{{ ti.xcom_pull(task_ids='extract') }}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 3.txt' DELIMITER '|' CSV HEADER;;
+FROM '{{ ti.xcom_pull(task_ids='extract') }}/Quarterly Prescription Drug Plan Formulary, Pharmacy Network, and Pricing Information/{{params.year}}-Q{{params.quarter}}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 3.txt' DELIMITER '|' CSV HEADER;;
 
 COPY sagerx_lake.cms_pharmacy_networks
-FROM '{{ ti.xcom_pull(task_ids='extract') }}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 4.txt' DELIMITER '|' CSV HEADER;;
+FROM '{{ ti.xcom_pull(task_ids='extract') }}/Quarterly Prescription Drug Plan Formulary, Pharmacy Network, and Pricing Information/{{params.year}}-Q{{params.quarter}}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 4.txt' DELIMITER '|' CSV HEADER;;
 
 COPY sagerx_lake.cms_pharmacy_networks
-FROM '{{ ti.xcom_pull(task_ids='extract') }}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 5.txt' DELIMITER '|' CSV HEADER;;
+FROM '{{ ti.xcom_pull(task_ids='extract') }}/Quarterly Prescription Drug Plan Formulary, Pharmacy Network, and Pricing Information/{{params.year}}-Q{{params.quarter}}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 5.txt' DELIMITER '|' CSV HEADER;;
 
 COPY sagerx_lake.cms_pharmacy_networks
-FROM '{{ ti.xcom_pull(task_ids='extract') }}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 6.txt' DELIMITER '|' CSV HEADER;;
+FROM '{{ ti.xcom_pull(task_ids='extract') }}/Quarterly Prescription Drug Plan Formulary, Pharmacy Network, and Pricing Information/{{params.year}}-Q{{params.quarter}}/pharmacy networks file  PPUF_{{params.year}}Q{{params.quarter}} part 6.txt' DELIMITER '|' CSV HEADER;;

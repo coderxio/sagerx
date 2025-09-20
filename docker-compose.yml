@@ -1,4 +1,3 @@
-version: "3.8"
 x-airflow-common: &airflow-common
   build:
     context: ./airflow

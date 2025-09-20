@@ -8,7 +8,7 @@ pricing as (
         *
     from {{ ref('int_nadac_historical_pricing') }}
     where is_last_price
-    order by ndc_description
+    order by nadac_description
 
 )
 

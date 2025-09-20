@@ -1,12 +1,12 @@
---Make schemas for sagerx
-CREATE SCHEMA sagerx_dev;
-CREATE SCHEMA sagerx_lake;
-CREATE SCHEMA sagerx;
+-- make schemas for sagerx
+create schema sagerx_dev;
+create schema sagerx_lake;
+create schema sagerx;
 
---Add pg_stat_statements extension for query monitoring
-CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
+-- add pg_stat_statements extension for query monitoring
+create extension if not exists pg_stat_statements;
 
-CREATE TABLE sagerx.data_availability (
+create table sagerx.data_availability (
     schema_name text,
     table_name text,
     has_data boolean,

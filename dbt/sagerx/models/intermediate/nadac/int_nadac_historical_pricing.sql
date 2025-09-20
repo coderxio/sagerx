@@ -111,7 +111,7 @@ nadac_historical_pricing as (
 
     select
         ndc,
-        ndc_description,
+        ndc_description as nadac_description,
         nadac_per_unit,
         pricing_unit,
         start_date,
@@ -148,6 +148,15 @@ final as (
 
     select
         nadac_historical_pricing.*,
+        ingredients.ingredient_name,
+        products.product_name,
+        products.clinical_product_name,
+        case when products.product_tty in ('SCD', 'GPCK')
+            then 'generic'
+        when products.product_tty in ('SBD', 'BPCK')
+            then 'brand'
+        else 'unknown'
+        end as generic_brand_indicator,
         case when current_release.ndc is not null
             then true
             else false
@@ -162,6 +171,10 @@ final as (
         on current_release.ndc = nadac_historical_pricing.ndc
         and current_release.nadac_per_unit = nadac_historical_pricing.nadac_per_unit
         and current_release.effective_date = nadac_historical_pricing.start_date
+    left join {{ ref('int_rxnorm_ndcs_to_products') }} products
+        on products.ndc = nadac_historical_pricing.ndc
+    left join {{ ref('int_rxnorm_clinical_products_to_ingredients') }} ingredients
+        on ingredients.clinical_product_rxcui = products.clinical_product_rxcui
     order by start_date desc
 
 )

@@ -2,7 +2,7 @@ version: "3.8"
 x-airflow-common: &airflow-common
   build:
     context: ./airflow
-  image: sagerx_airflow:v0.0.5 # versioning allows a rebuild of docker image where necessary
+  image: sagerx_airflow:v0.0.7 # versioning allows a rebuild of docker image where necessary
   networks:
       - airflow-dbt-network
   env_file:

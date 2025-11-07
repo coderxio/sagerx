@@ -370,3 +370,14 @@ def get_rxcuis_from_rxnorm_api(ttys:list) -> list:
 # Function to convert camelCase to snake_case
 def camel_to_snake(name):
     return re.sub(r'(?<!^)(?=[A-Z])', '_', name).lower()
+
+# Function to convert free-text column names into snake_case
+def free_text_to_snake(name: str) -> str:
+    """Convert free-text column names into snake_case."""
+    if name is None:
+        return ""
+    name = str(name).strip()
+    name = re.sub(r"\s+", "_", name)
+    name = re.sub(r"[^0-9a-zA-Z_]", "_", name)
+    name = re.sub(r"_+", "_", name)
+    return name.lower().strip("_")

@@ -116,7 +116,7 @@ def get_dataset(ds_url, data_folder, ti=None, file_name=None):
 
     file_path = download_dataset(url=ds_url, dest=data_folder)
     logging.info(f"requested url: {ds_url}")
-    if file_path.suffix == ".zip":
+    if file_path.suffix.lower() == ".zip":
         with zipfile.ZipFile(file_path, "r") as zip_ref:
             zip_ref.extractall(file_path.with_suffix(""))
         Path.unlink(file_path)

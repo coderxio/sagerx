@@ -3,9 +3,9 @@ x-airflow-common: &airflow-common
     context: ./airflow
   image: sagerx_airflow:v0.0.7 # versioning allows a rebuild of docker image where necessary
   networks:
-      - airflow-dbt-network
+    - airflow-dbt-network
   env_file:
-      - .env
+    - .env
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
@@ -51,7 +51,7 @@ services:
       shm_size: "4gb"
 
   pgadmin:
-    image: dpage/pgadmin4:6.15
+    image: dpage/pgadmin4:9.9
     networks:
       - airflow-dbt-network
     container_name: pgadmin
@@ -60,6 +60,8 @@ services:
       PGADMIN_DEFAULT_PASSWORD: pgadmin
       PGADMIN_CONFIG_SERVER_MODE: "False"
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_SETUP_EMAIL: pgadmin@pgadmin.org
+      PGADMIN_SETUP_PASSWORD: pgadmin
     ports:
       - 8002:80
     volumes:

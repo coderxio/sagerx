@@ -1,7 +1,7 @@
 x-airflow-common: &airflow-common
   build:
     context: ./airflow
-  image: sagerx_airflow:v0.0.7 # versioning allows a rebuild of docker image where necessary
+  image: sagerx_airflow:v0.0.2718 # versioning allows a rebuild of docker image where necessary
   networks:
     - airflow-dbt-network
   env_file:
@@ -49,6 +49,21 @@ services:
     build:
       context: .
       shm_size: "4gb"
+
+  marimo:
+    build:
+      context: ./marimo
+    image: sagerx_marimo:v0.0.1
+    networks:
+      - airflow-dbt-network
+    container_name: marimo
+    ports:
+      - "2718:2718"
+    volumes:
+      - ./notebooks:/notebooks
+    working_dir: /notebooks
+    environment:
+      - DATABASE_URL=postgresql://sagerx:sagerx@postgres:5432/sagerx
 
   pgadmin:
     image: dpage/pgadmin4:9.9

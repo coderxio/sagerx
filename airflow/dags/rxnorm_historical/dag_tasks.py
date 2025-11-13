@@ -45,7 +45,7 @@ def load(file_path_str:str):
     # Initialize a list to store the processed data
     records = []
     for result in results:
-        if not len(result['response']) == 0:
+        if result is not None and not len(result['response']) == 0:
             response = result['response']
             if 'historicalNdcConcept' in response:
                 url = result['url']
@@ -72,6 +72,7 @@ def load(file_path_str:str):
     # Create a single DataFrame from the list of dictionaries
     df = pd.DataFrame.from_records(records)
     print(f'Processed {len(df)} RXCUIs.')
+    print(df.head(10))
 
     # Load the final DataFrame into the database
     load_df_to_pg(df, "sagerx_lake", "rxnorm_historical", "replace", index=False, create_index=True, index_columns=['ndc', 'end_date'])

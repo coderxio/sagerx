@@ -6,7 +6,14 @@ RUN pip install --no-cache-dir \
     psycopg2-binary \
     sqlalchemy \
     pandas \
-    numpy
+    numpy \
+    matplotlib \
+    openai \
+    anthropic \
+    duckdb \
+    sqlglot \
+    altair \
+    ruff
 
 # Create marimo config directory
 RUN mkdir -p /root/.marimo

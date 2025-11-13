@@ -48,6 +48,9 @@ def load(file_path_str:str):
 
     classes = []
     for result in results:
+        # skip a result if it is None
+        if result is None:
+            continue        
         response = result['response']
         if 'rxclassDrugInfoList' in response:
             for drug_info in response["rxclassDrugInfoList"]["rxclassDrugInfo"]:

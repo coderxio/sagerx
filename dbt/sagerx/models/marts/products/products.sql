@@ -6,6 +6,7 @@ rxnorm_products as (
 
 ),
 
+/* TODO: bring this to stg / int layers */
 rxnorm_psn as (
 
     select
@@ -15,6 +16,14 @@ rxnorm_psn as (
     where sab = 'RXNORM'
         and tty = 'PSN'
 
+),
+
+/* TODO: bring this to stg / int layers */
+rxnorm_available_strength as (
+
+    select * from {{ source('rxnorm', 'rxnorm_rxnsat') }}
+    where sab = 'RXNORM'
+        and atn = 'RXN_AVAILABLE_STRENGTH'
 ),
 
 rxnorm_clinical_products_to_ingredients as (
@@ -39,6 +48,8 @@ select
     , cping.ingredient_name
     -- strength - couldn't easily get strength at this grain - can if needed
     , cping.dose_form_name
+    , cping.ingredient_dose_form_name
+    , str.atv as strength_name
     , prod.active
     , prod.prescribable
 from rxnorm_products prod
@@ -46,3 +57,5 @@ left join rxnorm_clinical_products_to_ingredients cping
     on cping.clinical_product_rxcui = prod.clinical_product_rxcui
 left join rxnorm_psn psn
     on psn.rxcui = prod.rxcui
+left join rxnorm_available_strength str
+    on str.rxcui = prod.rxcui

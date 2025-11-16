@@ -57,6 +57,7 @@ select distinct
 		case when product_component.rxcui is null then product.cvf else product_component.cvf end = '4096' then true else false end as prescribable
 	, cte.ingredient_rxcui as ingredient_rxcui
 	, dose_form_rxnrel.rxcui1 as dose_form_rxcui
+	, ingredient_dose_form_rxnrel.rxcui1 as ingredient_dose_form_rxcui
 from sagerx_lake.rxnorm_rxnconso product
 left join sagerx_lake.rxnorm_rxnrel rxnrel on rxnrel.rxcui2 = product.rxcui and rxnrel.rela = 'contains'
 left join sagerx_lake.rxnorm_rxnconso product_component
@@ -70,5 +71,30 @@ left join sagerx_lake.rxnorm_rxnrel dose_form_rxnrel
 	on dose_form_rxnrel.rxcui2 = case when product_component.rxcui is null then product.rxcui else product_component.rxcui end
 	and dose_form_rxnrel.rela = 'has_dose_form'
 	and dose_form_rxnrel.sab = 'RXNORM'
+/*
+	NOTE: It's occurring to me that we need to join to SXDF
+	at the "product" level vs the "clinical_product" level
+	so that people that searching for brand name products
+	don't get generic product results. Maybe should also
+	include SCDF the way we do for product->clinical_product.
+
+	Could do it for all three of these - basically brand to generic links:
+	- product -> clinical_product
+	- ingredient -> clinical_ingredient
+	- ingredient_dose_form -> clinical_ingredient_dose_form
+
+	Also an idea about treating GPCK like MIN - basically multi to single links:
+	- products table contains ALL products (SCD, GPCK, SBD, BPCK)
+	- separate table called product_links that links GPCK->SCD and BPCK->SBD
+	- same for ingredients table - one for (IN, MIN) and another for MIN->IN
+*/
+left join sagerx_lake.rxnorm_rxnrel ingredient_dose_form_rxnrel
+	on ingredient_dose_form_rxnrel.rxcui2 = case when product_component.rxcui is null then product.rxcui else product_component.rxcui end
+	and ingredient_dose_form_rxnrel.rela = 'isa'
+	and ingredient_dose_form_rxnrel.sab = 'RXNORM'
+inner join sagerx_lake.rxnorm_rxnconso sxdf
+	on ingredient_dose_form_rxnrel.rxcui1 = sxdf.rxcui
+	and sxdf.tty in ('SCDF', 'SBDF')
+	and sxdf.sab = 'RXNORM'
 where product.tty in('SCD', 'GPCK')
 	and product.sab = 'RXNORM'

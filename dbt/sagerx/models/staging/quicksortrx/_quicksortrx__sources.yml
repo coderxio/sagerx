@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: quicksortrx
+    description: Universal medication identifiers from QuicksortRx, including NDC, RXCUI, and QUMI codes.
+    schema: sagerx_lake
+    tables:
+      - name: quicksortrx_qumi
+        description: >
+          Universal medication identifiers mapping NDC, RXCUI, and QUMI codes.
+          
+          Source: https://github.com/QuicksortRx/universal-med-ids
+

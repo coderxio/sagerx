@@ -30,6 +30,12 @@ ri as (
 
     select * from {{ ref('stg_rxnorm__ingredients') }}
 
+),
+
+ridf as (
+
+    select * from {{ ref('stg_rxnorm__ingredient_dose_forms') }}
+
 )
 
 select
@@ -45,6 +51,9 @@ select
     , string_agg(ri.rxcui, ' | ') as ingredient_rxcui
     , string_agg(ri.name, ' | ') as ingredient_name
     , string_agg(ri.tty, ' | ') as ingredient_tty
+    , string_agg(ridf.rxcui, ' | ') as ingredient_dose_form_rxcui
+    , string_agg(ridf.name, ' | ') as ingredient_dose_form_name
+    , string_agg(ridf.tty, ' | ') as ingredient_dose_form_tty
     , rcp.active
     , rcp.prescribable        
 from rcp 
@@ -56,6 +65,8 @@ left join rdf
     on rcpc.dose_form_rxcui = rdf.rxcui 
 left join ri 
     on rcpc.ingredient_rxcui = ri.rxcui 
+left join ridf 
+    on rcpc.ingredient_dose_form_rxcui = ridf.rxcui 
 group by
     rcp.rxcui
     , rcp.name

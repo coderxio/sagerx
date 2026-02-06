@@ -28,6 +28,8 @@ select distinct
     , rcp.rxcui as clinical_product_rxcui
     , rcp.name as clinical_product_name
     , rcp.tty as clinical_product_tty
+    , ndc.active
+    , ndc.prescribable
 from ndc
 left join rcp 
     on ndc.clinical_product_rxcui = rcp.rxcui

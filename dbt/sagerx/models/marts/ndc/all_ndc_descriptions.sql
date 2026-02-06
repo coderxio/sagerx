@@ -16,6 +16,8 @@ rxnorm_ndcs as (
         ndc
         , product_rxcui as rxcui
         , product_name as rxnorm_description
+        , active
+        , prescribable
     from {{ ref('int_rxnorm_ndcs_to_products') }}
 
 ) 
@@ -41,6 +43,11 @@ and somehow filter out any parts that are wrong?
         rxnorm_historical_most_recent_ndcs.ndc::varchar
         , rxnorm_historical_most_recent_ndcs.rxcui::varchar
         , rxnorm_product_rxcuis.str as rxnorm_description
+        -- could infer false for historical here, but going with null for now
+        -- lower in this model, we prefer rxnorm_ndcs over rxnorm_historical_ndcs
+        -- so even if we put false for active here, it will be overridden by rxnorm_ndcs
+        , false as active
+        , false as prescribable
     from {{ ref('stg_rxnorm_historical__most_recent_ndcs') }} rxnorm_historical_most_recent_ndcs
     left join rxnorm_product_rxcuis
         on rxnorm_product_rxcuis.rxcui = rxnorm_historical_most_recent_ndcs.rxcui::varchar
@@ -141,6 +148,8 @@ and somehow filter out any parts that are wrong?
         ndc
         , rxcui
         , rxnorm_description
+        , active
+        , prescribable
     from ranked_rxnorm_ndcs
     where row_num = 1
 
@@ -196,6 +205,9 @@ and somehow filter out any parts that are wrong?
         , rxcui
         , rxnorm_description
         , fda_description
+        -- active and prescribable only come from RxNorm
+        , active
+        , prescribable
     from all_ndcs
     left join distinct_rxnorm_ndcs
         on distinct_rxnorm_ndcs.ndc = all_ndcs.ndc

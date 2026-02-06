@@ -241,3 +241,22 @@ models:
       - name: active
       - name: prescribable
       - name: ingredient_rxcui
+
+  - name: stg_rxnorm__prescribable_names
+    description: "RxNorm prescribable names (PSN)."
+    columns:
+      - name: rxcui
+        tests:
+          - unique
+          - not_null
+      - name: prescribable_name
+        description: "The prescribable name string (PSN) for the given RXCUI."
+
+  - name: stg_rxnorm__available_strengths
+    description: "RxNorm available strength attributes from RXNSAT where ATN = 'RXN_AVAILABLE_STRENGTH'."
+    columns:
+      - name: rxcui
+        tests:
+          - not_null
+      - name: strength_name
+        description: "The available strength attribute value (ATV) for the given RXCUI."

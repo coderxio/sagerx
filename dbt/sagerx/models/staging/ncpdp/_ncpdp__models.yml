@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: stg_ncpdp__terminology
+    description: NCPDP terminology concepts including DEA Schedule, dose/quantity/strength units of measure, and dosage form terminology from NCI EVS.

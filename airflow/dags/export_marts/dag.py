@@ -30,9 +30,9 @@ with dag:
         mart_dfs={}
         with engine.connect() as connection:
             for mart in marts_list:
-                if sqlalchemy.inspect(engine).has_table(mart, schema='sagerx_dev'):  
+                if sqlalchemy.inspect(engine).has_table(mart, schema='coderx'):  
                     print(f'{mart} exists and will be exported')
-                    df = pd.read_sql(f"SELECT * FROM sagerx_dev.{mart};", con=connection)
+                    df = pd.read_sql(f"SELECT * FROM coderx.{mart};", con=connection)
                     mart_dfs[mart] = df
 
         # get S3 destination from .env file, if any

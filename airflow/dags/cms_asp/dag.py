@@ -18,7 +18,7 @@ dag = create_dag(
 )
 
 with dag:
-    url= "https://www.cms.gov/files/zip/january-2026-alpha-numeric-hcpcs-file.zip"
+    url= "https://www.cms.gov/files/zip/january-2026-medicare-part-b-payment-limit-files.zip"
     ds_folder = get_ds_folder(dag_id)
 
     extract_task = extract(dag_id,url)

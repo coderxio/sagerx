@@ -7,7 +7,7 @@ import os
 @task
 def load(file_path_str:str):
     # find the matching file
-    pattern = os.path.join(file_path_str, "HCPC2026_JAN_ANWEB_01122026.xlsx")
+    pattern = os.path.join(file_path_str, "*Medicare Part B Payment Limit File*.xls")
     matching_files = glob.glob(pattern)
     
     if not matching_files:

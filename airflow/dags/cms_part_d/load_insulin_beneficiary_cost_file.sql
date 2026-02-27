@@ -10,7 +10,11 @@ days_supply     TEXT,
 copay_amt_pref_insln    TEXT,
 copay_amt_nonpref_insln TEXT,
 copay_amt_mail_pref_insln   TEXT,
-copay_amt_mail_nonpref_insln    TEXT
+copay_amt_mail_nonpref_insln    TEXT,
+coin_amt_pref_insln       TEXT,
+coin_amt_nonpref_insln    TEXT,
+coin_amt_mail_pref_insln  TEXT,
+coin_amt_mail_nonpref_insln TEXT
 );
 
 COPY sagerx_lake.cms_insulin_beneficiary_cost

@@ -12,7 +12,8 @@ quantity_limit_yn    VARCHAR(1),
 quantity_limit_amount      VARCHAR(7),
 quantity_limit_days      VARCHAR(3),
 prior_authorization_yn      VARCHAR(1),
-step_therapy_yn      VARCHAR(1)
+step_therapy_yn      VARCHAR(1),
+selected_drug_yn      VARCHAR(1)
 );
 
 COPY sagerx_lake.cms_basic_drugs_formulary

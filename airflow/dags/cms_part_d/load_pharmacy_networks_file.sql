@@ -18,7 +18,10 @@ brand_dispensing_fee_60       TEXT,
 brand_dispensing_fee_90       TEXT,
 generic_dispensing_fee_30       TEXT,
 generic_dispensing_fee_60       TEXT,
-generic_dispensing_fee_90       TEXT
+generic_dispensing_fee_90       TEXT,
+selected_dispensing_fee_30       TEXT,
+selected_dispensing_fee_60       TEXT,
+selected_dispensing_fee_90       TEXT
 );
 
 COPY sagerx_lake.cms_pharmacy_networks

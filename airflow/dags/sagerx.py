@@ -13,6 +13,7 @@ from concurrent.futures import ThreadPoolExecutor
 from urllib.request import urlopen
 from urllib.error import HTTPError, URLError
 from pathlib import Path
+import shutil
 from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperator
 from airflow.models import Variable
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
@@ -122,10 +123,13 @@ def get_dataset(ds_url, data_folder, ti=None, file_name=None):
         Path.unlink(file_path)
         file_path = file_path.with_suffix("")
 
-    # change name of file if one is provided
-    if file_name != None:
-        file_path.rename(file_path.with_name(file_name))
-        file_path = file_path.with_name(file_name)
+    # change name of file/directory if one is provided
+    if file_name is not None:
+        dest = file_path.with_name(file_name)
+        if dest.exists():
+            shutil.rmtree(dest) if dest.is_dir() else dest.unlink()
+        file_path.rename(dest)
+        file_path = dest
 
     file_path_str = file_path.resolve().as_posix()
     if ti != None:

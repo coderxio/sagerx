@@ -24,7 +24,7 @@ def cms_part_d():
     dag_id = "cms_part_d"
     file_date = "20250410"
     file_date_year = '2025'
-    file_date_quarter = '1'
+    file_date_quarter = '4'
     # NOTE: this file is from 2025 and yet the files inside represent 2024 Q4 data...
     # so this logic needs to be revisited
     #file_date_year = file_date[:4]
@@ -32,8 +32,8 @@ def cms_part_d():
 
     #ds_url = f"https://download.cms.gov/Research-Statistics-Data-and-Systems/Downloadable-Public-Use-Files/Pharmacy-Puf/Downloads/SPUF_{file_date_year}_{file_date}.zip"
     #ds_url = f"https://data.cms.gov/sites/default/files/2025-01/e78ce888-f571-4d86-baf0-7a1f9efffff4/SPUF_2025_{file_date}.zip"
-    ds_url = "https://data.cms.gov/sites/default/files/dataset_zips/ff7b76ec186d7c104e7f032216f1f5fb/Quarterly%20Prescription%20Drug%20Plan%20Formulary%2C%20Pharmacy%20Network%2C%20and%20Pricing%20Information.zip"
-    
+    ds_url = "https://data.cms.gov/sites/default/files/dataset_zips/5d27d71239d6e3d3c924445dc6b3e050/Quarterly%20Prescription%20Drug%20Plan%20Formulary%2C%20Pharmacy%20Network%2C%20and%20Pricing%20Information.zip"              
+
     # Task to download data from web location
     @task
     def extract():
@@ -46,7 +46,7 @@ def cms_part_d():
         # SPUF_2025_20250410.zip/<many zip files>
         
         print(data_path)
-        data_path = create_path(data_path, "Quarterly Prescription Drug Plan Formulary, Pharmacy Network, and Pricing Information", "2025-Q1")
+        data_path = create_path(data_path, "Quarterly Prescription Drug Plan Formulary, Pharmacy Network, and Pricing Information", f"{file_date_year}-Q{file_date_quarter}")
         print(data_path)
         txt_file_names = []
         

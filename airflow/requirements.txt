@@ -5,6 +5,7 @@ dbt-core
 dbt-postgres
 apache-airflow[google]
 bs4
+s3fs
 openpyxl
 xlrd==1.2.0
 cloudscraper

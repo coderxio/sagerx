@@ -1,11 +1,11 @@
 x-airflow-common: &airflow-common
   build:
     context: ./airflow
-  image: sagerx_airflow:v0.0.6 # versioning allows a rebuild of docker image where necessary
+  image: sagerx_airflow:v0.0.2718 # versioning allows a rebuild of docker image where necessary
   networks:
-      - airflow-dbt-network
+    - airflow-dbt-network
   env_file:
-      - .env
+    - .env
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
@@ -51,8 +51,23 @@ services:
       context: .
       shm_size: "4gb"
 
+  marimo:
+    build:
+      context: ./marimo
+    image: sagerx_marimo:v0.0.1
+    networks:
+      - airflow-dbt-network
+    container_name: marimo
+    ports:
+      - "2718:2718"
+    volumes:
+      - ./notebooks:/notebooks
+    working_dir: /notebooks
+    environment:
+      - DATABASE_URL=postgresql://sagerx:sagerx@postgres:5432/sagerx
+
   pgadmin:
-    image: dpage/pgadmin4:6.15
+    image: dpage/pgadmin4:9.9
     networks:
       - airflow-dbt-network
     container_name: pgadmin
@@ -61,6 +76,8 @@ services:
       PGADMIN_DEFAULT_PASSWORD: pgadmin
       PGADMIN_CONFIG_SERVER_MODE: "False"
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_SETUP_EMAIL: pgadmin@pgadmin.org
+      PGADMIN_SETUP_PASSWORD: pgadmin
     ports:
       - 8002:80
     volumes:

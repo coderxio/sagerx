@@ -2,7 +2,8 @@
 
 with rxclass_atcprod as (
 
-	select * from {{ ref('stg_rxclass__atcprod') }}
+	select * from {{ ref('stg_rxclass__rxclass') }}
+    where rela_source = 'ATCPROD'
 
 )
 

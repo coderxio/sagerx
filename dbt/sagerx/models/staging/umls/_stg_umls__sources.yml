@@ -1,0 +1,32 @@
+version: 2
+
+sources:
+  - name: umls
+    schema: sagerx_lake
+    tables:
+      - name: umls_crosswalk
+        description: |
+          Crosswalk between select vocabularies in UMLS.
+
+          https://documentation.uts.nlm.nih.gov/rest/source-asserted-identifiers/crosswalk/
+
+          Currently available:
+            - MSH -> ICD9CM
+            - MSH -> ICD10CM
+            - MSH -> SNOMEDCT_US
+
+          A common use case of the CUIs in the UMLS is as a sort of
+          ‘bridge of synonymy’ between code sets. For a given 
+          source-asserted code, the crosswalk endpoint will return 
+          codes from other sources that have UMLS-asserted synonymy.
+          It is important to note that the synonymy asserted by the 
+          UMLS in the MRCONSO.RRF files (and the APIs derived from 
+          them) has not been rigorously tested and maintained in 
+          actual clinical care.
+          
+          With that disclaimer, users often have questions such as 
+          ‘I have a code from vocabulary x, what is the equivalent 
+          code from vocabulary y according to UMLS synonymy?’.
+          Although UMLS CUIs can be used as a starting point, 
+          results should be carefully reviewed for relevancy
+          in your use case.

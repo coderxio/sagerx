@@ -19,6 +19,10 @@ models:
           
           If TTY = SBD or BPCK, this will be brand.          
           If TTY = SCD or GPCK, this will be generic.
+      - name: prescribable_name
+        description: "The prescribable name (PSN) for the product, sourced from RxNorm."
+      - name: strength_name
+        description: "The available strength name for the product, sourced from RxNorm RXNSAT where ATN = 'RXN_AVAILABLE_STRENGTH'."
 
   - name: brand_products_with_related_ndcs
     description: |

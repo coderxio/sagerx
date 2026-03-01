@@ -1,0 +1,113 @@
+version: 2
+
+models:
+  - name: stg_cms_hcris__hospital
+    description: >
+      Staging model for hospital data from the CMS Healthcare Cost Report Information System (HCRIS).
+      This model joins the report (rpt), alpha (alphanumeric), and numeric (nmrc) source tables to create
+      a normalized hospital record with provider information, ownership details, address, bed counts,
+      resident counts, and financial metrics. The model extracts data from specific worksheet codes and
+      line/column combinations to build a comprehensive hospital profile from the HCRIS cost report data.
+    
+    columns:
+      - name: cms_id
+        description: >
+          CMS Provider Number. A six-digit identifier where the first two digits represent the state code
+          and the remaining four digits represent the assigned provider range. This is the primary identifier
+          for hospitals in the CMS system.
+        tests:
+          - not_null
+      
+      - name: npi
+        description: >
+          National Provider Identifier. A unique 10-digit identifier for healthcare providers established
+          under HIPAA. May be null for some hospitals that haven't registered an NPI.
+      
+      - name: ownership_code
+        description: >
+          Provider Control Type Code. A numeric code (1-13) indicating the type of ownership structure
+          from Table 3A of the HCRIS specifications. Used to categorize hospitals by ownership type.
+        tests:
+          - accepted_values:
+              values: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13']
+      
+      - name: ownership_type
+        description: >
+          Human-readable ownership type description. Maps ownership codes to descriptive categories:
+          voluntary nonprofit (church/other), proprietary (individual/corporation/partnership/other),
+          governmental (federal/city-county/county/state/hospital district/city/other), or unknown.
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 'voluntary nonprofit-church'
+                - 'voluntary nonprofit-other'
+                - 'proprietary-individual'
+                - 'proprietary-corporation'
+                - 'proprietary-partnership'
+                - 'proprietary-other'
+                - 'governmental-federal'
+                - 'governmental-city-county'
+                - 'governmental-county'
+                - 'governmental-state'
+                - 'governmental-hospital district'
+                - 'governmental-city'
+                - 'governmental-other'
+                - 'unknown'
+      
+      - name: hospital_name
+        description: >
+          Hospital name extracted from worksheet S200001, line 00300, column 00100. The official name
+          of the hospital as reported in the HCRIS cost report.
+      
+      - name: street_address
+        description: >
+          Street address of the hospital extracted from worksheet S200001, line 00100, column 00100.
+          The physical street address where the hospital is located.
+      
+      - name: city
+        description: >
+          City where the hospital is located, extracted from worksheet S200001, line 00200, column 00100.
+          The city component of the hospital's address.
+      
+      - name: state
+        description: >
+          State where the hospital is located, extracted from worksheet S200001, line 00200, column 00200.
+          The state component of the hospital's address, typically a two-letter state code.
+      
+      - name: zip
+        description: >
+          ZIP code where the hospital is located, extracted from worksheet S200001, line 00200, column 00300.
+          The postal code component of the hospital's address.
+      
+      - name: hosp_bed_count
+        description: >
+          Number of hospital beds, extracted from worksheet S300001, line 01400, column 00200.
+          Represents the total number of licensed hospital beds available for patient care.
+      
+      - name: ld_bed_count
+        description: >
+          Number of long-term care (LTC) beds, extracted from worksheet S300001, line 03200, column 00200.
+          Represents beds designated for long-term care services within the hospital facility.
+      
+      - name: total_bed_count
+        description: >
+          Total bed count calculated as the sum of hospital beds and long-term care beds.
+          Uses COALESCE to handle null values by treating them as 0. This provides a comprehensive
+          count of all beds in the facility.
+      
+      - name: resident_count
+        description: >
+          Number of residents (medical residents), extracted from worksheet S300001, line 01400, column 00900.
+          Represents the count of medical residents training at the hospital, which may affect Medicare
+          reimbursement calculations.
+      
+      - name: total_revenue
+        description: >
+          Total revenue for the hospital, extracted from worksheet G300000, line 00200, column 00100.
+          Represents the total revenue reported in the cost report, including all sources of income.
+      
+      - name: net_revenue
+        description: >
+          Net revenue for the hospital, extracted from worksheet G300000, line 00300, column 00100.
+          Represents the net revenue after deductions, as reported in the HCRIS cost report.

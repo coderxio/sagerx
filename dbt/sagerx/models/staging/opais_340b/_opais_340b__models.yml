@@ -1,0 +1,269 @@
+version: 2
+
+models:
+  - name: stg_opais_340b__covered_entities
+    description: >
+      Staging model for covered entities participating in the 340B Drug Pricing Program.
+      This model serves as a staging layer for the OPAIS 340B covered entities source data,
+      providing a clean interface for downstream models. The 340B program enables covered entities
+      (hospitals, federally qualified health centers, and other eligible healthcare providers)
+      to purchase outpatient drugs at reduced prices. This model contains information about
+      participating healthcare organizations, their registration details, participation status,
+      addresses, contact information, and program participation history.
+    
+    columns:
+      - name: 340b_id
+        description: >
+          Unique identifier for covered entities in the 340B Drug Program. This is the primary
+          identifier used to track covered entities throughout the 340B program system.
+        tests:
+          - unique
+          - not_null
+      
+      - name: ce_id
+        description: >
+          Sequential unique identifier for covered entities assigned by OPAIS (Office of Pharmacy
+          Affairs Information System). This identifier is used internally by OPAIS for tracking purposes.
+        tests:
+          - unique
+          - not_null
+      
+      - name: entity_type
+        description: >
+          Hospital or non-hospital entity type code, typically 2-6 letters. Classifies the type
+          of covered entity (e.g., DSH for Disproportionate Share Hospital, FQHC for Federally
+          Qualified Health Center, etc.).
+        tests:
+          - not_null
+      
+      - name: participating
+        description: >
+          Boolean flag indicating whether the covered entity is currently active in the 340B program.
+          True indicates the entity is actively participating, false indicates it is not currently
+          participating or has been terminated.
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+      
+      - name: participating_start_date
+        description: >
+          Most recent start date when the covered entity began participating in the 340B program.
+          This may be the initial participation date or a re-entry date if the entity rejoined
+          the program after termination. May be null if the entity has never participated.
+      
+      - name: termination_date
+        description: >
+          Most recent date that the covered entity was terminated from the 340B program.
+          Null if the entity has never been terminated or is currently active.
+      
+      - name: termination_reason
+        description: >
+          Reason the covered entity was terminated from the 340B program. This can be selected
+          from a list of standard termination reasons defined by the program. Null if the entity
+          has never been terminated.
+      
+      - name: entity_name
+        description: >
+          Official name of the covered entity as registered in the 340B program.
+          This is the primary name used to identify the healthcare organization.
+        tests:
+          - not_null
+      
+      - name: entity_sub_division_name
+        description: >
+          Covered entity sub-division or department name. Used to identify specific divisions,
+          departments, or units within a larger covered entity organization. May be null for
+          entities that do not have subdivisions.
+      
+      - name: grant_number
+        description: >
+          Grant number associated with non-hospital covered entities (grantees). Used to identify
+          federal grants that qualify certain entities for 340B program participation. Primarily
+          applicable to entities such as federally qualified health centers and other grant-funded
+          healthcare providers.
+      
+      - name: site_id
+        description: >
+          An identifier associated with CH (Children's Hospital) and FQHCLA (Federally Qualified
+          Health Center Look-Alike) covered entity sites. Used to distinguish multiple sites
+          under the same covered entity registration.
+      
+      - name: medicare_provide_number
+        description: >
+          Six-digit Medicare provider number assigned to hospitals that verifies a provider has
+          been Medicare certified. This number is used to link the 340B entity to CMS provider
+          data. May be null for non-hospital entities or entities not certified by Medicare.
+      
+      - name: nofo_number
+        description: >
+          Notice of Funding Opportunity (NOFO) number associated with a grant for a Tuberculosis (TB)
+          or Sexually Transmitted Diseases (STD) entity type. Used to identify the specific funding
+          opportunity that qualifies the entity for 340B program participation.
+      
+      - name: assistance_received_from_date
+        description: >
+          Date assistance was received for covered entities with Ryan White grant(s). This date
+          marks the start of assistance period that qualifies the entity for 340B participation.
+          Applicable to entities funded under the Ryan White HIV/AIDS Program.
+      
+      - name: assistance_received_to_date
+        description: >
+          Last date assistance is available for covered entities with Ryan White grant(s). This
+          date marks the end of the assistance period. Applicable to entities funded under the
+          Ryan White HIV/AIDS Program.
+      
+      - name: street_address_1
+        description: >
+          First line of the covered entity's physical street address. This is the primary address
+          where the entity is located.
+      
+      - name: street_address_2
+        description: >
+          Second line of the covered entity's physical street address (continuation).
+          Used for additional address information such as suite numbers or building identifiers.
+          May be null if not applicable.
+      
+      - name: street_address_3
+        description: >
+          Third line of the covered entity's physical street address (continuation).
+          Used for additional address information. May be null if not applicable.
+      
+      - name: street_city
+        description: >
+          City associated with the covered entity's physical street address.
+          The city where the entity is physically located.
+      
+      - name: street_state
+        description: >
+          State associated with the covered entity's physical street address.
+          Typically a two-letter state code (e.g., "CA", "NY", "TX").
+      
+      - name: street_zip
+        description: >
+          ZIP code associated with the covered entity's physical street address.
+          The five-digit postal code for the entity's location.
+      
+      - name: street_zip4
+        description: >
+          ZIP code plus-4 extension associated with the covered entity's physical street address.
+          The four-digit extension that provides more precise location identification.
+          May be null if the extended ZIP code is not available.
+      
+      - name: medicaid_number
+        description: >
+          Identification number of an institutional provider certified by CMS to provide services
+          to Medicaid beneficiaries. Used to link the entity to Medicaid provider data.
+          May be null if the entity is not a Medicaid provider.
+      
+      - name: npi
+        description: >
+          National Provider Identifier (NPI). A unique 10-digit identifier for covered health care
+          providers established under HIPAA. Used to identify providers across different healthcare
+          systems and programs. May be null if the entity has not registered an NPI.
+      
+      - name: billing_organization
+        description: >
+          Covered entity's billing organization name. This may differ from the entity name if
+          billing is handled by a separate organization or parent company.
+      
+      - name: billing_address_1
+        description: >
+          First line of the covered entity's billing address. This is the address where billing
+          correspondence is sent, which may differ from the physical street address.
+      
+      - name: billing_address_2
+        description: >
+          Second line of the covered entity's billing address (optional).
+          Used for additional billing address information. May be null if not applicable.
+      
+      - name: billing_address_3
+        description: >
+          Third line of the covered entity's billing address (optional).
+          Used for additional billing address information. May be null if not applicable.
+      
+      - name: billing_city
+        description: >
+          City associated with the covered entity's billing address.
+          The city where billing correspondence is sent.
+      
+      - name: billing_state
+        description: >
+          State associated with the covered entity's billing address.
+          Typically a two-letter state code (e.g., "CA", "NY", "TX").
+      
+      - name: billing_zip
+        description: >
+          ZIP code associated with the covered entity's billing address.
+          The five-digit postal code for the billing address.
+      
+      - name: billing_zip4
+        description: >
+          ZIP code plus-4 extension associated with the covered entity's billing address.
+          The four-digit extension for the billing address. May be null if not available.
+      
+      - name: authorizing_official_name
+        description: >
+          Name of the covered entity Authorizing Official (AO). The AO is the individual authorized
+          to make decisions and sign documents on behalf of the covered entity in the 340B program.
+          May be null if not specified.
+      
+      - name: authorizing_official_title
+        description: >
+          Title of the covered entity Authorizing Official (AO). The job title or role of the
+          individual serving as the AO. May be null if not specified.
+      
+      - name: authorizing_official_phone
+        description: >
+          Phone number for the Authorizing Official (AO). Contact number for the individual
+          authorized to act on behalf of the covered entity. May be null if not provided.
+      
+      - name: authorizing_official_phone_ext
+        description: >
+          Phone extension for the Authorizing Official (AO). Extension number for the AO's
+          phone line. May be null if not applicable or not provided.
+      
+      - name: primary_contact_name
+        description: >
+          Name of the covered entity Primary Contact (PC). The PC is the main point of contact
+          for day-to-day operations and communications regarding the 340B program.
+          May be null if not specified.
+      
+      - name: primary_contact_title
+        description: >
+          Title of the covered entity Primary Contact (PC). The job title or role of the
+          individual serving as the primary contact. May be null if not specified.
+      
+      - name: primary_contact_phone
+        description: >
+          Phone number for the Primary Contact (PC). Contact number for the main point of contact
+          for the covered entity. May be null if not provided.
+      
+      - name: primary_contact_phone_ext
+        description: >
+          Phone extension for the Primary Contact (PC). Extension number for the primary contact's
+          phone line. May be null if not applicable or not provided.
+      
+      - name: certified_decertified_date
+        description: >
+          Covered entity recertification date or date the covered entity was decertified or
+          terminated during recertification. This date tracks the entity's certification status
+          changes in the 340B program. May be null if no certification events have occurred.
+      
+      - name: rural
+        description: >
+          Boolean or text field identifying whether the covered entity hospital is designated as rural.
+          Rural designation may affect eligibility for certain 340B program benefits and is used
+          for program reporting and analysis purposes. May be null for non-hospital entities.
+      
+      - name: entry_comments
+        description: >
+          Comments entered as part of the covered entity's record. Free-text field for additional
+          notes, clarifications, or special circumstances related to the entity's participation
+          in the 340B program. May be null if no comments have been entered.
+      
+      - name: edit_date
+        description: >
+          Most recent date the covered entity record was edited or updated in the OPAIS system.
+          This timestamp tracks when changes were made to the entity's registration information.
+          May be null if the record has never been edited.

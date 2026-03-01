@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_rxclass__rxclass
+    description: All RxClass mappings to the lowest level RxClass code.
+    columns:
+      - name: rxcui
+      - name: name
+      - name: tty
+      - name: rela
+      - name: class_id
+      - name: class_name
+      - name: class_type
+      - name: rela_source

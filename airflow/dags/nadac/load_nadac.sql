@@ -8,7 +8,7 @@ pricing_unit		                            TEXT,
 pharmacy_type_indicator	                        TEXT,
 otc		                                        TEXT,
 explanation_code		                        TEXT,
-classifiation_for_rate_setting		            TEXT,
+classification_for_rate_setting		            TEXT,
 corresponding_generic_drug_nadac_per_unit		TEXT,
 corresponding_generic_drug_effective_date		DATE,
 as_of_date  			                        DATE

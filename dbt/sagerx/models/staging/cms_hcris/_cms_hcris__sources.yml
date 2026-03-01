@@ -1,0 +1,155 @@
+version: 2
+
+sources:
+  - name: cms_hcris
+    schema: sagerx_lake
+    description: Healthcare Cost Report Information System (HCRIS) data tables
+    tables:
+      - name: cms_hcris_rpt
+        description: Report table containing cost report information
+        columns:
+          - name: rpt_rec_num
+            description: Report Record Number. HCRIS assigned cost report specific number.
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: prvdr_num
+            description: Provider Number. Valid Provider Number defined as follows xxyyyy where xx = State Code and yyyy = Assigned Provider Range
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: rpt_stus_cd
+            description: Report Status Code. Type of cost report.
+            data_type: string
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['1', '2', '3', '4', '5']
+          
+          - name: npi
+            description: National Provider Identifier. Unique health identifier for health care providers. Established under HIPAA.
+            data_type: string
+          
+          - name: fy_bgn_dt
+            description: Fiscal Year Begin Date. Cost Report Fiscal Year beginning date.
+            data_type: date
+          
+          - name: fy_end_dt
+            description: Fiscal Year End Date. Cost Report Fiscal Year ending date.
+            data_type: date
+          
+          - name: proc_dt
+            description: Process Date. The date the cost report was processed into HCRIS.
+            data_type: date
+          
+          - name: initl_rpt_sw
+            description: Initial Report Switch. Y or N, Y = the first cost report filed for this provider. (Not actively used.)
+            data_type: string
+          
+          - name: last_rpt_sw
+            description: Last Report Switch. Y or N, Y = the final cost report filed for this provider. (Not actively used.)
+            data_type: string
+          
+          - name: trnsmtl_num
+            description: The current transmittal or version number in effect for each sub-system. Transmittal Number or transmittal version used to create the cost report
+            data_type: string
+          
+          - name: fi_num
+            description: Fiscal Intermediary Number. Fiscal Intermediary Number in effect at the time of cost report filing.
+            data_type: string
+          
+          - name: adr_vndr_cd
+            description: Automated Desk Review Vendor Code. Vendor for Fiscal Intermediary.
+            data_type: string
+          
+          - name: fi_rcpt_dt
+            description: Fiscal Intermediary Receipt Date. Date cost report was received by Fiscal Intermediary.
+            data_type: date
+          
+          - name: util_cd
+            description: Utilization Code. Level of Medicare utilization of filed cost report.
+            data_type: string
+          
+          - name: npr_dt
+            description: Notice of Program Reimbursement Date. Date Provider received NPR.
+            data_type: date
+          
+          - name: spec_ind
+            description: Special Indicator. HCRIS code used for special purposes.
+            data_type: string
+          
+          - name: fi_creat_dt
+            description: Fiscal Intermediary Create Date. Date the FI created the HCRIS file.
+            data_type: date
+          
+          - name: prvdr_ctrl_type_cd
+            description: Provider Control Type Code. Type of ownership from Table 3A of Specifications.
+            data_type: string
+
+      - name: cms_hcris_alpha
+        description: Alpha table containing provider reported alphanumeric data
+        columns:
+          - name: rpt_rec_num
+            description: Report Record Number. HCRIS assigned cost report specific number.
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: wksht_cd
+            description: Worksheet Identifier. Valid worksheets are defined for each subsystem in other documentation.
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: line_num
+            description: Line Number. Valid Line Number defined as follows xxxyy where xxx = Line Number and yy = Sub-Line Number
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: clmn_num
+            description: Column Number. Valid Column Number defined as follows xxxyy where xxx = Column Number and yy = Sub-Column Number
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: alphnmrc_itm_txt
+            description: Alphanumeric Item Text. Provider reported alpha data.
+            data_type: string
+            tests:
+              - not_null
+
+      - name: cms_hcris_nmrc
+        description: Numeric table containing provider reported numeric data
+        columns:
+          - name: rpt_rec_num
+            description: Report Record Number. HCRIS assigned cost report specific number.
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: wksht_cd
+            description: Worksheet Identifier. Valid worksheets are defined for each subsystem in other documentation.
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: line_num
+            description: Line Number. Valid Line Number defined as follows xxxyy where xxx = Line Number and yy = Sub-Line Number
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: clmn_num
+            description: Column Number. Valid Column Number defined as follows xxxyy where xxx = Column Number and yy = Sub-Column Number
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: itm_val_num
+            description: Item Value Number. Provider reported numeric data.
+            data_type: numeric
+            tests:
+              - not_null

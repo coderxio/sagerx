@@ -6,6 +6,7 @@ from datetime import date, datetime
 from time import sleep
 
 import requests
+import cloudscraper
 from bs4 import BeautifulSoup
 import pandas as pd
 
@@ -45,11 +46,22 @@ with dag:
     def extract_load_shortage_list():
         logging.basicConfig(level=logging.INFO, format='%(asctime)s : %(levelname)s : %(message)s')
 
+        # Use cloudscraper to bypass Cloudflare protection
+        scraper = cloudscraper.create_scraper(
+            browser={
+                'browser': 'chrome',
+                'platform': 'windows',
+                'mobile': False
+            }
+        )
+        
         logging.info('Checking ASHP website for updates')
-        shortage_list = requests.get(landing_url)
+        shortage_list = scraper.get(landing_url)
 
         if shortage_list.status_code != 200:
             logging.error('ASHP website unreachable')
+            logging.error(f'Status code: {shortage_list.status_code}')
+            logging.error(f'Response: {shortage_list.text}')
             exit()
 
         ashp_drugs = []
@@ -64,7 +76,7 @@ with dag:
         available_ndcs = []
 
         for shortage in ashp_drugs:
-            shortage_detail_data = requests.get(base_url + shortage['detail_url'])
+            shortage_detail_data = scraper.get(base_url + shortage['detail_url'])
             soup = BeautifulSoup(shortage_detail_data.content, 'html.parser')
 
             # Get shortage reasons

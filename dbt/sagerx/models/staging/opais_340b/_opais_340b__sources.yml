@@ -1,0 +1,338 @@
+version: 2
+
+sources:
+  - name: opais_340b
+    schema: sagerx_lake
+    description: >
+      Data from the 340B Drug Pricing Program, which enables covered entities 
+      to purchase outpatient drugs at reduced prices. Contains information about 
+      participating healthcare organizations, their registration details, and 
+      program participation status.
+    
+    tables:
+      - name: opais_340b_covered_entities
+        description: >
+          Registry of covered entities participating in the 340B Drug Pricing Program,
+          including hospitals, federally qualified health centers, and other eligible
+          healthcare providers.
+        
+        columns:
+          - name: 340b_id
+            description: Unique identifier for covered entities in the 340B Drug Program
+            tests:
+              - unique
+              - not_null
+          
+          - name: ce_id
+            description: Sequential unique identifier for covered entities assigned by OPAIS
+            tests:
+              - unique
+              - not_null
+          
+          - name: entity_type
+            description: Hospital or non-hospital entity type code, 2-6 letters
+            tests:
+              - not_null
+          
+          - name: participating
+            description: Indicates whether covered entity is currently active in the 340B program
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [true, false]
+          
+          - name: participating_start_date
+            description: Most recent start date covered entity began participating in the 340B program
+          
+          - name: termination_date
+            description: Most recent date that covered entity was terminated from the 340B program
+          
+          - name: termination_reason
+            description: Reason covered entity was terminated from program, which can be selected from list of standard reasons
+          
+          - name: entity_name
+            description: Covered entity name
+            tests:
+              - not_null
+          
+          - name: entity_sub_division_name
+            description: Covered entity sub-division or department name
+          
+          - name: grant_number
+            description: Grant number associated with non-hospital covered entity (grantee)
+          
+          - name: site_id
+            description: An ID associated with CH and FQHCLA covered entity sites
+          
+          - name: medicare_provide_number
+            description: Six-digit number assigned to hospitals that verifies a provider has been Medicare certified
+          
+          - name: nofo_number
+            description: Notice of Funding Opportunity number associated with a grant for a Tuberculosis (TB) or Sexually Transmitted Diseases (STD) entity type
+          
+          - name: assistance_received_from_date
+            description: Date assistance was received for covered entities with Ryan White grant(s)
+          
+          - name: assistance_received_to_date
+            description: Last date assistance is available for covered entities with Ryan White grant(s)
+          
+          - name: street_address_1
+            description: Covered entity's physical street address
+          
+          - name: street_address_2
+            description: Covered entity's physical street address (continuation)
+          
+          - name: street_address_3
+            description: Covered entity's physical street address (continuation)
+          
+          - name: street_city
+            description: City associated with covered entity's physical street address
+          
+          - name: street_state
+            description: State associated with covered entity's physical street address
+          
+          - name: street_zip
+            description: Zip code associated with covered entity's physical street address
+          
+          - name: street_zip4
+            description: Zip code plus-4 associated with covered entity's physical street address
+          
+          - name: medicaid_number
+            description: Identification number of an institutional provider certified by the CMS to provide services to beneficiaries
+          
+          - name: npi
+            description: National Provider Identifier is a unique ID number for covered health care providers
+          
+          - name: billing_organization
+            description: Covered entity's billing organization name
+          
+          - name: billing_address_1
+            description: Covered entity's billing address line 1
+          
+          - name: billing_address_2
+            description: Covered entity's billing address line 2 (optional)
+          
+          - name: billing_address_3
+            description: Covered entity's billing address line 3 (optional)
+          
+          - name: billing_city
+            description: City associated with the covered entity's billing address
+          
+          - name: billing_state
+            description: State associated with the covered entity's billing address
+          
+          - name: billing_zip
+            description: Zip code associated with the covered entity's billing address
+          
+          - name: billing_zip4
+            description: Zip code plus-4 associated with the covered entity's billing address
+          
+          - name: authorizing_official_name
+            description: Name of the covered entity Authorizing Official (AO)
+          
+          - name: authorizing_official_title
+            description: Title of the covered entity Authorizing Official
+          
+          - name: authorizing_official_phone
+            description: Authorizing Official phone number
+          
+          - name: authorizing_official_phone_ext
+            description: Authorizing Official phone extension
+          
+          - name: primary_contact_name
+            description: Name of the covered entity Primary Contact (PC)
+          
+          - name: primary_contact_title
+            description: Title of the covered entity Primary Contact
+          
+          - name: primary_contact_phone
+            description: Primary Contact phone number
+          
+          - name: primary_contact_phone_ext
+            description: Primary Contact phone extension
+          
+          - name: certified_decertified_date
+            description: Covered entity recertification date or date covered entity was decertified or terminated during recertification
+          
+          - name: rural
+            description: Identifies whether the covered entity hospital is designated as rural
+          
+          - name: entry_comments
+            description: Comments entered as part of the covered entity's record
+          
+          - name: edit_date
+            description: Most recent date covered entity record was edited
+      
+      - name: opais_340b_shipping_addresses
+        description: >
+          Shipping addresses for covered entities in the 340B Drug Pricing Program.
+          Contains both street addresses and designated shipping locations for drug delivery.
+        
+        columns:
+          - name: 340b_id
+            description: Unique identifier for covered entities in the 340B Drug Program
+            tests:
+              - not_null
+              - relationships:
+                  to: source('340b_drug_program', 'covered_entities')
+                  field: 340b_id
+          
+          - name: ce_id
+            description: Sequential unique identifier for covered entities assigned by OPAIS
+            tests:
+              - not_null
+          
+          - name: entity_type
+            description: Hospital or non-hospital entity type code, 2-6 letters
+            tests:
+              - not_null
+          
+          - name: participating
+            description: Indicates whether covered entity is currently active in the 340B program
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [true, false]
+          
+          - name: participating_start_date
+            description: Most recent start date covered entity began participating in the 340B program
+          
+          - name: termination_date
+            description: Most recent date that covered entity was terminated from the 340B program
+          
+          - name: entity_name
+            description: Covered entity name
+            tests:
+              - not_null
+          
+          - name: entity_sub_division_name
+            description: Covered entity sub-division or department name
+          
+          - name: 340b_id_street_address
+            description: >
+              Field to distinguish street address vs shipping address. 
+              If the address is the covered entity Street Address, this field will be "Yes." 
+              If the address is a designated shipping address for the covered entity, this field will be "No."
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['Yes', 'No']
+          
+          - name: shipping_organization
+            description: Shipping organization name for covered entity shipping location
+          
+          - name: shipping_address_1
+            description: Shipping address line 1 for covered entity shipping location
+          
+          - name: shipping_address_2
+            description: Shipping address line 2 for covered entity shipping location
+          
+          - name: shipping_address_3
+            description: Shipping address line 3 for covered entity shipping location
+          
+          - name: shipping_city
+            description: Shipping city for covered entity shipping location
+          
+          - name: shipping_state
+            description: Shipping state for covered entity shipping location
+          
+          - name: shipping_zip
+            description: Shipping zip code for covered entity shipping location
+          
+          - name: shipping_zip4
+            description: Shipping zip code plus-4 for covered entity shipping location
+      
+      - name: opais_340b_contract_pharmacies
+        description: >
+          Contract pharmacy arrangements for covered entities in the 340B Drug Pricing Program.
+          Contains information about pharmacies contracted to dispense 340B-priced drugs on behalf
+          of covered entities, including contract dates and pharmacy location details.
+        
+        columns:
+          - name: 340b_id
+            description: Unique identifier for covered entities in the 340B Drug Program
+            tests:
+              - not_null
+              - relationships:
+                  to: source('340b_drug_program', 'covered_entities')
+                  field: 340b_id
+          
+          - name: ce_id
+            description: Sequential unique identifier for covered entities assigned by OPAIS
+            tests:
+              - not_null
+          
+          - name: entity_type
+            description: Hospital or non-hospital entity type code, 2-6 letters
+            tests:
+              - not_null
+          
+          - name: participating
+            description: Indicates whether covered entity is currently active in the 340B program
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [true, false]
+          
+          - name: participating_start_date
+            description: Most recent start date covered entity began participating in the 340B program
+          
+          - name: termination_date
+            description: Most recent date that covered entity was terminated from the 340B program
+          
+          - name: entity_name
+            description: Covered entity name
+            tests:
+              - not_null
+          
+          - name: entity_sub_division_name
+            description: Covered entity sub-division or department name
+          
+          - name: pharmacy_name
+            description: Name of pharmacy
+            tests:
+              - not_null
+          
+          - name: contract_id
+            description: Unique identifier when a pharmacy is associated with a covered entity in the 340B program
+            tests:
+              - unique
+              - not_null
+          
+          - name: pharmacy_id
+            description: Unique identifier for each pharmacy
+            tests:
+              - not_null
+          
+          - name: contract_begin_date
+            description: Date contract between covered entity and pharmacy became effective
+          
+          - name: contract_termination_date
+            description: Date contract between covered entity and pharmacy ended
+          
+          - name: pharmacy_address_1
+            description: Pharmacy address line 1
+          
+          - name: pharmacy_address_2
+            description: Pharmacy address line 2
+          
+          - name: pharmacy_address_3
+            description: Pharmacy address line 3
+          
+          - name: pharmacy_city
+            description: Pharmacy city
+          
+          - name: pharmacy_state
+            description: Pharmacy state
+          
+          - name: pharmacy_zip
+            description: Pharmacy zip code
+          
+          - name: pharmacy_zip4
+            description: Pharmacy zip code plus-4
+          
+          - name: pharmacy_phone
+            description: Pharmacy phone number
+          
+          - name: pharmacy_phone_ext
+            description: Pharmacy phone extension

@@ -19,6 +19,7 @@ starting_date = pendulum.parse("2013-12-01")
     description="DAG for downloading NADAC weekly",
     on_failure_callback=alert_slack_channel,
     max_active_runs=1,
+    catchup=False
 )
 def nadac():
 
@@ -77,7 +78,7 @@ def nadac():
             )
         )
 
-    transform_task = transform(dag_id)
+    transform_task = transform(dag_id, models_subdir=['staging', 'intermediate'])
 
     extract() >> load >> transform_task
 

@@ -79,9 +79,7 @@ total_product as (
 
 	select
 		ndc11,
-		-- NOTE: had to do this because was breaking build_marts - see #378
-		--array_product(array_agg(product)) as total_product
-		null as total_product
+		product_agg(product) as total_product
 	from inner_outer_product
 	where product > 0
 	group by ndc11

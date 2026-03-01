@@ -1,10 +1,10 @@
---Build airflow database and user
-CREATE USER airflow WITH ENCRYPTED PASSWORD 'airflow';
-CREATE DATABASE airflow;
-GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;
+-- build airflow database and user
+create user airflow with encrypted password 'airflow';
+create database airflow;
+grant all privileges on database airflow to airflow;
 
---Make foreign data wrapper to allow sagerx read access to airflow tables
-CREATE EXTENSION IF NOT EXISTS postgres_fdw;
-CREATE SERVER airflow_fdw FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'postgres', port '5432', dbname 'airflow');
-CREATE USER MAPPING FOR sagerx SERVER airflow_fdw OPTIONS (user 'airflow', password 'airflow');
-GRANT USAGE ON FOREIGN SERVER airflow_fdw TO sagerx;
+-- make foreign data wrapper to allow sagerx read access to airflow tables
+create extension if not exists postgres_fdw;
+create server airflow_fdw foreign data wrapper postgres_fdw options (host 'postgres', port '5432', dbname 'airflow');
+create user mapping for sagerx server airflow_fdw options (user 'airflow', password 'airflow');
+grant usage on foreign server airflow_fdw to sagerx;

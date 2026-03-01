@@ -1,0 +1,15 @@
+[display]
+theme = "dark"
+
+[datasources]
+auto_discover_schemas = true
+auto_discover_tables = true
+auto_discover_columns = true
+
+[datasources.sources.postgres]
+dialect = "postgresql"
+host = "postgres"
+port = 5432
+database = "sagerx"
+username = "sagerx"
+password = "sagerx"

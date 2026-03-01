@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: stg_umls__crosswalk_codes
+    description: |
+      UMLS crosswalk from MeSH to ICD9, ICD10, and SNOMED.
+
+      TODO: Make this more generic - not just MeSH but other
+      potential "from_sources".
+    columns:
+      - name: from_source
+        description: The source of the original code.
+      - name: from_code
+        description: The original code to which we want to map other codes.
+      - name: to_source
+        description: The destination source we are mapping to.
+      - name: to_code
+        description: The synonymous code we are mapping to.
+      - name: to_name
+        description: The name of the concept we are mapping to.

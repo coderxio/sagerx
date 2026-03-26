@@ -113,7 +113,7 @@ To accomplish this yourself, you need to follow these steps:
 
 If you get issues on folder permissions:
 
-`sudo chmod -R 777 postgres,data,extracts,logs,plugins`
+`sudo chmod -R 777 postgres,data,exports,extracts,logs,plugins`
 
 If you get `permission denied while trying to connect to the Docker daemon socket`, try:
 

@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: ncpdp
+    description: >
+      NCPDP terminology files from NCI EVS supporting NCPDP SCRIPT and Telecommunication Standards.
+      Includes DEA Schedule, Quantity Unit of Measure, Strength Form, Strength Unit of Measure,
+      Dose Unit of Measure, and Compound Dosage Form terminology subsets.
+
+      Source: https://evs.nci.nih.gov/ftp1/NCPDP/
+      Documentation: https://evs.nci.nih.gov/ftp1/NCPDP/About.html
+    schema: sagerx_lake
+    tables:
+      - name: ncpdp
+        description: Tab-delimited NCPDP terminology with NCIt codes and preferred terms across all subsets.

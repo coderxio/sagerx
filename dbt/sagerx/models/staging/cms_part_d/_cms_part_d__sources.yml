@@ -1,0 +1,511 @@
+version: 2
+
+sources:
+  - name: cms_part_d
+    schema: sagerx_lake
+    description: CMS Part D Prescription Drug Plan Formulary, Pharmacy Network, and Pricing Information data tables
+    tables:
+      - name: cms_plan_information
+        description: Plan information table containing contract, plan, and formulary details
+        columns:
+          - name: contract_id
+            description: "Organization contract number assigned by CMS; the first letter of CONTRACT_ID signals the type of entity: Hxxxx = Local Medicare Advantage (MA) plan, Rxxxx = Regional MA plan, Sxxxx = Stand-alone Prescription Drug Plan (PDP)"
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: plan_id
+            description: Plan identifier assigned by CMS
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: segment_id
+            description: Segment ID for local MA-PD plans assigned by CMS (zero for all other)
+            data_type: string
+          
+          - name: contract_name
+            description: Contract name
+            data_type: string
+          
+          - name: plan_name
+            description: Plan name
+            data_type: string
+          
+          - name: formulary_id
+            description: Unique Identifier assigned to formulary
+            data_type: string
+          
+          - name: premium
+            description: Monthly premium amount
+            data_type: string
+          
+          - name: deductible
+            description: Annual deductible amount
+            data_type: string
+          
+          - name: ma_region_code
+            description: Regional MA plan service area (applicable only for "R" contracts); codes are listed in "MA_REGION_CODE values" table
+            data_type: string
+          
+          - name: pdp_region_code
+            description: PDP plan service area (applicable only for "S" contracts); codes are listed in "PBP_REGION_CODE values" table
+            data_type: string
+          
+          - name: state
+            description: 2-character State code (applicable only for "H" contracts -- Local MA plans)
+            data_type: string
+          
+          - name: county_code
+            description: 5-character SSA State/County code (applicable only for "H" contracts -- Local MA plans); see Geographic Locater file
+            data_type: string
+          
+          - name: snp
+            description: "Is this a Special Needs Plan and, if so, what type? (0=Not a SNP, 1=Chronic or Disabling Condition, 2=Dual-Eligible, 3=Institutional)"
+            data_type: string
+          
+          - name: plan_suppressed_yn
+            description: Was this plan's pharmacy data suppressed?
+            data_type: string
+
+      - name: cms_pricing
+        description: Pricing file containing drug pricing information by contract, plan, and NDC
+        columns:
+          - name: contract_id
+            description: Organization contract number assigned by CMS
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: plan_id
+            description: Plan identifier assigned by CMS
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: segment_id
+            description: Segment ID for local MA-PD plans assigned by CMS (zero for all other)
+            data_type: string
+          
+          - name: ndc
+            description: 11-digit proxy National Drug Code (NDC) associated with the drug product
+            data_type: string
+          
+          - name: days_supply
+            description: "Length of days supply to which cost structure applies (30, 60, or 90)"
+            data_type: string
+          
+          - name: unit_cost
+            description: Average unit cost (e.g. per pill) for the specified days supply at in-area retail pharmacies. A pharmacy is considered in-area when it is geographically located in the plan's service area. For additional information regarding submissions of unit cost data, refer to the Pricing Data Guidelines.
+            data_type: string
+
+      - name: cms_basic_drugs_formulary
+        description: Basic drugs formulary file containing formulary drug information
+        columns:
+          - name: formulary_id
+            description: Unique ID assigned to each newly created formulary
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: formulary_version
+            description: Version ID
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: contract_year
+            description: Contract year
+            data_type: string
+          
+          - name: rxcui
+            description: RxNorm concept unique identifier
+            data_type: string
+          
+          - name: ndc
+            description: 11-digit proxy National Drug Code (NDC) associated with the drug product
+            data_type: string
+          
+          - name: tier_level_value
+            description: Cost share tier level associated with the NDC
+            data_type: string
+          
+          - name: quantity_limit_yn
+            description: Does this NDC have a quantity limit restriction?
+            data_type: string
+          
+          - name: quantity_limit_amount
+            description: Quantity limit amount associated with this NDC
+            data_type: string
+          
+          - name: quantity_limit_days
+            description: Quantity limit days associated with this NDC
+            data_type: string
+          
+          - name: prior_authorization_yn
+            description: Is prior authorization required for this NDC?
+            data_type: string
+          
+          - name: step_therapy_yn
+            description: Does step therapy apply to this NDC?
+            data_type: string
+          
+          - name: selected_drug_yn
+            description: Selected drug yes/no indicator
+            data_type: string
+
+      - name: cms_beneficiary_cost
+        description: Beneficiary cost file containing cost-sharing information by tier and coverage level
+        columns:
+          - name: contract_id
+            description: Organization contract number assigned by CMS
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: plan_id
+            description: Plan identifier assigned by CMS
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: segment_id
+            description: Segment ID for local MA-PD plans assigned by CMS (zero for all other)
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: coverage_level
+            description: Coverage level
+            data_type: number
+          
+          - name: tier
+            description: Cost share tier value
+            data_type: number
+          
+          - name: days_supply
+            description: Length of days supply to which cost structure applies
+            data_type: number
+          
+          - name: cost_type_pref
+            description: "Type of cost sharing at preferred retail pharmacies. 0=not offered, 1=copay, 2=coinsurance"
+            data_type: number
+          
+          - name: cost_amt_pref
+            description: "Amount of cost sharing at preferred retail pharmacies. If COST_TYPE_PREF=1, this field is interpreted as $$$$$cc -- for example, 2.65 is interpreted as $2.65. If COST_TYPE_PREF=2, this field is interpreted as a 2-decimal-place number -- for example, .25 is interpreted as 25%"
+            data_type: number
+          
+          - name: cost_min_amt_pref
+            description: Minimum cost sharing at preferred retail pharmacies
+            data_type: string
+          
+          - name: cost_max_amt_pref
+            description: Maximum cost sharing at preferred retail pharmacies
+            data_type: number
+          
+          - name: cost_type_nonpref
+            description: "Type of cost sharing at standard retail pharmacies. 0=not offered, 1=copay, 2=coinsurance"
+            data_type: number
+          
+          - name: cost_amt_nonpref
+            description: Amount of cost sharing at standard retail pharmacies. See description of COST_AMT_PREF
+            data_type: number
+          
+          - name: cost_min_amt_nonpref
+            description: Minimum cost sharing at standard retail pharmacies
+            data_type: string
+          
+          - name: cost_max_amt_nonpref
+            description: Maximum cost sharing at standard retail pharmacies
+            data_type: number
+          
+          - name: cost_type_mail_pref
+            description: "Type of cost sharing at preferred mail-order pharmacies. 0=not offered, 1=copay, 2=coinsurance"
+            data_type: number
+          
+          - name: cost_amt_mail_pref
+            description: Amount of cost sharing at preferred mail-order pharmacies. See description of COST_AMT_PREF
+            data_type: number
+          
+          - name: cost_min_amt_mail_pref
+            description: Minimum cost sharing at preferred mail-order pharmacies
+            data_type: string
+          
+          - name: cost_max_amt_mail_pref
+            description: Maximum cost sharing at preferred mail-order pharmacies
+            data_type: number
+          
+          - name: cost_type_mail_nonpref
+            description: "Type of cost sharing at standard mail-order pharmacies. 0=not offered, 1=copay, 2=coinsurance"
+            data_type: string
+          
+          - name: cost_amt_mail_nonpref
+            description: Amount of cost sharing at standard mail-order pharmacies. See description of COST_AMT_PREF
+            data_type: number
+          
+          - name: cost_min_amt_mail_nonpref
+            description: Minimum cost sharing at standard mail-order pharmacies
+            data_type: string
+          
+          - name: cost_max_amt_mail_nonpref
+            description: Maximum cost sharing at standard mail-order pharmacies
+            data_type: number
+          
+          - name: tier_specialty_yn
+            description: Is this tier designated as a specialty tier? Note – not all plans offer specialty tiers due to the plan benefit design. Plans are not required to designate any tiers as specialty tiers.
+            data_type: string
+          
+          - name: ded_applies_yn
+            description: Does the deductible apply to this tier?
+            data_type: string
+
+      - name: cms_excluded_drugs_formulary
+        description: Excluded drugs formulary file containing information about excluded drugs
+        columns:
+          - name: contract_id
+            description: Organization contract number assigned by CMS
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: plan_id
+            description: Plan identifier assigned by CMS
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: rxcui
+            description: RxNorm concept unique identifier
+            data_type: string
+          
+          - name: tier
+            description: Cost share tier associated with this drug product
+            data_type: string
+          
+          - name: quantity_limit_yn
+            description: "Does this RXCUI have a quantity limit restriction? 0=No, 1=Yes"
+            data_type: string
+          
+          - name: quantity_limit_amount
+            description: Quantity limit amount associated with this RXCUI
+            data_type: string
+          
+          - name: quantity_limit_days
+            description: Quantity limit days associated with this RXCUI
+            data_type: string
+          
+          - name: prior_auth_yn
+            description: Is prior authorization required for this RXCUI?
+            data_type: string
+          
+          - name: step_therapy_yn
+            description: Does step therapy apply to this RXCUI?
+            data_type: string
+          
+          - name: capped_benefit_yn
+            description: Does this RXCUI have a capped benefit restriction?
+            data_type: string
+
+      - name: cms_geographic_locator
+        description: Geographic locator file containing county and region mapping information
+        columns:
+          - name: county_code
+            description: 5-character SSA state/county code
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: statename
+            description: State name
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: county
+            description: County name
+            data_type: string
+          
+          - name: ma_region_code
+            description: Regional MA service area (applicable only for "R" contracts)
+            data_type: string
+          
+          - name: ma_region
+            description: Description of Regional MA region
+            data_type: string
+          
+          - name: pdp_region_code
+            description: Plan service area (applicable only for "S" contracts)
+            data_type: string
+          
+          - name: pdp_region
+            description: Description of PDP region
+            data_type: string
+
+      - name: cms_indication_based_coverage_formulary
+        description: Indication based coverage formulary file containing disease-specific coverage information
+        columns:
+          - name: contract_id
+            description: Organization contract number assigned by CMS
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: plan_id
+            description: Plan identifier assigned by CMS
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: rxcui
+            description: RxNorm concept unique identifier
+            data_type: string
+          
+          - name: disease
+            description: FDA-approved indication for which the RXCUI is considered on-formulary
+            data_type: string
+
+      - name: cms_insulin_beneficiary_cost
+        description: Insulin beneficiary cost file containing insulin-specific cost-sharing information
+        columns:
+          - name: contract_id
+            description: Organization contract number assigned by CMS
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: plan_id
+            description: Plan identifier assigned by CMS
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: segment_id
+            description: Segment ID for local MA-PD plans assigned by CMS (zero for all other)
+            data_type: string
+          
+          - name: tier
+            description: Cost share tier value. This field is missing for defined standard plans.
+            data_type: string
+          
+          - name: days_supply
+            description: "Length of days supply to which cost structure applies. 1=30 days, 2=90 days, 3=other, 4=60 days"
+            data_type: string
+          
+          - name: copay_amt_pref_insln
+            description: "Amount of cost sharing for insulin at preferred retail pharmacies. This field is interpreted as $$$$$cc -- for example, 2.65 is interpreted as $2.65."
+            data_type: string
+          
+          - name: copay_amt_nonpref_insln
+            description: Amount of cost sharing for insulin at standard retail pharmacies. See description of COPAY_AMT_PREF_INSLN.
+            data_type: string
+          
+          - name: copay_amt_mail_pref_insln
+            description: Amount of cost sharing for insulin at preferred mail-order pharmacies. See description of COPAY_AMT_PREF_INSLN.
+            data_type: string
+          
+          - name: copay_amt_mail_nonpref_insln
+            description: Amount of cost sharing for insulin at standard mail-order pharmacies. See description of COPAY_AMT_PREF_INSLN.
+            data_type: string
+          
+          - name: coin_amt_pref_insln
+            description: Coinsurance amount for preferred insulin
+            data_type: string
+          
+          - name: coin_amt_nonpref_insln
+            description: Coinsurance amount for non-preferred insulin
+            data_type: string
+          
+          - name: coin_amt_mail_pref_insln
+            description: Coinsurance amount for mail order preferred insulin
+            data_type: string
+          
+          - name: coin_amt_mail_nonpref_insln
+            description: Coinsurance amount for mail order non-preferred insulin
+            data_type: string
+
+      - name: cms_pharmacy_networks
+        description: Pharmacy networks file containing pharmacy network information and dispensing fees
+        columns:
+          - name: contract_id
+            description: Organization contract number assigned by CMS
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: plan_id
+            description: Plan identifier assigned by CMS
+            data_type: string
+            tests:
+              - not_null
+          
+          - name: segment_id
+            description: Segment ID for local MA-PD plans assigned by CMS (zero for all other)
+            data_type: string
+          
+          - name: pharmacy_number
+            description: "12-digit pharmacy number. 10 digit National Provider Identifier (NPI) with leading one and zero"
+            data_type: string
+          
+          - name: pharmacy_zipcode
+            description: ZIP Code for pharmacy
+            data_type: string
+          
+          - name: preferred_status_retail
+            description: Is the retail pharmacy preferred? (Y/N)
+            data_type: string
+          
+          - name: preferred_status_mail
+            description: Is the mail pharmacy preferred? (Y/N)
+            data_type: string
+          
+          - name: pharmacy_retail
+            description: Is the pharmacy a retail outlet? (Y/N)
+            data_type: string
+          
+          - name: pharmacy_mail
+            description: Is the pharmacy a mail-order outlet? (Y/N)
+            data_type: string
+          
+          - name: in_area_flag
+            description: "Pharmacy ZIP Code places it in the plan service area (1=yes)"
+            data_type: string
+          
+          - name: floor_price
+            description: Negotiated minimum price that a given pharmacy will be paid for filling a prescription
+            data_type: string
+          
+          - name: brand_dispensing_fee_30
+            description: Brand dispensing fee for a 30 day supply
+            data_type: string
+          
+          - name: brand_dispensing_fee_60
+            description: Brand dispensing fee for a 60 day supply
+            data_type: string
+          
+          - name: brand_dispensing_fee_90
+            description: Brand dispensing fee for a 90 day supply
+            data_type: string
+          
+          - name: generic_dispensing_fee_30
+            description: Generic dispensing fee for a 30 day supply
+            data_type: string
+          
+          - name: generic_dispensing_fee_60
+            description: Generic dispensing fee for a 60 day supply
+            data_type: string
+          
+          - name: generic_dispensing_fee_90
+            description: Generic dispensing fee for a 90 day supply
+            data_type: string
+          
+          - name: selected_dispensing_fee_30
+            description: Selected dispensing fee for a 30 day supply
+            data_type: string
+          
+          - name: selected_dispensing_fee_60
+            description: Selected dispensing fee for a 60 day supply
+            data_type: string
+          
+          - name: selected_dispensing_fee_90
+            description: Selected dispensing fee for a 90 day supply
+            data_type: string

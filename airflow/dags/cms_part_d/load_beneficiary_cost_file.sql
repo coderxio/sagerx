@@ -24,7 +24,7 @@ cost_amt_mail_pref  NUMERIC(14,2),
 cost_min_amt_mail_pref  VARCHAR(12),
 cost_max_amt_mail_pref  NUMERIC(14,2),
 
-cost_type_mail_nonpref   VARCHAR(1),
+cost_type_mail_nonpref   SMALLINT,
 cost_amt_mail_nonpref  NUMERIC(14,2),
 cost_min_amt_mail_nonpref  VARCHAR(12),
 cost_max_amt_mail_nonpref  NUMERIC(14,2),

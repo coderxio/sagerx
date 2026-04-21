@@ -1,7 +1,7 @@
 x-airflow-common: &airflow-common
   build:
     context: ./airflow
-  image: sagerx_airflow:v0.0.2718 # versioning allows a rebuild of docker image where necessary
+  image: sagerx_airflow:v0.0.2721 # versioning allows a rebuild of docker image where necessary
   networks:
     - airflow-dbt-network
   env_file:
@@ -47,9 +47,7 @@ services:
       - ./postgres:/docker-entrypoint-initdb.d
       - ./airflow/data:/opt/airflow/data
       - ./airflow/extracts:/opt/airflow/extracts
-    build:
-      context: .
-      shm_size: "4gb"
+    shm_size: "4gb"
 
   marimo:
     build:

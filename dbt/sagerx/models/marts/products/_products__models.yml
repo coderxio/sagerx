@@ -101,3 +101,31 @@ models:
       - name: inactive_ingredient_tty
       - name: active
       - name: prescribable
+
+  - name: products_to_pregnancy_category
+    description: |
+      Product information including name, RXCUI, and pregnancy category.
+
+      Data generally comes from RxNorm and OpenFDA.
+    columns:
+      - name: clinical_product_rxcui
+        description: >
+          Product-level RxNorm RXCUI.
+        data_tests:
+          - unique
+          - not_null    
+      - name: clinical_product_name
+        description: >
+          Product-level RxNorm RXCUI name.
+        data_tests:
+          - unique
+          - not_null 
+      - name: pregnancy_category
+        description: |
+          Pregnancy category as defined by the FDA.
+          
+          A = No risk
+          B = No risk in humans
+          C = Risk cannot be ruled out
+          D = Positive evidence of risk
+          X = Contraindicated in pregnancy
